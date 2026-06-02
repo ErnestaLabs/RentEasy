@@ -24,8 +24,9 @@ function resolveSocialAppUrl() {
   return productionSocialAppUrl;
 }
 
-const socialAppUrl = resolveSocialAppUrl();
-const socialSignupUrl = `${socialAppUrl}/auth/sign_up`;
+const appFeedUrl = '/app/feed';
+const socialAppUrl = appFeedUrl;
+const socialSignupUrl = '/signup';
 
 const navLinks = [
   { label: 'How it works', href: '#how-it-works' },
@@ -954,7 +955,7 @@ function RotatingHeroWord({ words = defaultRotatingHeroWords, intervalMs = 2000,
 function CheckItem({ children, light = false }) {
   return (
     <span className={`inline-flex items-center gap-2 text-sm ${light ? 'text-white/82' : 'text-slate-600'}`}>
-      <iconify-icon icon="solar:check-circle-linear" className={light ? 'text-[#9bd383]' : 'text-[#2f7d32]'}></iconify-icon>
+      <iconify-icon icon="solar:check-circle-linear" class={light ? 'text-[#9bd383]' : 'text-[#2f7d32]'}></iconify-icon>
       {children}
     </span>
   );
@@ -1207,7 +1208,7 @@ function InteractiveMatchCard({ canSwipe = true, onSwipeAction = () => {}, onBlo
               <p className="mt-2 text-sm leading-6 text-slate-600">{modal.text}</p>
             </div>
             <button type="button" aria-label="Keep swiping demo" onClick={() => setModal(null)} className="h-9 w-9 shrink-0 rounded-full border border-slate-200 bg-white text-slate-500">
-              <iconify-icon icon="solar:close-circle-linear" className="text-xl"></iconify-icon>
+              <iconify-icon icon="solar:close-circle-linear" class="text-xl"></iconify-icon>
             </button>
           </div>
           <div className="mt-4 flex flex-col sm:flex-row gap-2">
@@ -1253,13 +1254,13 @@ function InteractiveMatchCard({ canSwipe = true, onSwipeAction = () => {}, onBlo
             </div>
             <div className="absolute inset-x-0 bottom-5 z-20 flex items-center justify-center gap-4">
               <button type="button" aria-label="Pass" onClick={(event) => { event.stopPropagation(); swipe('pass'); }} className="h-14 w-14 rounded-full bg-white/94 backdrop-blur-sm border border-white text-[#ef4444] shadow-[0_16px_30px_-18px_rgba(0,0,0,0.55),inset_0_1px_0_white]">
-                <iconify-icon icon="solar:close-circle-bold" className="text-3xl"></iconify-icon>
+                <iconify-icon icon="solar:close-circle-bold" class="text-3xl"></iconify-icon>
               </button>
               <button type="button" aria-label="Superlike" onClick={(event) => { event.stopPropagation(); swipe('superlike'); }} className="h-16 w-16 rounded-full bg-[#092243]/96 backdrop-blur-sm border border-white/20 text-white shadow-[0_18px_34px_-18px_rgba(0,0,0,0.62),inset_0_1px_0_rgba(255,255,255,0.2)]">
-                <iconify-icon icon="solar:star-bold" className="text-3xl"></iconify-icon>
+                <iconify-icon icon="solar:star-bold" class="text-3xl"></iconify-icon>
               </button>
               <button type="button" aria-label="Like" onClick={(event) => { event.stopPropagation(); swipe('like'); }} className="h-14 w-14 rounded-full bg-[#2f7d32]/96 backdrop-blur-sm border border-white/20 text-white shadow-[0_16px_30px_-18px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(255,255,255,0.25)]">
-                <iconify-icon icon="solar:heart-bold" className="text-3xl"></iconify-icon>
+                <iconify-icon icon="solar:heart-bold" class="text-3xl"></iconify-icon>
               </button>
             </div>
           </article>
@@ -1606,13 +1607,40 @@ function getRoleMarketLanes(role) {
 }
 
 function SignupBridge() {
-  const [name, setName] = useStoredState('renteazy-waitlist-name', '');
-  const [email, setEmail] = useStoredState('renteazy-waitlist-email', '');
-  const [joined, setJoined] = useStoredState('renteazy-waitlist-joined', false);
+  const [mode, setMode] = useState('register');
+  const [name, setName] = useStoredState('renteazy-signup-name', '');
+  const [email, setEmail] = useStoredState('renteazy-signup-email', '');
+  const [password, setPassword] = useState('');
+  const [role, setRole] = useStoredState('renteazy-signup-role', 'Tenant');
+  const [status, setStatus] = useState('idle');
+  const [error, setError] = useState('');
 
-  const submit = (event) => {
+  const submit = async (event) => {
     event.preventDefault();
-    setJoined(true);
+    setStatus('submitting');
+    setError('');
+
+    try {
+      const path = mode === 'register' ? '/api/auth/register' : '/api/auth/login';
+      const response = await apiRequest(path, {
+        method: 'POST',
+        body: mode === 'register' ? { name, email, password, role } : { email, password },
+      });
+      if (response.token) {
+        window.localStorage.setItem('renteazy-api-token', JSON.stringify(response.token));
+      }
+      if (response.state?.profile) {
+        window.localStorage.setItem('renteazy-app-profile', JSON.stringify(response.state.profile));
+      }
+      window.location.assign(appFeedUrl);
+    } catch (authError) {
+      setStatus('idle');
+      setError(authError.data?.error === 'email_exists'
+        ? 'That email already has a RentEazy account. Sign in instead.'
+        : authError.data?.error === 'invalid_login'
+          ? 'Email or password is not right.'
+          : 'Enter a valid email and a password with at least 8 characters.');
+    }
   };
 
   return (
@@ -1625,35 +1653,50 @@ function SignupBridge() {
             <h1 className="mt-4 text-4xl font-normal tracking-tight text-slate-950 md:text-6xl">Join RentEazy and start with the Free Feed.</h1>
             <p className="mt-5 max-w-xl text-base leading-8 text-slate-600">Create your account, post what you need, browse what people have, and start using RentEazy today.</p>
             <div className="mt-6 rounded-3xl border border-[#d5ecd7] bg-[#edf8ee] p-5 text-sm leading-7 text-[#215d27]">
-              After you create your account, your demo offer unlocks RentEazy Match free for 24 hours.
+              After signup you land straight in the Feed with free posting, daily swipes, Share Everywhere, and basic matching.
             </div>
           </div>
           <div className="rounded-4xl border border-white bg-white/82 p-6 shadow-[0_24px_60px_-38px_rgba(15,23,42,0.45),inset_0_1px_0_white]">
-            {joined ? (
-              <div>
-                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#edf8ee] text-[#2f7d32]">
-                  <Check className="h-6 w-6" />
-                </div>
-                <h2 className="mt-5 text-2xl font-normal tracking-tight text-slate-950">Next: create your account.</h2>
-                <p className="mt-3 text-sm leading-7 text-slate-600">We saved your details on this device. Finish signup in RentEazy, then use the Feed, create a post, and try Share Everywhere.</p>
-                <a href={socialSignupUrl} className="mt-6 inline-flex w-full items-center justify-center rounded-full bg-[#2f7d32] px-5 py-3 text-sm text-white">Create RentEazy account</a>
-                <a href={socialAppUrl} className="mt-3 inline-flex w-full items-center justify-center rounded-full border border-slate-200 bg-white px-5 py-3 text-sm text-slate-600">Browse Feed first</a>
+            <form onSubmit={submit}>
+              <div className="grid grid-cols-2 rounded-full bg-slate-100 p-1 text-sm">
+                {[
+                  ['register', 'Create account'],
+                  ['login', 'Sign in'],
+                ].map(([value, label]) => (
+                  <button key={value} type="button" onClick={() => { setMode(value); setError(''); }} className={`rounded-full px-4 py-2 ${mode === value ? 'bg-white text-slate-950 shadow-sm' : 'text-slate-500'}`}>
+                    {label}
+                  </button>
+                ))}
               </div>
-            ) : (
-              <form onSubmit={submit}>
-                <h2 className="text-2xl font-normal tracking-tight text-slate-950">Create your free account</h2>
-                <label className="mt-6 block text-sm text-slate-600">
+              <h2 className="mt-6 text-2xl font-normal tracking-tight text-slate-950">{mode === 'register' ? 'Create your free account' : 'Sign in to RentEazy'}</h2>
+              {mode === 'register' && (
+                <>
+                  <label className="mt-6 block text-sm text-slate-600">
                   Name
-                  <input value={name} onChange={(event) => setName(event.target.value)} required className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-950 outline-hidden focus:border-[#2f7d32]" placeholder="Your name" />
-                </label>
-                <label className="mt-4 block text-sm text-slate-600">
-                  Email
-                  <input value={email} onChange={(event) => setEmail(event.target.value)} required type="email" className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-950 outline-hidden focus:border-[#2f7d32]" placeholder="you@example.com" />
-                </label>
-                <button className="mt-6 inline-flex w-full items-center justify-center rounded-full bg-[#2f7d32] px-5 py-3 text-sm text-white">Continue to signup</button>
-                <a href={socialSignupUrl} className="mt-3 inline-flex w-full items-center justify-center rounded-full border border-slate-200 bg-white px-5 py-3 text-sm text-slate-600">Create directly in RentEazy</a>
-              </form>
-            )}
+                    <input value={name} onChange={(event) => setName(event.target.value)} required className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-950 outline-hidden focus:border-[#2f7d32]" placeholder="Your name" />
+                  </label>
+                  <label className="mt-4 block text-sm text-slate-600">
+                    What brings you to RentEazy?
+                    <select value={role} onChange={(event) => setRole(event.target.value)} className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-950 outline-hidden focus:border-[#2f7d32]">
+                      {roleOptions.map((option) => <option key={option}>{option}</option>)}
+                    </select>
+                  </label>
+                </>
+              )}
+              <label className={mode === 'register' ? 'mt-4 block text-sm text-slate-600' : 'mt-6 block text-sm text-slate-600'}>
+                Email
+                <input value={email} onChange={(event) => setEmail(event.target.value)} required type="email" className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-950 outline-hidden focus:border-[#2f7d32]" placeholder="you@example.com" />
+              </label>
+              <label className="mt-4 block text-sm text-slate-600">
+                Password
+                <input value={password} onChange={(event) => setPassword(event.target.value)} required minLength={8} type="password" className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-950 outline-hidden focus:border-[#2f7d32]" placeholder="At least 8 characters" />
+              </label>
+              {error && <p className="mt-4 rounded-2xl border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p>}
+              <button disabled={status === 'submitting'} className="mt-6 inline-flex w-full items-center justify-center rounded-full bg-[#2f7d32] px-5 py-3 text-sm text-white disabled:opacity-60">
+                {status === 'submitting' ? 'Opening RentEazy...' : mode === 'register' ? 'Create account and open Feed' : 'Sign in and open Feed'}
+              </button>
+              <a href={appFeedUrl} className="mt-3 inline-flex w-full items-center justify-center rounded-full border border-slate-200 bg-white px-5 py-3 text-sm text-slate-600">Browse demo Feed first</a>
+            </form>
           </div>
         </div>
       </div>
@@ -2945,13 +2988,13 @@ export default function App() {
               <div className="mt-10 lg:mt-6 xl:mt-8 flex flex-col items-center lg:items-start gap-3">
                 <a href="/signup?source=hero_primary&offer=match24h" className="inline-flex items-center justify-center gap-2.5 rounded-full px-8 py-4 bg-linear-to-b from-[#52a832] to-[#2f7d32] border border-[#25672a] text-white text-base font-medium shadow-[0_12px_28px_rgba(47,125,50,0.3),inset_0_1px_0_rgba(255,255,255,0.35)] transition-all duration-200 hover:shadow-[0_16px_36px_rgba(47,125,50,0.44)] hover:from-[#64bd44] hover:to-[#3b8d3d] active:scale-95">
                   Start Matching — it's free
-                  <iconify-icon icon="solar:arrow-right-linear" className="text-xl"></iconify-icon>
+                  <iconify-icon icon="solar:arrow-right-linear" class="text-xl"></iconify-icon>
                 </a>
                 <p className="text-xs text-slate-400 font-light">No card required · Profile ready in 2 minutes · Upgrade anytime</p>
                 <div className="mt-1 flex items-center gap-5 text-sm text-slate-500">
-                  <a href={socialAppUrl} className="inline-flex items-center gap-1.5 hover:text-[#2f7d32] transition-colors duration-200"><iconify-icon icon="solar:feed-linear" className="text-base text-[#2670a8]"></iconify-icon>Browse Feed</a>
+                  <a href={socialAppUrl} className="inline-flex items-center gap-1.5 hover:text-[#2f7d32] transition-colors duration-200"><iconify-icon icon="solar:feed-linear" class="text-base text-[#2670a8]"></iconify-icon>Browse Feed</a>
                   <span className="w-px h-4 bg-slate-200" aria-hidden="true"></span>
-                  <a href={socialSignupUrl} className="inline-flex items-center gap-1.5 hover:text-[#2f7d32] transition-colors duration-200"><iconify-icon icon="solar:add-square-linear" className="text-base text-[#2f7d32]"></iconify-icon>List a Property</a>
+                  <a href={socialSignupUrl} className="inline-flex items-center gap-1.5 hover:text-[#2f7d32] transition-colors duration-200"><iconify-icon icon="solar:add-square-linear" class="text-base text-[#2f7d32]"></iconify-icon>List a Property</a>
                 </div>
                 <a href="#why-switch" className="mt-2 inline-flex items-center gap-1 text-xs text-slate-400 hover:text-[#2f7d32] transition-colors duration-200">
                   <iconify-icon icon="solar:arrow-down-linear" class="text-xs"></iconify-icon>
@@ -3669,7 +3712,7 @@ export default function App() {
               </div>
               <div className="grid sm:grid-cols-2 gap-4">
                 {conciergeFeatures.map((item) => (
-                  <div key={item} className="rounded-2xl bg-white/[0.07] border border-white/10 p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]"><iconify-icon icon="solar:check-circle-linear" className="text-2xl text-[#9bd383]"></iconify-icon><p className="mt-4 text-sm text-white/82">{item}</p></div>
+                  <div key={item} className="rounded-2xl bg-white/[0.07] border border-white/10 p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]"><iconify-icon icon="solar:check-circle-linear" class="text-2xl text-[#9bd383]"></iconify-icon><p className="mt-4 text-sm text-white/82">{item}</p></div>
                 ))}
               </div>
             </div>
@@ -3685,7 +3728,7 @@ export default function App() {
           <div className="space-y-4">
             {faqs.map((faq) => (
               <details key={faq.q} className="group rounded-4xl bg-white/72 border border-white shadow-[0_14px_34px_-26px_rgba(15,23,42,0.32),inset_0_1px_0_white] overflow-hidden open:bg-white/90 transition-all">
-                <summary className="cursor-pointer list-none px-5 md:px-6 py-5 flex items-center justify-between gap-5 outline-hidden"><div className="flex items-center gap-4"><div className="w-10 h-10 shrink-0 rounded-2xl bg-[#edf7ff] border border-[#cde7f8] flex items-center justify-center"><iconify-icon icon={faq.icon} className="text-xl text-[#2670a8]"></iconify-icon></div><h3 className="text-base md:text-lg font-normal tracking-tight text-slate-950">{faq.q}</h3></div><div className="w-9 h-9 shrink-0 rounded-full bg-linear-to-b from-white to-slate-50 border border-slate-200 flex items-center justify-center"><iconify-icon icon="solar:add-circle-linear" className="text-xl text-slate-500 group-open:rotate-45 transition-transform"></iconify-icon></div></summary>
+                <summary className="cursor-pointer list-none px-5 md:px-6 py-5 flex items-center justify-between gap-5 outline-hidden"><div className="flex items-center gap-4"><div className="w-10 h-10 shrink-0 rounded-2xl bg-[#edf7ff] border border-[#cde7f8] flex items-center justify-center"><iconify-icon icon={faq.icon} class="text-xl text-[#2670a8]"></iconify-icon></div><h3 className="text-base md:text-lg font-normal tracking-tight text-slate-950">{faq.q}</h3></div><div className="w-9 h-9 shrink-0 rounded-full bg-linear-to-b from-white to-slate-50 border border-slate-200 flex items-center justify-center"><iconify-icon icon="solar:add-circle-linear" class="text-xl text-slate-500 group-open:rotate-45 transition-transform"></iconify-icon></div></summary>
                 <div className="px-5 md:px-6 pb-6 md:pl-23"><p className="text-sm md:text-base leading-7 text-slate-600 font-light">{faq.a}</p></div>
               </details>
             ))}
@@ -3730,7 +3773,7 @@ export default function App() {
               <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-3">
                 <a href="/signup?source=final_cta&offer=match24h" className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-full px-8 py-4 bg-linear-to-b from-[#52a832] to-[#2f7d32] border border-[#74c656]/30 text-white text-base font-medium shadow-[0_12px_32px_rgba(82,168,50,0.36)] transition-all duration-200 hover:from-[#64bd44] hover:to-[#3b8d3d] hover:shadow-[0_16px_40px_rgba(82,168,50,0.48)]">
                   Start free — no card required
-                  <iconify-icon icon="solar:arrow-right-linear" className="text-xl"></iconify-icon>
+                  <iconify-icon icon="solar:arrow-right-linear" class="text-xl"></iconify-icon>
                 </a>
                 <a href={socialAppUrl} className="w-full sm:w-auto inline-flex items-center justify-center rounded-full px-7 py-4 bg-white/10 border border-white/18 text-white/78 text-sm font-normal transition-all duration-200 hover:bg-white/18 hover:text-white">Browse Free Feed first</a>
               </div>
