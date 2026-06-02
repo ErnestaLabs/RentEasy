@@ -1,0 +1,206 @@
+@import 'tailwindcss';
+
+/* Display typeface for headings — Bricolage Grotesque gives RentEazy a
+   distinctive, warm, trustworthy voice instead of generic Inter headlines.
+   Body copy stays Inter. Applied at the element level so it cascades to
+   every h1/h2/h3 without touching individual components. */
+@theme {
+  --font-display: 'Bricolage Grotesque Variable', 'Inter', system-ui, sans-serif;
+}
+
+@layer base {
+  h1, h2, h3 {
+    font-family: var(--font-display);
+    letter-spacing: -0.02em;
+  }
+}
+
+/*
+  The default border color has changed to `currentcolor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentcolor);
+  }
+}
+
+@utility hero-headline {
+  font-size: clamp(3.05rem, 9.5vw, 3.55rem);
+
+  @media (min-width: 768px) {
+    font-size: 5rem;
+  }
+
+  @media (min-width: 1024px) {
+    font-size: 6rem;
+  }
+
+  @media (max-width: 420px) {
+    font-size: clamp(2.45rem, 11vw, 3rem);
+  }
+}
+
+@utility hero-headline-pill {
+  max-width: 100%;
+  white-space: nowrap;
+
+  @media (max-width: 420px) {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+}
+
+@utility hero-rotating-word {
+  animation: heroWordSwitch 0.48s cubic-bezier(0.22, 1, 0.36, 1) both;
+  will-change: opacity, transform;
+}
+
+@utility hero-swipe-card {
+  touch-action: pan-y;
+  user-select: none;
+  transition: transform 180ms cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+}
+
+@utility hero-phone-mockup {
+  width: 266px;
+  height: 561px;
+  transform: scale(0.64) !important;
+  transform-origin: top center !important;
+
+  @media (min-width: 640px) {
+    width: 296px;
+    height: 622px;
+    transform: scale(0.71) !important;
+  }
+
+  @media (min-width: 1024px) {
+    width: 292px;
+    height: 613px;
+    transform: scale(0.7) !important;
+  }
+
+  @media (min-width: 1280px) {
+    width: 309px;
+    height: 648px;
+    transform: scale(0.74) !important;
+  }
+}
+
+@utility rent-eazy-float-bubble {
+  animation: float 6s ease-in-out infinite;
+  &:nth-child(2) {
+    animation-delay: -1.5s;
+    animation-duration: 7s;
+  }
+  &:nth-child(3) {
+    animation-delay: -3s;
+    animation-duration: 6.5s;
+  }
+  &:nth-child(4) {
+    animation-delay: -4.5s;
+    animation-duration: 8s;
+  }
+}
+
+@layer utilities {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+@keyframes heroWordSwitch {
+  0% {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateY(0.08em);
+  }
+  100% {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateY(0);
+  }
+}
+
+@keyframes float {
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+@keyframes rentEazyFinalFloatOne {
+  0%, 100% {
+    transform: translateY(0) rotate(-5deg);
+  }
+  50% {
+    transform: translateY(-15px) rotate(-3deg);
+  }
+}
+
+@keyframes rentEazyFinalFloatTwo {
+  0%, 100% {
+    transform: translateY(0) rotate(5deg);
+  }
+  50% {
+    transform: translateY(-12px) rotate(3deg);
+  }
+}
+
+@keyframes hero-pill-shimmer {
+  0%, 100% {
+    background-position: 200% center;
+  }
+  50% {
+    background-position: -200% center;
+  }
+}
+
+.hero-pill-shimmer::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.22) 50%, transparent 60%);
+  background-size: 200% auto;
+  animation: hero-pill-shimmer 3.5s ease-in-out infinite;
+  pointer-events: none;
+}
+
+details > summary {
+  list-style: none;
+}
+details > summary::-webkit-details-marker {
+  display: none;
+}
+
+/* Respect the OS "reduce motion" setting. Disables the marquees, ping dots,
+   bounce, float bubbles, and shimmer for users with vestibular sensitivity.
+   Framer Motion's JS reveals are handled separately via MotionConfig
+   reducedMotion="user" in main.jsx. */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
