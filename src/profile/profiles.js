@@ -21,7 +21,7 @@ export const PROFILES = {
     hero: {
       eyebrow: 'FOR RENTERS & HOUSE BUDDIES',
       rotating: ['room', 'flat', 'home', 'studio', 'house', 'buddy', 'share', 'match'],
-      heroShort: 'Stop applying to listings. Start matching with homes — and people — that already want you.',
+      heroShort: 'Stop shouting into the void. Match first — then only talk to people who already want you. Free to post, free to swipe — no premium wall.',
       sub: 'Searching is exhausting — applications ignored, viewings gone before you can book. RentEazy flips it: swipe homes scored to your brief, and match when the landlord or agent likes you back. No more shouting into the void.',
       cta: 'Start matching — it’s free',
       ctaHref: '/signup?source=hero_tenant&profile=tenant&offer=match24h',
@@ -50,7 +50,7 @@ export const PROFILES = {
       // What a LANDLORD matches with — a tenant who likes them back. Never
       // 'buddy'/'agent' (tenant-side words that read as a cross-wired bug).
       rotating: ['tenant', 'renter', 'professional', 'household', 'resident', 'match'],
-      heroShort: 'Stop sifting through enquiries. Start matching with tenants who already fit — budget and move date set.',
+      heroShort: 'See tenants who already want your property — budgets and move dates set. You choose who gets the keys, not whoever shouted loudest.',
       sub: 'Every empty week costs you — and the wrong tenant costs more. See people who already match your property, with budgets and move dates set, and fill the void with someone you trust, not whoever messaged first.',
       cta: 'List your property — free',
       ctaHref: '/signup?source=hero_landlord&profile=landlord&offer=match24h',
@@ -75,7 +75,7 @@ export const PROFILES = {
     hero: {
       eyebrow: 'FOR OPERATORS, INVESTORS & SOURCERS',
       rotating: ['deal', 'sourcer', 'operator', 'opportunity', 'match'],
-      heroShort: 'Stop chasing stale deals in WhatsApp. Start matching with credible sourcers and deals by strategy.',
+      heroShort: 'See the track record before the deal — not after you’ve been burned. Match with sourcers and deals by strategy.',
       sub: 'Stop chasing stale deals in WhatsApp groups. Match by strategy with sourcers and operators in a market that remembers who actually delivers — and see the numbers before the deal hits the portals.',
       cta: 'Build your investor profile — free',
       ctaHref: '/signup?source=hero_investor&profile=investor&offer=match24h',

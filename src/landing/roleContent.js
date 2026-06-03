@@ -19,9 +19,9 @@ export const ROLE_CONTENT = {
     },
     dream: {
       heading: 'Imagine opening an app to three places that actually fit.',
-      sub: 'The landlord already knows you’re serious. You already know the place suits you. One viewing. You like it, they like you, you take it. That’s matching.',
+      sub: 'The landlord already knows you’re serious. You already know the place suits you. One viewing. You like it, they like you, you take it. That’s matching — direct, with no chasing someone who never calls back.',
     },
-    mechanism: ['Create your free profile — 2 minutes', 'Swipe scored homes that fit your brief', 'Match when both sides like → viewing flow begins'],
+    mechanism: ['Create your free profile — no premium wall, and your reputation travels with you', 'Swipe scored homes that fit your brief', 'Match when both sides like → viewing flow begins'],
     proof: 'stats',
     cta: 'Start matching — it’s free',
     ctaHref: '/signup?source=gen_tenant&profile=tenant',
@@ -41,7 +41,7 @@ export const ROLE_CONTENT = {
     },
     dream: {
       heading: 'See the tenant before you ever pick up the phone.',
-      sub: 'Budget set. Move date set. Genuinely interested in your property. You match with people you’d actually want — and fill the void with confidence, not a leap of faith.',
+      sub: 'Budget set. Move date set. Genuinely interested in your property. You match with people you’d actually want — and you choose who gets the keys, not whoever shouted loudest first.',
     },
     mechanism: ['List your property — free', 'Receive matched tenants with budgets & move dates set', 'Match → meet the right person → fill faster'],
     proof: 'stats',
@@ -55,7 +55,7 @@ export const ROLE_CONTENT = {
     hero: {
       fast_match: { headline: 'Deals matched by strategy — before the portals.', sub: 'Off-market opportunities and credible sourcers, matched to your criteria.' },
       deep_explain: { headline: 'See the numbers before the deal hits Rightmove.', sub: 'Match by strategy with sourcers and operators in a market that remembers who actually delivers.' },
-      social_proof: { headline: 'The deals never hit the portals. See them first.', sub: 'Match by strategy with compliance-checked sourcers. Reputation and track record on every profile.' },
+      social_proof: { headline: 'The deals never hit the portals. See them first.', sub: 'Match by strategy with sourcers whose reputation and track record sit on every profile — see who delivers before you commit.' },
     },
     problem: {
       heading: 'The best deals never reach the portals.',
@@ -63,7 +63,7 @@ export const ROLE_CONTENT = {
     },
     dream: {
       heading: 'Deal flow that finds you — by strategy, with the numbers attached.',
-      sub: 'BTL, HMO, SA — matched to your criteria, with credible, compliance-checked sourcers and operators whose track record is visible before you ever message.',
+      sub: 'BTL, HMO, SA — matched to your criteria, with sourcers and operators whose track record and reputation are visible before you ever message. See who actually delivers — before you’re the one who got burned.',
     },
     mechanism: ['Set your criteria & strategy — free', 'Discover matched deals and credible sourcers', 'Build relationships with people who deliver'],
     proof: 'stats',
