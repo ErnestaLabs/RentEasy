@@ -295,6 +295,21 @@ const matchTypes = [
   'Investor ↔ Opportunity',
 ];
 
+// Icon + colour per role so every match-type pair renders as a real visual,
+// not an empty text pill.
+const matchRoleIcon = {
+  Tenant: ['solar:user-rounded-bold', '#93c5fd'],
+  Property: ['solar:home-smile-bold', '#9bd383'],
+  Buddy: ['solar:users-group-rounded-bold', '#93c5fd'],
+  'Short-Term Stay': ['solar:bed-bold', '#5bc4ff'],
+  Landlord: ['solar:key-bold', '#fbbf24'],
+  Agent: ['solar:buildings-bold', '#9bd383'],
+  Operator: ['solar:case-round-bold', '#9bd383'],
+  Sourcer: ['solar:magnifer-bold', '#93c5fd'],
+  Investor: ['solar:graph-up-bold', '#9bd383'],
+  Opportunity: ['solar:buildings-2-bold', '#5bc4ff'],
+};
+
 const paidMechanics = [
   {
     title: 'Boost',
@@ -2494,7 +2509,7 @@ function ClerkBillingSurface() {
       <div className="rounded-[1.75rem] border border-[#d5ecd7] bg-[#edf8ee] p-5 text-[#215d27]">
         <p className="font-['JetBrains_Mono',monospace] text-xs">BILLING</p>
         <h2 className="mt-2 text-2xl font-normal tracking-tight text-slate-950">Sign in to manage plans.</h2>
-        <p className="mt-2 text-sm leading-6">Plans, seats, upgrades, and billing are handled through Clerk.</p>
+        <p className="mt-2 text-sm leading-6">Plans, seats, upgrades, and billing are handled securely inside your RentEazy account.</p>
         <SignInButton mode="modal" fallbackRedirectUrl="/app/billing">
           <button type="button" className="mt-4 inline-flex w-full items-center justify-center rounded-full bg-[#2f7d32] px-5 py-3 text-sm text-white">Sign in</button>
         </SignInButton>
@@ -2533,9 +2548,9 @@ function BillingPanel({ onSelectProduct, purchases, boosts, wallet }) {
         <ClerkBillingSurface />
       ) : (
         <div className="rounded-[1.75rem] border border-[#fed7aa] bg-[#fff7ed] p-5 text-[#9a3412]">
-          <p className="font-['JetBrains_Mono',monospace] text-xs">CLERK NOT CONFIGURED</p>
-          <h2 className="mt-2 text-2xl font-normal tracking-tight text-slate-950">Set VITE_CLERK_PUBLISHABLE_KEY to enable Clerk billing.</h2>
-          <p className="mt-2 text-sm leading-6">The local mini shop remains available for development until Clerk keys and billing products are configured.</p>
+          <p className="font-['JetBrains_Mono',monospace] text-xs">BILLING SETUP</p>
+          <h2 className="mt-2 text-2xl font-normal tracking-tight text-slate-950">Billing is ready to connect.</h2>
+          <p className="mt-2 text-sm leading-6">Add the account and billing keys for launch. The local mini shop remains available for development until live billing products are configured.</p>
         </div>
       )}
       <MiniShopPanel onSelectProduct={onSelectProduct} />
@@ -2563,7 +2578,7 @@ function MicroUpsellModal({ product, onClose, onConfirm, billingEnabled = false 
           <p className="mt-2 text-xs leading-5 text-slate-500">Costs are shown plainly and not hidden behind credits.</p>
         </div>
         {billingEnabled ? (
-          <a href={`/app/billing?sku=${encodeURIComponent(product.sku)}`} className="mt-5 inline-flex w-full items-center justify-center rounded-full bg-[#2f7d32] px-5 py-3 text-sm text-white">Open Clerk billing</a>
+          <a href={`/app/billing?sku=${encodeURIComponent(product.sku)}`} className="mt-5 inline-flex w-full items-center justify-center rounded-full bg-[#2f7d32] px-5 py-3 text-sm text-white">Open billing</a>
         ) : (
           <button type="button" onClick={() => onConfirm(product)} className="mt-5 inline-flex w-full items-center justify-center rounded-full bg-[#2f7d32] px-5 py-3 text-sm text-white">Add to local account</button>
         )}
@@ -3908,7 +3923,9 @@ export default function App() {
                   <div className="relative flex items-center gap-3">
                     <div className="flex -space-x-3">
                       <img src="/images/match-tenant.jpg" alt="Tenant" className="h-10 w-10 rounded-full border-2 border-[#06231a] object-cover" loading="lazy" />
-                      <img src="/images/match-flat.jpg" alt="Home" className="h-10 w-10 rounded-full border-2 border-[#06231a] object-cover" loading="lazy" />
+                      <span className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-[#06231a] bg-linear-to-br from-[#2670a8] to-[#1e3a8a]">
+                        <iconify-icon icon="solar:home-smile-bold" class="text-lg text-white"></iconify-icon>
+                      </span>
                     </div>
                     <span className="flex h-7 w-7 items-center justify-center rounded-full bg-linear-to-br from-[#52a832] to-[#2f7d32] text-sm font-bold text-white shadow-lg">✓</span>
                     <p className="font-['JetBrains_Mono',monospace] text-[10px] tracking-[0.12em] text-[#9bd383]">MUTUAL MATCH</p>
@@ -3932,10 +3949,26 @@ export default function App() {
                   </div>
                 </div>
 
-                {/* Match types — dark glass pills */}
-                <Marquee speed={30} className="-mx-4 mt-1 overflow-visible">
-                  {matchTypes.map((type) => <span key={type} className="shrink-0 rounded-full bg-white/[0.06] border border-white/12 px-3.5 py-1.5 text-xs text-white/70 backdrop-blur-sm">{type}</span>)}
-                </Marquee>
+              </div>
+            </div>
+
+            {/* Full-width: every match type as a real visual pair, not a text pill */}
+            <div className="border-t border-white/10 px-8 md:px-12 lg:px-16 py-9">
+              <p className="font-['JetBrains_Mono',monospace] text-[10px] tracking-[0.14em] text-[#b8ddf4] mb-5">{matchTypes.length} WAYS TO MATCH</p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                {matchTypes.map((mt) => {
+                  const [a, b] = mt.split(' ↔ ');
+                  const [ia, ca] = matchRoleIcon[a] || ['solar:user-rounded-bold', '#93c5fd'];
+                  const [ib, cb] = matchRoleIcon[b] || ['solar:home-smile-bold', '#9bd383'];
+                  return (
+                    <div key={mt} className="flex items-center gap-2.5 rounded-2xl bg-white/[0.05] border border-white/10 px-3.5 py-3 transition-colors hover:bg-white/[0.08]">
+                      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white/[0.08]"><iconify-icon icon={ia} style={{ color: ca }} class="text-lg"></iconify-icon></span>
+                      <iconify-icon icon="solar:arrow-right-linear" class="shrink-0 text-xs text-white/30"></iconify-icon>
+                      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white/[0.08]"><iconify-icon icon={ib} style={{ color: cb }} class="text-lg"></iconify-icon></span>
+                      <span className="ml-1 min-w-0 text-xs leading-tight text-white/75">{a} <span className="text-white/35">↔</span> {b}</span>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </div>
