@@ -16,6 +16,7 @@ export const SECTION_POOL = [
   'hero',
   'problem',
   'dream',
+  'vsl',
   'how_it_works',
   'featured_listings_preview',
   'trust_and_safety',
@@ -24,7 +25,7 @@ export const SECTION_POOL = [
   'final_cta',
 ];
 
-const FULL_ARC = ['hero', 'problem', 'dream', 'how_it_works', 'trust_and_safety', 'social_proof', 'pricing_or_value', 'final_cta'];
+const FULL_ARC = ['hero', 'problem', 'dream', 'vsl', 'how_it_works', 'featured_listings_preview', 'trust_and_safety', 'social_proof', 'pricing_or_value', 'final_cta'];
 
 const DEFAULT_FEATURE_CARDS = [
   { id: 'mutual', title: 'Mutual Match', description: 'Both sides like before anyone wastes a viewing.', priority: 1, visible: true },

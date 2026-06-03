@@ -10,6 +10,7 @@ import RentEazyVoiceAgent from '@/components/voice/RentEazyVoiceAgent';
 import ProfileChooser from '@/profile/ProfileChooser';
 import { useProfile } from '@/profile/useProfile';
 import { getProfile } from '@/profile/profiles';
+import RoleStory from '@/landing/RoleStory';
 import { buildRentEazyFeed, createFeedSignal, createFeedCardSchema } from '@/lib/feedEngine';
 // Code-split the VSL: Remotion is ~400KB and sits below the fold, so it must
 // not block the hero paint. Loads lazily when the user scrolls toward it.
@@ -3842,7 +3843,7 @@ function AppHeroPanel({ profile, usageLimit, posts, shares, onPost }) {
           <div className="absolute inset-0 bg-linear-to-t from-[#06182f]/78 via-[#06182f]/12 to-transparent" />
           <div className="absolute bottom-4 left-4 right-4 rounded-3xl bg-white/92 p-4 text-[#092243] shadow-[0_18px_40px_-28px_rgba(0,0,0,0.8)]">
             <p className="text-xs font-semibold text-[#2f7d32]">{topPost?.postType || 'Feed'}</p>
-            <p className="mt-1 line-clamp-2 text-sm font-semibold">{topPost?.title || 'Your Feed is ready'}</p>
+            <p className="mt-1 line-clamp-2 text-sm font-semibold">{topPost?.title || 'Fresh market signal'}</p>
             <p className="mt-1 text-xs text-slate-500">{topPost?.area || 'RentEazy network'}</p>
           </div>
         </div>
@@ -4408,8 +4409,8 @@ function FeedPostCard({ post, ranking, card, streamId, liked, saved, followed, c
           <h2 className="text-3xl font-normal tracking-tight">{post.title}</h2>
           <p className="mt-2 text-sm text-white/78">{schema.standout}</p>
           <div className="mt-4 grid grid-cols-[1fr_1fr] gap-3">
-            <button type="button" onClick={() => onPass?.(post, actionSpeedMs())} className="rounded-full border border-white/20 bg-white/12 px-5 py-3 text-sm font-semibold text-white backdrop-blur active:scale-[0.98]">Pass</button>
-            <button type="button" onClick={() => onMatch?.(post, actionSpeedMs())} className="rounded-full bg-[#8bdc65] px-5 py-3 text-sm font-semibold text-[#092243] shadow-[0_16px_30px_-20px_rgba(139,220,101,0.8)] active:scale-[0.98]">Match</button>
+            <button type="button" data-feed-action="pass" onClick={() => onPass?.(post, actionSpeedMs())} className="rounded-full border border-white/20 bg-white/12 px-5 py-3 text-sm font-semibold text-white backdrop-blur active:scale-[0.98]">Pass</button>
+            <button type="button" data-feed-action="match" onClick={() => onMatch?.(post, actionSpeedMs())} className="rounded-full bg-[#8bdc65] px-5 py-3 text-sm font-semibold text-[#092243] shadow-[0_16px_30px_-20px_rgba(139,220,101,0.8)] active:scale-[0.98]">Match</button>
           </div>
         </div>
       </div>
@@ -4434,17 +4435,15 @@ function FeedPostCard({ post, ranking, card, streamId, liked, saved, followed, c
             {(rank.negativeSignals || []).map((signal) => <span key={signal} className="rounded-full bg-[#fff7ed] px-3 py-1 text-xs text-[#9a3412]">{signal}</span>)}
           </div>
         )}
-        <div className="mt-4 grid grid-cols-5 gap-1 rounded-2xl bg-slate-50 p-1.5">
+        <div className="mt-4 grid grid-cols-4 gap-1 rounded-2xl bg-slate-50 p-1.5">
           <button type="button" onClick={() => onSave(post.id, post)} className={`rounded-xl px-2 py-2 text-xs ${saved ? 'bg-[#edf7ff] text-[#154f79]' : 'text-slate-600'}`}><Bookmark className={`mx-auto h-4 w-4 ${saved ? 'fill-current' : ''}`} />Save</button>
           <button type="button" onClick={() => onShare(post)} className="rounded-xl px-2 py-2 text-xs text-slate-600"><Share2 className="mx-auto h-4 w-4" />Share</button>
           <button type="button" onClick={() => onComment(post)} className="rounded-xl px-2 py-2 text-xs text-slate-600"><MessageCircle className="mx-auto h-4 w-4" />{commentCount}</button>
-          <button type="button" onClick={() => onHide(post.id, post)} className="rounded-xl px-2 py-2 text-xs text-slate-600"><RotateCcw className="mx-auto h-4 w-4" />Not for me</button>
           <button type="button" onClick={() => onReport(post)} className="rounded-xl px-2 py-2 text-xs text-slate-600"><Flag className="mx-auto h-4 w-4" />Report</button>
         </div>
         {post.sponsoredStatus && (
-          <div className="mt-3 flex items-center justify-between gap-3 rounded-2xl border border-[#fed7aa] bg-[#fff7ed] px-3 py-2 text-xs text-[#9a3412]">
+          <div className="mt-3 rounded-2xl border border-[#fed7aa] bg-[#fff7ed] px-3 py-2 text-xs text-[#9a3412]">
             <span>{post.sponsoredStatus} content is labelled and reportable.</span>
-            <button type="button" onClick={() => onHide(post.id, post)} className="rounded-full bg-white px-3 py-1">Hide</button>
           </div>
         )}
       </div>
@@ -5120,7 +5119,9 @@ function RentEazyAppShell() {
   };
 
   const passFeedCard = (post, speedMs) => {
-    recordFeedSignal('swipe', post, { direction: 'left', speedMs, suppressionDays: speedMs <= 900 ? 14 : 0 });
+    recordFeedSignal('not_interested', post, { direction: 'left', speedMs, suppressionDays: 30, source: 'pass' });
+    setHiddenPostIds((current) => [...new Set([...current, post.id])]);
+    syncApiState(apiRequest(`/api/posts/${post.id}/hide`, { method: 'POST' }));
   };
 
   const matchFeedCard = (post, speedMs) => {
@@ -5138,28 +5139,22 @@ function RentEazyAppShell() {
     syncApiState(apiRequest(`/api/posts/${report.targetId}/report`, { method: 'POST', body: report }));
   };
 
-  const rankingById = new Map(posts.map((post) => {
-    const backendRank = feedRankings.find((ranking) => ranking.postId === post.id);
-    return [post.id, backendRank || calculateFeedRanking(post, { profile, answers, followedIds, likedIds, savedIds, comments })];
-  }));
-
-  const filteredPosts = posts.filter((post) => {
-    if (hiddenPostIds.includes(post.id)) return false;
-    if (activeFeedTab === 'Groups' || activeFeedTab === 'Perks') return false;
-    if (activeFeedTab === 'For You') return true;
-    if (activeFeedTab === 'Following') return followedIds.includes(post.authorId);
-    if (activeFeedTab === 'Properties') return ['Property', 'Room', 'Serviced Accommodation'].includes(post.postType);
-    if (activeFeedTab === 'Short-Term') return ['Short-Term Stay', 'Serviced Accommodation'].includes(post.postType);
-    if (activeFeedTab === 'House Buddies') return post.postType === 'House Buddy';
-    if (activeFeedTab === 'Advice') return ['Advice', 'Question', 'Area Insight', 'Success Story'].includes(post.postType);
-    return post.postType.toLowerCase().includes(activeFeedTab.toLowerCase().replace(/s$/, '')) || post.authorType.toLowerCase().includes(activeFeedTab.toLowerCase().replace(/s$/, ''));
-  }).sort((a, b) => (rankingById.get(b.id)?.score || 0) - (rankingById.get(a.id)?.score || 0));
-
-  const feedSummary = filteredPosts.reduce((acc, post) => {
-    const objective = rankingById.get(post.id)?.objective || 'Discovery';
-    acc[objective] = (acc[objective] || 0) + 1;
-    return acc;
-  }, {});
+  const feedStream = useMemo(() => buildRentEazyFeed({
+    posts,
+    profile,
+    answers,
+    followedIds,
+    likedIds,
+    savedIds,
+    hiddenPostIds,
+    comments,
+    behavioralEvents,
+    feedSignals,
+    activeFeedTab,
+    minItems: 36,
+  }), [activeFeedTab, answers, behavioralEvents, comments, feedSignals, followedIds, hiddenPostIds, likedIds, posts, profile, savedIds]);
+  const rankingById = feedStream.rankingById;
+  const feedItems = feedStream.items;
 
   const navItems = [
     ['Feed', '/app/feed', Home],
@@ -5228,15 +5223,15 @@ function RentEazyAppShell() {
                 <div className="mb-4 rounded-[1.75rem] border border-white bg-white/92 p-4 shadow-[0_18px_44px_-34px_rgba(15,23,42,0.35),inset_0_1px_0_white]">
                   <div className="flex items-start justify-between gap-3">
                     <div>
-                      <p className="font-['JetBrains_Mono',monospace] text-xs text-[#2670a8]">EXPLAINABLE FEED</p>
-                      <h2 className="mt-2 text-xl font-normal tracking-tight text-slate-950">Ranked for fit, not noise</h2>
-                      <p className="mt-1 text-sm leading-6 text-slate-500">Every card is tagged as discovery, progress, or social proof, with the reasons visible.</p>
+                      <p className="font-['JetBrains_Mono',monospace] text-xs text-[#2670a8]">LIVE DISCOVERY ENGINE</p>
+                      <h2 className="mt-2 text-xl font-normal tracking-tight text-slate-950">Scroll teaches the next card</h2>
+                      <p className="mt-1 text-sm leading-6 text-slate-500">High-fit cards, near matches, and labelled explorations are mixed continuously as you interact.</p>
                     </div>
-                    <span className="shrink-0 rounded-full bg-[#edf8ee] px-3 py-1 text-xs text-[#215d27]">{filteredPosts.length} ranked</span>
+                    <span className="shrink-0 rounded-full bg-[#edf8ee] px-3 py-1 text-xs text-[#215d27]">{feedStream.state.replaceAll('_', ' ')}</span>
                   </div>
                   <div className="mt-3 flex flex-wrap gap-2">
-                    {['Discovery', 'Progress', 'Social proof'].map((objective) => (
-                      <span key={objective} className="rounded-full bg-slate-50 px-3 py-1.5 text-xs text-slate-600">{feedSummary[objective] || 0} {objective}</span>
+                    {['80/20 fit + exploration', 'Reward spikes', 'Within-session learning'].map((signal) => (
+                      <span key={signal} className="rounded-full bg-slate-50 px-3 py-1.5 text-xs text-slate-600">{signal}</span>
                     ))}
                   </div>
                 </div>
@@ -5262,11 +5257,15 @@ function RentEazyAppShell() {
                 ) : activeFeedTab === 'Perks' ? (
                   <PerksRail partnerOffers={sortedPartnerOffers} profile={profile} onOpenOffer={openPartnerOffer} />
                 ) : (
-                  filteredPosts.map((post, index) => (
-                    <React.Fragment key={post.id}>
+                  feedItems.map((item, index) => {
+                    const post = item.post;
+                    return (
+                    <React.Fragment key={item.streamId}>
                       <FeedPostCard
                         post={post}
-                        ranking={rankingById.get(post.id)}
+                        ranking={{ ...item.ranking, sequence: item.sequence, rewardSpike: item.rewardSpike }}
+                        card={item.card}
+                        streamId={item.streamId}
                         liked={likedIds.includes(post.id)}
                         saved={savedIds.includes(post.id)}
                         followed={followedIds.includes(post.authorId)}
@@ -5280,6 +5279,9 @@ function RentEazyAppShell() {
                         onHide={hidePost}
                         onReport={setReportPost}
                         onExplain={explainFeedItem}
+                        onPass={passFeedCard}
+                        onMatch={matchFeedCard}
+                        onSignal={recordFeedSignal}
                       />
                       {index === 0 && (
                         <GroupsPanel groups={groups} memberships={groupMemberships} onJoinGroup={joinGroup} onCreateGroup={createGroup} compact />
@@ -5315,14 +5317,8 @@ function RentEazyAppShell() {
                         </div>
                       )}
                     </React.Fragment>
-                  ))
-                )}
-                {filteredPosts.length === 0 && activeFeedTab !== 'Groups' && activeFeedTab !== 'Perks' && (
-                  <div className="rounded-[1.75rem] border border-white bg-white/86 p-6 text-center shadow-[0_18px_44px_-34px_rgba(15,23,42,0.45),inset_0_1px_0_white]">
-                    <p className="text-2xl font-normal tracking-tight text-slate-950">Your Feed is ready.</p>
-                    <p className="mt-2 text-sm leading-6 text-slate-600">Follow people, browse categories, or post what you are looking for.</p>
-                    <a href="/app/post" className="mt-5 inline-flex rounded-full bg-[#2f7d32] px-5 py-3 text-sm text-white">Create Post</a>
-                  </div>
+                    );
+                  })
                 )}
               </div>
             </>
@@ -5804,6 +5800,9 @@ export default function App() {
             ))}
           </div>
         </section>
+
+        {/* ── PER-ROLE STORY (Gen UI: landlord sees landlord pain → dream → how) ── */}
+        <RoleStory profile={profile} />
 
         {/* ── VSL ─────────────────────────────────────────────────── */}
         <section id="vsl" className="max-w-5xl mx-auto px-6 pb-10 pt-4">

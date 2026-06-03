@@ -1,9 +1,12 @@
-import React from 'react';
+import React, { Suspense, lazy } from 'react';
 
 // Renders a personalised landing PURELY from a LandingSpec (Gen UI on the real
 // page). Sections render in spec.sectionOrder; the BODY (problem/dream/mechanism/
 // proof) reads spec.content so a landlord sees landlord copy, not tenant copy.
 // Honest: urgency = real lever only; social proof never fabricated live counts.
+
+// VSL is heavy (Remotion) — lazy-load so it never blocks first paint.
+const VSLPlayer = lazy(() => import('@/components/vsl/VSLPlayer'));
 
 const display = "font-['Bricolage_Grotesque_Variable',Inter,sans-serif]";
 
@@ -64,6 +67,18 @@ const SECTION_REGISTRY = {
         <h2 className={`${display} text-3xl font-normal leading-[1.1] tracking-tight text-white md:text-4xl`}>{spec.content.dream.heading}</h2>
         <p className="mx-auto mt-5 max-w-2xl text-base font-light leading-8 text-white/65">{spec.content.dream.sub}</p>
       </div>
+    </section>
+  ),
+
+  vsl: (spec) => (
+    <section data-section="vsl" key="vsl" className="mx-auto max-w-5xl px-6 py-12">
+      <div className="mb-6 text-center">
+        <p className="font-['JetBrains_Mono',monospace] text-[11px] tracking-[0.16em]" style={{ color: spec.content.accent }}>60 SECONDS</p>
+        <h2 className={`${display} mt-2 text-3xl font-normal tracking-tight text-slate-950 md:text-4xl`}>Watch how the match happens.</h2>
+      </div>
+      <Suspense fallback={<div className="aspect-video w-full animate-pulse rounded-4xl bg-[#06182f]/90" />}>
+        <VSLPlayer userType={spec.role} />
+      </Suspense>
     </section>
   ),
 
