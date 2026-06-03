@@ -1,9 +1,11 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import "iconify-icon";
 import { motion } from 'framer-motion';
+import { PricingTable, SignIn, SignInButton, SignUp, SignUpButton, UserButton, useAuth, useUser } from '@clerk/react';
 import IPhoneMockup from '@/components/ui/iphone-mockup';
 import Marquee from '@/components/ui/marquee';
 import { NumberTicker } from '@/components/ui/number-ticker';
+import { BorderBeam } from '@/components/ui/border-beam';
 // Code-split the VSL: Remotion is ~400KB and sits below the fold, so it must
 // not block the hero paint. Loads lazily when the user scrolls toward it.
 const VSLPlayer = React.lazy(() => import('@/components/vsl/VSLPlayer'));
@@ -28,6 +30,31 @@ function resolveSocialAppUrl() {
 const appFeedUrl = '/app/feed';
 const socialAppUrl = appFeedUrl;
 const socialSignupUrl = '/signup';
+const clerkEnabled = Boolean(import.meta.env.VITE_CLERK_PUBLISHABLE_KEY);
+let clerkTokenProvider = null;
+
+function setClerkTokenProvider(provider) {
+  clerkTokenProvider = provider;
+}
+
+const clerkAppearance = {
+  variables: {
+    colorPrimary: '#2f7d32',
+    colorBackground: '#ffffff',
+    colorText: '#0f172a',
+    colorInputBackground: '#ffffff',
+    borderRadius: '1rem',
+    fontFamily: 'Inter, sans-serif',
+  },
+  elements: {
+    cardBox: 'shadow-none border-0',
+    card: 'shadow-none border-0 p-0',
+    headerTitle: 'text-slate-950',
+    headerSubtitle: 'text-slate-500',
+    formButtonPrimary: 'bg-[#2f7d32] hover:bg-[#276b2b]',
+    footerActionLink: 'text-[#2f7d32]',
+  },
+};
 
 const navLinks = [
   { label: 'How it works', href: '#how-it-works' },
@@ -1487,7 +1514,15 @@ const apiBaseUrl = import.meta.env.VITE_RENTEAZY_API_URL || (
 );
 
 async function apiRequest(path, { method = 'GET', body } = {}) {
-  const token = getStoredJson('renteazy-api-token', '');
+  let token = '';
+  if (clerkTokenProvider) {
+    try {
+      token = await clerkTokenProvider();
+    } catch {
+      token = '';
+    }
+  }
+  if (!token) token = getStoredJson('renteazy-api-token', '');
   const response = await fetch(`${apiBaseUrl}${path}`, {
     method,
     headers: {
@@ -1613,7 +1648,131 @@ function getRoleMarketLanes(role) {
   return roleMarketLanes[role] || roleMarketLanes.General;
 }
 
+function ClerkSessionBridge({ setProfile }) {
+  const { getToken, isSignedIn, userId } = useAuth();
+  const { user } = useUser();
+
+  useEffect(() => {
+    if (!isSignedIn) {
+      setClerkTokenProvider(null);
+      return undefined;
+    }
+
+    setClerkTokenProvider(() => getToken());
+    return () => setClerkTokenProvider(null);
+  }, [getToken, isSignedIn, userId]);
+
+  useEffect(() => {
+    if (!isSignedIn || !user) return;
+    const savedRole = getStoredJson('renteazy-signup-role', 'Tenant');
+    const displayName = user.fullName || user.primaryEmailAddress?.emailAddress || 'RentEazy member';
+    setProfile((current) => ({
+      ...current,
+      id: current.id?.startsWith('clerk-') ? current.id : `clerk-${user.id}`,
+      name: current.name && current.name !== currentUser.name ? current.name : displayName,
+      role: current.role || savedRole,
+      clerkUserId: user.id,
+      updatedAt: new Date().toISOString(),
+    }));
+  }, [isSignedIn, setProfile, user]);
+
+  return null;
+}
+
+function ClerkAccountControls() {
+  const { isSignedIn } = useUser();
+
+  if (isSignedIn) {
+    return (
+      <>
+        <a href="/app/billing" className="hidden rounded-full bg-[#092243] px-3 py-1.5 text-xs text-white sm:inline-flex">Billing</a>
+        <UserButton afterSignOutUrl="/signup" />
+      </>
+    );
+  }
+
+  return (
+    <>
+      <SignInButton mode="modal" fallbackRedirectUrl="/app/feed">
+        <button type="button" className="hidden rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-600 sm:inline-flex">Sign in</button>
+      </SignInButton>
+      <SignUpButton mode="modal" fallbackRedirectUrl="/app/feed">
+        <button type="button" className="rounded-full bg-[#2f7d32] px-3 py-1.5 text-xs text-white">Create account</button>
+      </SignUpButton>
+    </>
+  );
+}
+
+function ClerkSignupBridge() {
+  const [mode, setMode] = useState(() => {
+    if (typeof window === 'undefined') return 'sign-up';
+    return new URLSearchParams(window.location.search).get('mode') === 'sign-in' ? 'sign-in' : 'sign-up';
+  });
+  const [role, setRole] = useStoredState('renteazy-signup-role', 'Tenant');
+
+  return (
+    <div className="min-h-screen bg-[#eef5f2] px-5 py-6 text-slate-900">
+      <div className="mx-auto flex max-w-5xl flex-col gap-8">
+        <BrandLogo />
+        <div className="grid gap-8 lg:grid-cols-[0.92fr_1.08fr] lg:items-start">
+          <div className="rounded-[2rem] bg-[#092243] p-6 text-white shadow-[0_28px_70px_-46px_rgba(9,34,67,0.95)]">
+            <p className="font-['JetBrains_Mono',monospace] text-xs text-[#8fd0ff]">RENTEAZY ACCOUNT</p>
+            <h1 className="mt-4 text-4xl font-semibold leading-[0.98] tracking-tight md:text-6xl">Open the market, then pick your lane.</h1>
+            <p className="mt-5 max-w-xl text-sm leading-7 text-white/68">Create a free account, land in the Feed, post for free, swipe daily, and improve matches as you answer useful rental-market questions.</p>
+            <div className="mt-6 grid gap-2 sm:grid-cols-2">
+              {['Feed', 'Swipe', 'Post', 'Match'].map((item) => (
+                <div key={item} className="rounded-2xl bg-white/10 px-4 py-3 text-sm ring-1 ring-white/10">{item} ready</div>
+              ))}
+            </div>
+          </div>
+          <div className="rounded-[2rem] border border-white bg-white p-4 shadow-[0_24px_60px_-38px_rgba(15,23,42,0.45),inset_0_1px_0_white] sm:p-6">
+            <div className="grid grid-cols-2 rounded-full bg-slate-100 p-1 text-sm">
+              {[
+                ['sign-up', 'Create account'],
+                ['sign-in', 'Sign in'],
+              ].map(([value, label]) => (
+                <button key={value} type="button" onClick={() => setMode(value)} className={`rounded-full px-4 py-2 ${mode === value ? 'bg-white text-slate-950 shadow-sm' : 'text-slate-500'}`}>
+                  {label}
+                </button>
+              ))}
+            </div>
+            {mode === 'sign-up' && (
+              <label className="mt-5 block text-sm text-slate-600">
+                What brings you to RentEazy?
+                <select value={role} onChange={(event) => setRole(event.target.value)} className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-950 outline-hidden focus:border-[#2f7d32]">
+                  {roleOptions.map((option) => <option key={option}>{option}</option>)}
+                </select>
+              </label>
+            )}
+            <div className="mt-5">
+              {mode === 'sign-up' ? (
+                <SignUp
+                  appearance={clerkAppearance}
+                  routing="hash"
+                  signInUrl="/signup?mode=sign-in"
+                  forceRedirectUrl="/app/feed"
+                  fallbackRedirectUrl="/app/feed"
+                />
+              ) : (
+                <SignIn
+                  appearance={clerkAppearance}
+                  routing="hash"
+                  signUpUrl="/signup"
+                  forceRedirectUrl="/app/feed"
+                  fallbackRedirectUrl="/app/feed"
+                />
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function SignupBridge() {
+  if (clerkEnabled) return <ClerkSignupBridge />;
+
   const [mode, setMode] = useState('register');
   const [name, setName] = useStoredState('renteazy-signup-name', '');
   const [email, setEmail] = useStoredState('renteazy-signup-email', '');
@@ -2327,7 +2486,64 @@ function MiniShopPanel({ onSelectProduct, compact = false }) {
   );
 }
 
-function MicroUpsellModal({ product, onClose, onConfirm }) {
+function ClerkBillingSurface() {
+  const { isSignedIn } = useUser();
+
+  if (!isSignedIn) {
+    return (
+      <div className="rounded-[1.75rem] border border-[#d5ecd7] bg-[#edf8ee] p-5 text-[#215d27]">
+        <p className="font-['JetBrains_Mono',monospace] text-xs">BILLING</p>
+        <h2 className="mt-2 text-2xl font-normal tracking-tight text-slate-950">Sign in to manage plans.</h2>
+        <p className="mt-2 text-sm leading-6">Plans, seats, upgrades, and billing are handled through Clerk.</p>
+        <SignInButton mode="modal" fallbackRedirectUrl="/app/billing">
+          <button type="button" className="mt-4 inline-flex w-full items-center justify-center rounded-full bg-[#2f7d32] px-5 py-3 text-sm text-white">Sign in</button>
+        </SignInButton>
+      </div>
+    );
+  }
+
+  return (
+    <div className="overflow-hidden rounded-[1.75rem] border border-white bg-white p-3 shadow-[0_18px_44px_-34px_rgba(15,23,42,0.45),inset_0_1px_0_white]">
+      <PricingTable appearance={clerkAppearance} />
+    </div>
+  );
+}
+
+function BillingPanel({ onSelectProduct, purchases, boosts, wallet }) {
+  return (
+    <div className="space-y-5">
+      <section className="overflow-hidden rounded-[2rem] bg-[#092243] p-6 text-white shadow-[0_28px_70px_-46px_rgba(9,34,67,0.95)]">
+        <p className="font-['JetBrains_Mono',monospace] text-xs text-[#8fd0ff]">BILLING</p>
+        <h1 className="mt-3 text-4xl font-semibold leading-[0.96] tracking-tight">Plans, boosts, credits, and Protect.</h1>
+        <p className="mt-4 max-w-2xl text-sm leading-7 text-white/68">Free users create liquidity. Paid users remove friction. Businesses pay for labelled reach. Paid visibility never replaces suitability or trust.</p>
+        <div className="mt-5 grid gap-2 sm:grid-cols-3">
+          {[
+            [`${wallet.balance}`, 'Credits'],
+            [`${purchases.length}`, 'Purchases'],
+            [`${boosts.length}`, 'Boosts'],
+          ].map(([value, label]) => (
+            <div key={label} className="rounded-2xl bg-white/10 px-4 py-3 ring-1 ring-white/10">
+              <p className="text-2xl font-semibold">{value}</p>
+              <p className="mt-1 text-xs text-white/55">{label}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+      {clerkEnabled ? (
+        <ClerkBillingSurface />
+      ) : (
+        <div className="rounded-[1.75rem] border border-[#fed7aa] bg-[#fff7ed] p-5 text-[#9a3412]">
+          <p className="font-['JetBrains_Mono',monospace] text-xs">CLERK NOT CONFIGURED</p>
+          <h2 className="mt-2 text-2xl font-normal tracking-tight text-slate-950">Set VITE_CLERK_PUBLISHABLE_KEY to enable Clerk billing.</h2>
+          <p className="mt-2 text-sm leading-6">The local mini shop remains available for development until Clerk keys and billing products are configured.</p>
+        </div>
+      )}
+      <MiniShopPanel onSelectProduct={onSelectProduct} />
+    </div>
+  );
+}
+
+function MicroUpsellModal({ product, onClose, onConfirm, billingEnabled = false }) {
   if (!product) return null;
 
   return (
@@ -2346,7 +2562,11 @@ function MicroUpsellModal({ product, onClose, onConfirm }) {
           <p className="mt-1 text-3xl font-normal text-slate-950">{product.price}</p>
           <p className="mt-2 text-xs leading-5 text-slate-500">Costs are shown plainly and not hidden behind credits.</p>
         </div>
-        <button type="button" onClick={() => onConfirm(product)} className="mt-5 inline-flex w-full items-center justify-center rounded-full bg-[#2f7d32] px-5 py-3 text-sm text-white">Add to account</button>
+        {billingEnabled ? (
+          <a href={`/app/billing?sku=${encodeURIComponent(product.sku)}`} className="mt-5 inline-flex w-full items-center justify-center rounded-full bg-[#2f7d32] px-5 py-3 text-sm text-white">Open Clerk billing</a>
+        ) : (
+          <button type="button" onClick={() => onConfirm(product)} className="mt-5 inline-flex w-full items-center justify-center rounded-full bg-[#2f7d32] px-5 py-3 text-sm text-white">Add to local account</button>
+        )}
       </div>
     </div>
   );
@@ -2440,7 +2660,7 @@ function FeedPostCard({ post, liked, saved, followed, commentCount, onLike, onSa
 
 function RentEazyAppShell() {
   const path = typeof window === 'undefined' ? '/app/feed' : window.location.pathname;
-  const routeTab = path.includes('/post') ? 'Post' : path.includes('/likes') ? 'Likes' : path.includes('/profile') ? 'Profile' : path.includes('/swipe') ? 'Swipe' : 'Feed';
+  const routeTab = path.includes('/billing') ? 'Billing' : path.includes('/post') ? 'Post' : path.includes('/likes') ? 'Likes' : path.includes('/profile') ? 'Profile' : path.includes('/swipe') ? 'Swipe' : 'Feed';
   const [activeFeedTab, setActiveFeedTab] = useStoredState('renteazy-feed-tab', 'For You');
   const [posts, setPosts] = useStoredState('renteazy-feed-posts', seededFeedPosts);
   const [likedIds, setLikedIds] = useStoredState('renteazy-liked-posts', []);
@@ -2720,12 +2940,13 @@ function RentEazyAppShell() {
 
   return (
     <div className="min-h-screen bg-[#eef5f2] pb-24 text-slate-900 antialiased">
+      {clerkEnabled && <ClerkSessionBridge setProfile={setProfile} />}
       {(sharePost || (routeTab === 'Post' && newPost)) && (
         <ShareEverywhereModal post={sharePost || newPost} onClose={() => setSharePost(null)} onShared={trackShare} />
       )}
       {reportPost && <ReportModal post={reportPost} onClose={() => setReportPost(null)} onReport={submitReport} />}
       {commentPost && <CommentModal post={commentPost} comments={comments.filter((comment) => comment.postId === commentPost.id)} onClose={() => setCommentPost(null)} onComment={addComment} />}
-      <MicroUpsellModal product={activeUpsellProduct} onClose={closeUpsell} onConfirm={confirmMicroProduct} />
+      <MicroUpsellModal product={activeUpsellProduct} onClose={closeUpsell} onConfirm={confirmMicroProduct} billingEnabled={clerkEnabled} />
       <header className="sticky top-0 z-40 border-b border-white/70 bg-[#eef5f2]/88 px-4 py-3 backdrop-blur-xl">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-3">
           <BrandLogo />
@@ -2741,7 +2962,7 @@ function RentEazyAppShell() {
             <a href="/app/profile" className="hidden rounded-full bg-[#edf7ff] px-3 py-1.5 text-xs text-[#154f79] sm:inline-flex">{profile.role}</a>
             <span className={`hidden rounded-full px-3 py-1.5 text-xs sm:inline-flex ${backendStatus === 'connected' ? 'bg-[#edf8ee] text-[#215d27]' : backendStatus === 'checking' ? 'bg-[#edf7ff] text-[#154f79]' : 'bg-[#fff7ed] text-[#9a3412]'}`}>{backendStatus === 'connected' ? 'API connected' : backendStatus === 'checking' ? 'API checking' : 'Offline mode'}</span>
             <span className="hidden rounded-full bg-[#edf8ee] px-3 py-1.5 text-xs text-[#215d27] sm:inline-flex">5 extra swipes available after sharing</span>
-            <button className="flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600"><Bell className="h-4 w-4" /></button>
+            {clerkEnabled ? <ClerkAccountControls /> : <button className="flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600"><Bell className="h-4 w-4" /></button>}
           </div>
         </div>
       </header>
@@ -2916,11 +3137,24 @@ function RentEazyAppShell() {
           {routeTab === 'Profile' && (
             <div className="space-y-5">
               <AppPulseStrip wallet={wallet} purchases={purchases} boosts={boosts} reports={reports} shares={shares} />
+              <div className="rounded-[1.75rem] border border-[#cfe9fb] bg-white/88 p-4 shadow-[0_14px_34px_-28px_rgba(15,23,42,0.45)]">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-slate-950">Billing and upgrades</p>
+                    <p className="mt-1 text-sm leading-6 text-slate-600">Manage Match, Priority, Protect, credits, boosts, and business starter upgrades.</p>
+                  </div>
+                  <a href="/app/billing" className="inline-flex shrink-0 items-center justify-center rounded-full bg-[#092243] px-5 py-3 text-sm text-white">Open billing</a>
+                </div>
+              </div>
               <ProfileEditor profile={profile} setProfile={setProfile} answers={answers} setAnswers={setAnswers} />
               <TrustReputationPanel reports={reports} comments={comments} profile={profile} />
               <ActivityInbox usageLimit={usageLimit} posts={posts} shares={shares} reports={reports} boosts={boosts} profile={profile} />
               <MiniShopPanel onSelectProduct={openUpsell} />
             </div>
+          )}
+
+          {routeTab === 'Billing' && (
+            <BillingPanel onSelectProduct={openUpsell} purchases={purchases} boosts={boosts} wallet={wallet} />
           )}
         </section>
 
@@ -3653,31 +3887,54 @@ export default function App() {
                 <div className="mt-8 rounded-2xl bg-white/[0.07] border border-white/10 p-5 text-sm leading-7 text-white/65">A match opens the conversation — it does not guarantee a tenancy. Final approval depends on referencing, affordability, and landlord or agent decision.</div>
               </div>
               <div className="grid gap-4">
-                <div className="rounded-2xl bg-linear-to-br from-[#1d4ed8]/22 to-[#1e3a8a]/14 border border-[#1d4ed8]/25 p-5">
-                  <div className="flex items-center gap-2 mb-3">
-                    <iconify-icon icon="solar:user-rounded-bold" class="text-lg text-[#93c5fd]"></iconify-icon>
-                    <p className="text-sm text-[#93c5fd] font-medium">Tenant side</p>
+                {/* Tenant side — with a real property thumbnail */}
+                <div className="flex items-center gap-4 rounded-2xl bg-linear-to-br from-[#1d4ed8]/22 to-[#1e3a8a]/12 border border-[#1d4ed8]/25 p-4">
+                  <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-2xl">
+                    <img src="/images/match-flat.jpg" alt="Matched home" className="h-full w-full object-cover" loading="lazy" />
+                    <span className="absolute bottom-1 left-1 rounded-full bg-[#2f7d32] px-1.5 py-0.5 text-[9px] font-bold text-white shadow">88%</span>
                   </div>
-                  <h3 className="text-xl font-normal text-white leading-snug">Swipe through scored homes that fit your brief.</h3>
-                  <p className="mt-2 text-sm text-white/55">Agent and landlord reputation visible behind every offer.</p>
-                </div>
-                <div className="rounded-2xl bg-linear-to-br from-white to-[#f0fdf4] text-[#092243] border border-white p-5 shadow-[0_8px_24px_-12px_rgba(47,125,50,0.25),inset_0_1px_0_white]">
-                  <div className="flex items-center gap-2 mb-3">
-                    <span className="flex h-6 w-6 items-center justify-center rounded-full bg-linear-to-br from-[#52a832] to-[#2f7d32] text-white text-xs font-bold">✓</span>
-                    <p className="text-sm text-[#2670a8] font-medium">Mutual match</p>
+                  <div className="min-w-0">
+                    <div className="mb-1.5 flex items-center gap-2">
+                      <iconify-icon icon="solar:user-rounded-bold" class="text-base text-[#93c5fd]"></iconify-icon>
+                      <p className="font-['JetBrains_Mono',monospace] text-[10px] tracking-[0.12em] text-[#93c5fd]">TENANT SIDE</p>
+                    </div>
+                    <h3 className="text-base font-normal leading-snug text-white">Swipe scored homes that fit your brief — reputation shown behind every offer.</h3>
                   </div>
-                  <h3 className="text-xl font-normal leading-snug">The right people like each other first. Then viewing flow begins.</h3>
-                  <p className="mt-2 text-sm text-slate-500">No cold messages. No wasted slots. Just genuine mutual interest.</p>
                 </div>
-                <div className="rounded-2xl bg-linear-to-br from-[#2f7d32]/22 to-[#14532d]/14 border border-[#2f7d32]/25 p-5">
-                  <div className="flex items-center gap-2 mb-3">
-                    <iconify-icon icon="solar:buildings-bold" class="text-lg text-[#9bd383]"></iconify-icon>
-                    <p className="text-sm text-[#9bd383] font-medium">Agent and landlord side</p>
+
+                {/* Mutual match — the centrepiece. Dark + green glow + beam, never white. */}
+                <div className="relative overflow-hidden rounded-2xl bg-linear-to-br from-[#0f3d22] to-[#06231a] border border-[#2f7d32]/40 p-5 shadow-[0_0_44px_-14px_rgba(82,168,50,0.45)]">
+                  <BorderBeam size={150} duration={8} borderWidth={1.5} colorFrom="#9bd383" colorTo="#5bc4ff" />
+                  <div className="relative flex items-center gap-3">
+                    <div className="flex -space-x-3">
+                      <img src="/images/match-tenant.jpg" alt="Tenant" className="h-10 w-10 rounded-full border-2 border-[#06231a] object-cover" loading="lazy" />
+                      <img src="/images/match-flat.jpg" alt="Home" className="h-10 w-10 rounded-full border-2 border-[#06231a] object-cover" loading="lazy" />
+                    </div>
+                    <span className="flex h-7 w-7 items-center justify-center rounded-full bg-linear-to-br from-[#52a832] to-[#2f7d32] text-sm font-bold text-white shadow-lg">✓</span>
+                    <p className="font-['JetBrains_Mono',monospace] text-[10px] tracking-[0.12em] text-[#9bd383]">MUTUAL MATCH</p>
                   </div>
-                  <h3 className="text-xl font-normal text-white leading-snug">See vetted tenants who match your home, with budgets and move dates confirmed.</h3>
+                  <h3 className="relative mt-3 text-lg font-normal leading-snug text-white">Both sides like each other first. Then viewing flow begins.</h3>
+                  <p className="relative mt-1.5 text-sm text-white/55">No cold messages. No wasted slots. Just genuine mutual interest.</p>
                 </div>
-                <Marquee speed={28} className="-mx-4 overflow-visible">
-                  {matchTypes.map((type) => <span key={type} className="shrink-0 rounded-full bg-white/8 border border-white/10 px-3 py-1.5 text-xs text-white/72">{type}</span>)}
+
+                {/* Agent & landlord side — with a real tenant photo */}
+                <div className="flex items-center gap-4 rounded-2xl bg-linear-to-br from-[#2f7d32]/22 to-[#14532d]/12 border border-[#2f7d32]/25 p-4">
+                  <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-2xl">
+                    <img src="/images/match-tenant.jpg" alt="Verified tenant" className="h-full w-full object-cover" loading="lazy" />
+                    <span className="absolute bottom-1 left-1 rounded-full bg-[#2670a8] px-1.5 py-0.5 text-[9px] font-bold text-white shadow">Verified</span>
+                  </div>
+                  <div className="min-w-0">
+                    <div className="mb-1.5 flex items-center gap-2">
+                      <iconify-icon icon="solar:buildings-bold" class="text-base text-[#9bd383]"></iconify-icon>
+                      <p className="font-['JetBrains_Mono',monospace] text-[10px] tracking-[0.12em] text-[#9bd383]">AGENT &amp; LANDLORD SIDE</p>
+                    </div>
+                    <h3 className="text-base font-normal leading-snug text-white">See vetted tenants who match your home — budgets and move dates confirmed.</h3>
+                  </div>
+                </div>
+
+                {/* Match types — dark glass pills */}
+                <Marquee speed={30} className="-mx-4 mt-1 overflow-visible">
+                  {matchTypes.map((type) => <span key={type} className="shrink-0 rounded-full bg-white/[0.06] border border-white/12 px-3.5 py-1.5 text-xs text-white/70 backdrop-blur-sm">{type}</span>)}
                 </Marquee>
               </div>
             </div>
