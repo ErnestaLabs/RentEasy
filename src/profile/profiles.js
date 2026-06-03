@@ -1,7 +1,9 @@
 // Profile model for the "land → pick who you are → get YOUR landing" flow.
-// Each profile maps to: the VSL variant (userType), hero framing, primary CTA,
-// and which existing section anchors matter most for that audience.
-// Starting deep on `tenant`; the others are functional and ready to deepen.
+// Positioning is derived from the Role-Based Landing blueprint (JTBD, real pain
+// language, emotional transformation, tone). HONESTY RULE: no fabricated live
+// data (review counts, "X matching now", trust scores, void calculators with
+// fake numbers). Those `dynamic` hooks are declared but gated off until real
+// data exists — the brand sells on "no fake scarcity".
 
 export const PROFILE_ORDER = ['tenant', 'landlord', 'investor'];
 
@@ -15,18 +17,21 @@ export const PROFILES = {
     accent: '#2670a8',
     iconBg: '#edf7ff',
     iconBorder: '#cde7f8',
+    // JTBD: from powerless searcher → confident person in control of the process.
     hero: {
       eyebrow: 'FOR RENTERS & HOUSE BUDDIES',
-      // headline is rendered as: "Your next {rotating} could" + pill "like you first."
-      // For tenants we narrow the rotating set to what they actually swipe.
       rotating: ['room', 'flat', 'home', 'studio', 'house', 'buddy', 'share', 'match'],
-      sub: 'Stop applying to listings that are already gone. Swipe scored homes that fit your brief — and match when a landlord or agent likes you back.',
+      sub: 'Searching is exhausting — applications ignored, viewings gone before you can book. RentEazy flips it: swipe homes scored to your brief, and match when the landlord or agent likes you back. No more shouting into the void.',
       cta: 'Start matching — it’s free',
       ctaHref: '/signup?source=hero_tenant&profile=tenant&offer=match24h',
       secondary: { label: 'Browse the Feed', href: '#feed' },
     },
-    // section anchors to surface first for this profile
     emphasis: ['match', 'vsl', 'how-it-works', 'swipe-ui', 'why-switch', 'be-early', 'pricing', 'faq'],
+    // Honest positioning copy (safe to render now)
+    trustWords: ['verified', 'all-in monthly cost', 'real reviews', 'your match score', 'responds within'],
+    avoidWords: ['exclusive', 'act now', "don't miss out", 'premium listings', 'upgrade to see more'],
+    // Declared hooks that need REAL data before they can render (gated off now)
+    dynamicHooks: ['live demand count', 'review counts', 'response-time stats', 'all-in cost calc'],
   },
 
   landlord: {
@@ -38,15 +43,19 @@ export const PROFILES = {
     accent: '#2f7d32',
     iconBg: '#edf8ee',
     iconBorder: '#d5ecd7',
+    // JTBD: fill the void fast, with a tenant you can actually trust. Core driver: fear/safety + void cost.
     hero: {
       eyebrow: 'FOR LANDLORDS & AGENTS',
       rotating: ['tenant', 'renter', 'buddy', 'agent', 'match'],
-      sub: 'Stop wading through unqualified enquiries. See vetted, ready tenants who match your property — and build a reputation that wins your next instruction.',
+      sub: 'Every empty week costs you — and the wrong tenant costs more. See people who already match your property, with budgets and move dates set, and fill the void with someone you trust, not whoever messaged first.',
       cta: 'List your property — free',
       ctaHref: '/signup?source=hero_landlord&profile=landlord&offer=match24h',
       secondary: { label: 'For agents & landlords', href: '#partners' },
     },
     emphasis: ['match', 'partners', 'vsl', 'why-switch', 'marketplace', 'be-early', 'pricing', 'faq'],
+    trustWords: ['pre-qualified', 'budget confirmed', 'move date set', 'reputation', 'mutual match'],
+    avoidWords: ['thousands of tenants', 'guaranteed tenant', 'easy', 'unlimited leads', 'better than Rightmove'],
+    dynamicHooks: ['void cost calculator', 'tenant trust score', 'days-to-let benchmark', 'live demand count'],
   },
 
   investor: {
@@ -58,15 +67,19 @@ export const PROFILES = {
     accent: '#092243',
     iconBg: 'rgba(9,34,67,0.06)',
     iconBorder: 'rgba(9,34,67,0.12)',
+    // JTBD: see deals early, match by strategy, work with credible/compliant people. Driver: insider access + data.
     hero: {
       eyebrow: 'FOR OPERATORS, INVESTORS & SOURCERS',
-      rotating: ['deal', 'sourcer', 'investor', 'operator', 'match'],
-      sub: 'Stop chasing stale deals in WhatsApp groups. Match by strategy with a market that remembers who actually delivers.',
+      rotating: ['deal', 'sourcer', 'operator', 'strategy', 'match'],
+      sub: 'Stop chasing stale deals in WhatsApp groups. Match by strategy with sourcers and operators in a market that remembers who actually delivers — and see the numbers before the deal hits the portals.',
       cta: 'Build your investor profile — free',
       ctaHref: '/signup?source=hero_investor&profile=investor&offer=match24h',
       secondary: { label: 'Explore opportunities', href: '#marketplace' },
     },
     emphasis: ['match', 'marketplace', 'vsl', 'why-switch', 'be-early', 'pricing', 'faq'],
+    trustWords: ['match by strategy', 'verified yield', 'compliance-checked sourcer', 'track record', 'reputation'],
+    avoidWords: ['high returns', 'guaranteed yields', 'no experience required', 'exclusive deals'],
+    dynamicHooks: ['off-market deal velocity', 'sourcer compliance badges', 'yield benchmarks', 'live investor appetite'],
   },
 };
 
