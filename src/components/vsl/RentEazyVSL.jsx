@@ -245,17 +245,20 @@ function Act1Interrupt({ content }) {
   const frame = useCurrentFrame();
   const words = content.hookWords;
 
-  // Deliberate cadence — each word gets ~15 frames (0.5s) to land, then the
-  // whole line holds for ~1.7s before the cut. A rushed hook reads as noise.
-  const wordFrames = [8, 23, 38, 53, 68, 83, 98, 113].slice(0, words.length);
+  // Beat-synced cadence — each word lands ON a beat (BEAT≈18.37f @ 98 BPM).
+  // Humans feel off-beat text subconsciously; on-beat reads as intentional and
+  // gives each word ~0.6s to land (also kills the "too fast" feel).
+  const wordFrames = [1, 2, 3, 4, 5, 6, 7].map((n) => Math.round(n * BEAT)).slice(0, words.length);
+  const lastWordF = wordFrames[wordFrames.length - 1] ?? 92;
 
-  const subOp = fi(frame, [94, 112], [0, 1], easeOut);
-  const subY  = interpolate(clamp(sp(frame, 94, { damping: 22, stiffness: 240 })), [0, 1], [12, 0]);
+  // Subline lands on the next beat after the last word; whole line holds, cuts on a beat.
+  const subStart = lastWordF + Math.round(BEAT);
+  const subOp = fi(frame, [subStart, subStart + 14], [0, 1], easeOut);
+  const subY  = interpolate(clamp(sp(frame, subStart, { damping: 22, stiffness: 240 })), [0, 1], [12, 0]);
 
-  const exitOp = fi(frame, [134, 147], [1, 0], easeInOut);
+  const exitOp = fi(frame, [136, 147], [1, 0], easeInOut);
 
-  const lastWordF = wordFrames[wordFrames.length - 1] ?? 83;
-  const cursorVisible = frame > lastWordF + 6 && frame < 132;
+  const cursorVisible = frame > lastWordF + 6 && frame < 134;
   const cursorOn      = cursorVisible && Math.floor((frame - lastWordF) / 7) % 2 === 0;
 
   // Subtle red vignette builds during hook — signals danger/urgency
@@ -337,22 +340,25 @@ function Act1Interrupt({ content }) {
 
 // ─── ACT 2: IDENTIFY (147–368f, 4.9–12.3s) ───────────────────────────────────
 // Pain cards that name the exact feeling. Role-specific UI fragments in corners.
+// Kept clear of the central band (38–62%) so they never sit under the hero line.
 const PAIN_POSITIONS = [
-  { x: '4%',  y: '6%',  r: -4 },
-  { x: '55%', y: '4%',  r:  3 },
-  { x: '5%',  y: '52%', r: -3 },
-  { x: '57%', y: '53%', r:  5 },
+  { x: '3%',  y: '7%',  r: -4 },
+  { x: '56%', y: '5%',  r:  3 },
+  { x: '3%',  y: '72%', r: -3 },
+  { x: '57%', y: '73%', r:  5 },
 ];
 
 function Act2Identify({ content, userType }) {
   const frame = useCurrentFrame();
-  const cardDelay = 16;
+  const cardDelay = 20;
   const cards = content.painCards;
 
-  // Hero identity line enters at ~f130 relative
-  const heroOp = fi(frame, [128, 150], [0, 1], easeOut);
-  const heroY  = interpolate(clamp(sp(frame, 128, { damping: 16, stiffness: 240 })), [0, 1], [28, 0]);
-  const exitOp = fi(frame, [200, 220], [1, 0], easeInOut);
+  // Hero identity line enters at ~f132 relative and OWNS the screen — the
+  // scattered pain cards recede to the background as it lands (no overlap).
+  const heroOp = fi(frame, [132, 156], [0, 1], easeOut);
+  const heroY  = interpolate(clamp(sp(frame, 132, { damping: 16, stiffness: 240 })), [0, 1], [28, 0]);
+  const recede = fi(frame, [116, 140], [1, 0.16], easeInOut);
+  const exitOp = fi(frame, [204, 221], [1, 0], easeInOut);
 
   const identityLine  = content.identityLine;
   const accentWord    = content.identityAccent;
@@ -383,7 +389,7 @@ function Act2Identify({ content, userType }) {
           <div key={card.title} style={{
             position: 'absolute', left: pos.x, top: pos.y,
             transform: `translateY(${cardY}px) rotate(${pos.r}deg)`,
-            opacity: cardOp,
+            opacity: cardOp * recede,
           }}>
             {/* Glow splash on entry */}
             <div style={{
@@ -424,19 +430,21 @@ function Act2Identify({ content, userType }) {
         );
       })}
 
-      {/* Role-specific buried listing UI fragments */}
-      {fragments.map((lf) => (
-        <BuriedListing
-          key={lf.title}
-          frame={frame}
-          enterFrame={lf.ef}
-          title={lf.title}
-          sub={lf.sub}
-          x={lf.x}
-          y={lf.y}
-          rot={lf.r}
-        />
-      ))}
+      {/* Role-specific buried listing UI fragments — recede with the cards */}
+      <div style={{ opacity: recede }}>
+        {fragments.map((lf) => (
+          <BuriedListing
+            key={lf.title}
+            frame={frame}
+            enterFrame={lf.ef}
+            title={lf.title}
+            sub={lf.sub}
+            x={lf.x}
+            y={lf.y}
+            rot={lf.r}
+          />
+        ))}
+      </div>
 
       {/* Hero identity line — the empathy moment */}
       <div style={{
@@ -1110,54 +1118,40 @@ function Act6Proof({ content }) {
 // The consequence line names the exact cost of doing nothing.
 function Act7Close({ content }) {
   const frame = useCurrentFrame();
+  const beat = (n) => Math.round(n * BEAT); // beat-synced reveal frames
 
   const glowPulse = 0.5 + Math.sin(frame / 13) * 0.13;
 
-  // Identity headline: enters quietly in the breakdown (0–42f)
-  const idOp = fi(frame, [8, 44], [0, 1], easeInOut);
-  const idY  = interpolate(frame, [8, 52], [40, 0], {
-    extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: easeInOut,
-  });
+  // Closing line — lands on beat 1, the calm before the drop
+  const lineOp = fi(frame, [beat(0.4), beat(1.4)], [0, 1], easeOut);
+  const lineY  = interpolate(clamp(sp(frame, beat(0.4), { damping: 20, stiffness: 200 })), [0, 1], [26, 0]);
 
-  const identityFrame  = content.identityFrame;
-  const accentWord     = content.identityAccentWord;
+  const identityFrame = content.identityFrame;
+  const accentWord    = content.identityAccentWord;
   const idParts = identityFrame.split(accentWord);
   const idEl = idParts.length > 1 ? (
     <>{idParts[0]}<Accent>{accentWord}</Accent>{idParts[1]}</>
   ) : identityFrame;
 
-  // Audience pills — appear just before the drop (32–48f)
-  const pillOps = [
-    fi(frame, [32, 48], [0, 1], easeOut),
-    fi(frame, [36, 52], [0, 1], easeOut),
-    fi(frame, [40, 56], [0, 1], easeOut),
-    fi(frame, [44, 60], [0, 1], easeOut),
-  ];
+  // Logo lockup — settles in on beat 2, just before the drop
+  const logoProg  = clamp(sp(frame, beat(1.6), { damping: 18, stiffness: 180, mass: 0.9 }));
+  const logoScale = interpolate(logoProg, [0, 1], [0.78, 1]);
+  const logoOp    = fi(frame, [beat(1.6), beat(2.4)], [0, 1], easeOut);
 
-  // CTA — springs in on DROP 2 (frame 43 relative = 1440 absolute)
+  // CTA — springs in ON DROP 2 (rel frame 43 = abs 1440)
   const ctaDrop  = 43;
   const ctaScale = 0.58 + clamp(sp(frame, ctaDrop, { damping: 9, stiffness: 400, mass: 0.50 })) * 0.42;
   const ctaOp    = fi(frame, [ctaDrop, ctaDrop + 16], [0, 1], easeOut);
   const ctaGlow  = 0.5 + Math.sin(frame / 10) * 0.15;
-
-  // Green flash on the drop (43–58f)
   const dropFlash = fi(frame, [ctaDrop, ctaDrop + 15], [0.38, 0], easeOut);
 
-  // Consequence line
-  const conseqOp = fi(frame, [88, 116], [0, 1], easeOut);
-  const conseqY  = interpolate(clamp(sp(frame, 88, { damping: 22, stiffness: 180 })), [0, 1], [14, 0]);
+  // Domain + reassurance land on the following beats
+  const domOp    = fi(frame, [beat(4), beat(5)], [0, 1], easeOut);
+  const socialOp = fi(frame, [beat(6.5), beat(7.5)], [0, 1], easeOut);
 
-  const footOp = fi(frame, [118, 148], [0, 1], easeOut);
-
-  // Social proof micro-line (appears late)
-  const socialOp = fi(frame, [200, 228], [0, 1], easeOut);
-
-  const pills = [
-    { label: 'Renters',   color: C.greenPale, bg: 'rgba(82,168,50,0.18)',  border: 'rgba(82,168,50,0.42)' },
-    { label: 'Landlords', color: C.bluePale,  bg: 'rgba(38,112,168,0.15)', border: 'rgba(91,196,255,0.30)' },
-    { label: 'Agents',    color: '#fbbf24',   bg: 'rgba(245,158,11,0.13)', border: 'rgba(245,158,11,0.30)' },
-    { label: 'Investors', color: 'rgba(255,255,255,0.58)', bg: 'rgba(255,255,255,0.07)', border: 'rgba(255,255,255,0.14)' },
-  ];
+  // Fade to black over the final ~1.2s → seamless loop into Act 1's black open,
+  // and a clean, deliberate finish instead of a hard cut.
+  const endFade = fi(frame, [368, 402], [0, 1], easeInOut);
 
   return (
     <AbsoluteFill style={{
@@ -1177,52 +1171,47 @@ function Act7Close({ content }) {
 
       {/* Ambient pulsing glow */}
       <div style={{
-        position: 'absolute', top: '40%', left: '50%',
-        width: 680, height: 440,
+        position: 'absolute', top: '46%', left: '50%',
+        width: 720, height: 460,
         transform: 'translate(-50%, -50%)',
         borderRadius: '50%',
-        background: `radial-gradient(ellipse, rgba(82,168,50,${glowPulse * 0.20}) 0%, transparent 65%)`,
-        filter: 'blur(65px)', pointerEvents: 'none',
+        background: `radial-gradient(ellipse, rgba(82,168,50,${glowPulse * 0.22}) 0%, transparent 65%)`,
+        filter: 'blur(70px)', pointerEvents: 'none',
       }} />
 
-      {/* Identity headline */}
+      {/* Closing line */}
       <div style={{
-        opacity: idOp, transform: `translateY(${idY}px)`,
-        textAlign: 'center', padding: '0 80px', maxWidth: 980, zIndex: 1,
+        opacity: lineOp, transform: `translateY(${lineY}px)`,
+        textAlign: 'center', padding: '0 80px', maxWidth: 920, zIndex: 1,
+        marginBottom: 30,
       }}>
         <div style={{
-          fontFamily: FONT.display, fontSize: 82, fontWeight: 800,
-          color: C.white, letterSpacing: '-0.042em', lineHeight: 1.0,
+          fontFamily: FONT.display, fontSize: 54, fontWeight: 800,
+          color: C.white, letterSpacing: '-0.04em', lineHeight: 1.04,
         }}>
           {idEl}
         </div>
       </div>
 
-      {/* Audience pills */}
+      {/* Logo lockup — the real RentEazy mark on a clean card */}
       <div style={{
-        marginTop: 28, display: 'flex', gap: 12,
-        justifyContent: 'center', flexWrap: 'wrap',
-        padding: '0 40px', zIndex: 1,
+        opacity: logoOp,
+        transform: `scale(${logoScale})`,
+        background: '#ffffff',
+        borderRadius: 28,
+        padding: '26px 44px',
+        boxShadow: '0 30px 70px rgba(0,0,0,0.45), 0 0 0 1px rgba(255,255,255,0.6), 0 0 60px rgba(82,168,50,0.25)',
+        zIndex: 1,
       }}>
-        {pills.map((pill, i) => (
-          <div key={pill.label} style={{
-            opacity: pillOps[i],
-            background: pill.bg, border: `1px solid ${pill.border}`,
-            borderRadius: 100, padding: '9px 20px',
-          }}>
-            <span style={{
-              fontFamily: FONT.sans, fontSize: 14,
-              fontWeight: 500, color: pill.color,
-            }}>
-              {pill.label}
-            </span>
-          </div>
-        ))}
+        <Img
+          src={staticFile('/images/renteazy-main-logo-transparent.png')}
+          style={{ width: 230, height: 'auto', display: 'block' }}
+        />
       </div>
 
       {/* CTA button — spring-drops on DROP 2 */}
       <div style={{
-        marginTop: 32, opacity: ctaOp,
+        marginTop: 30, opacity: ctaOp,
         transform: `scale(${ctaScale})`,
         textAlign: 'center', zIndex: 1,
       }}>
@@ -1230,9 +1219,9 @@ function Act7Close({ content }) {
           background: `linear-gradient(135deg, ${C.green} 0%, ${C.greenDark} 100%)`,
           borderRadius: 100, padding: '22px 64px',
           color: 'white', fontFamily: FONT.display,
-          fontSize: 23, fontWeight: 600, display: 'inline-block',
+          fontSize: 24, fontWeight: 600, display: 'inline-block',
           boxShadow: [
-            `0 22px 56px rgba(47,125,50,${ctaGlow * 0.65})`,
+            `0 22px 56px rgba(47,125,50,${ctaGlow * 0.7})`,
             '0 0 0 1px rgba(255,255,255,0.20)',
             '0 2px 0 rgba(255,255,255,0.14) inset',
           ].join(', '),
@@ -1240,61 +1229,49 @@ function Act7Close({ content }) {
         }}>
           {content.ctaLabel}
         </div>
-        {/* 2-min framing under the button */}
         <div style={{
-          marginTop: 10,
+          marginTop: 11,
           fontFamily: FONT.mono, fontSize: 10,
-          letterSpacing: '0.14em', color: 'rgba(255,255,255,0.28)',
+          letterSpacing: '0.14em', color: 'rgba(255,255,255,0.30)',
           textTransform: 'uppercase',
         }}>
           Takes 2 minutes · No card required
         </div>
       </div>
 
-      {/* Consequence line — the cost of inaction */}
-      <div style={{
-        marginTop: 22, opacity: conseqOp,
-        transform: `translateY(${conseqY}px)`,
-        textAlign: 'center', padding: '0 80px', zIndex: 1,
-      }}>
+      {/* Domain + multi-sided reassurance */}
+      <div style={{ marginTop: 20, opacity: domOp, zIndex: 1, textAlign: 'center' }}>
         <div style={{
-          fontFamily: FONT.sans, fontSize: 16, fontWeight: 300,
-          color: 'rgba(255,255,255,0.38)', letterSpacing: '-0.005em',
-          fontStyle: 'italic',
+          fontFamily: FONT.mono, fontSize: 12,
+          color: 'rgba(255,255,255,0.40)',
+          letterSpacing: '0.16em',
         }}>
-          {content.consequenceLine}
+          renteazy.co.uk
         </div>
       </div>
 
-      {/* Domain footer */}
-      <div style={{ marginTop: 16, opacity: footOp, zIndex: 1 }}>
-        <div style={{
-          fontFamily: FONT.mono, fontSize: 11,
-          color: 'rgba(255,255,255,0.24)',
-          letterSpacing: '0.16em', textAlign: 'center',
-        }}>
-          renteazy.co.uk · free to post · free to swipe · mutual match
-        </div>
-      </div>
-
-      {/* "Your match is already swiping" — the urgency kicker */}
       <div style={{
         marginTop: 12, opacity: socialOp, zIndex: 1,
         display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'center',
       }}>
         <div style={{
           width: 6, height: 6, borderRadius: '50%',
-          background: C.greenPale,
-          boxShadow: `0 0 6px ${C.greenPale}`,
+          background: C.greenPale, boxShadow: `0 0 6px ${C.greenPale}`,
         }} />
         <div style={{
           fontFamily: FONT.mono, fontSize: 10,
-          letterSpacing: '0.14em', color: 'rgba(155,211,131,0.55)',
+          letterSpacing: '0.14em', color: 'rgba(155,211,131,0.6)',
           textTransform: 'uppercase',
         }}>
-          Your match is already on the platform
+          Renters · Landlords · Agents · Investors — your match is already here
         </div>
       </div>
+
+      {/* Fade to black — clean finish + seamless loop */}
+      <div style={{
+        position: 'absolute', inset: 0, background: '#000000',
+        opacity: endFade, pointerEvents: 'none', zIndex: 40,
+      }} />
     </AbsoluteFill>
   );
 }
@@ -1317,8 +1294,15 @@ export default function RentEazyVSL({ userType = 'tenant' }) {
       */}
       <Audio
         src={staticFile('/audio/in-it-kadant.mp3')}
-        volume={0.65}
         startFrom={0}
+        volume={(f) =>
+          interpolate(
+            f,
+            [0, 14, TOTAL - 60, TOTAL - 4],
+            [0, 0.65, 0.65, 0],
+            { extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: easeInOut }
+          )
+        }
       />
 
       {/* Act 1: INTERRUPT — 0–147f */}
