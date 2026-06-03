@@ -13,23 +13,23 @@ export const CONTENT = {
     // SpareRoom is the UK's #1 rooms/flatshare platform — far more resonant for
     // renters than Rightmove (which is agent/whole-property led).
     hookWords: ['Still', 'refreshing', 'SpareRoom', 'at', '1am?'],
-    hookSubline: 'You already know the answer isn\'t on there.',
+    hookSubline: 'Your messages just echo in a black hole.',
 
-    // Act 2 — IDENTIFY: pain cards that name the exact feeling
+    // Act 2 — IDENTIFY: pain cards in renters' OWN words (verbatim from Reddit VoC)
     painCards: [
-      { title: '"Already let, sorry"', sub: 'Listed 4 hrs ago. Gone before your message sent.' },
-      { title: '22 messages sent', sub: 'Zero replies. Zero. Not one.' },
-      { title: '6 viewings booked', sub: 'Landlord ghosted 4. No-show for the other 2.' },
-      { title: '"Still looking"', sub: 'You\'ve said it so many times you hate the words.' },
+      { title: '"Already let, sorry"', sub: 'Listed 4 hrs ago. Gone before you messaged.' },
+      { title: 'Messages into a black hole', sub: '20+ sent. Not even a "no" comes back.' },
+      { title: 'Worse than dating', sub: 'At least there, someone turns you down.' },
+      { title: '"Get premium or forget it"', sub: 'Pay up — or say goodbye to a decent room.' },
     ],
     identityLine: 'The place you want doesn\'t wait.',
     identityAccent: 'doesn\'t wait',
 
-    // Act 3 — AGITATE: visceral cost lines
+    // Act 3 — AGITATE: their exact spiral — ending on the real, unsaid fear
     agitateLines: [
-      'Every morning you check — still nothing right.',
-      'Every viewing you rush to is already gone.',
-      'The market moves. You\'re always one day late.',
+      'You refresh at 7am. Same rooms. Already gone.',
+      'You earn well — still asked for a guarantor, or a year upfront.',
+      'You did everything right. It still doesn\'t matter.',
     ],
     anguishLine: 'SpareRoom rewards whoever messages first — not whoever fits.',
     anguishAccent: 'not whoever fits',
@@ -37,7 +37,7 @@ export const CONTENT = {
     // Act 4 — BRIDGE: the pivot moment
     bridgeLine: 'What if the right place found you?',
     bridgeAccent: 'found you',
-    bridgeSub: 'Not 300 listings. The ones where the landlord already likes your profile.',
+    bridgeSub: 'Not 300 listings. The room where they already want you — and your reputation arrives before you do.',
 
     // Act 5 — REVEAL
     revealLabel: 'FOR TENANTS',
@@ -60,19 +60,19 @@ export const CONTENT = {
 
     // Act 2 — IDENTIFY: landlord inner monologue
     painCards: [
-      { title: '3 no-shows this week', sub: 'Tuesday. Thursday. Saturday. All confirmed. None showed.' },
-      { title: 'Budget nowhere near', sub: 'They asked about the flat. Can\'t afford it. Time wasted.' },
-      { title: '47 enquiries', sub: '3 might be serious. Good luck finding which 3.' },
-      { title: 'Void: week 3', sub: 'You do the maths. £600, £1200, £1800... still counting.' },
+      { title: '30 viewings booked. 1 showed.', sub: 'The rest confirmed — then ghosted.' },
+      { title: 'Like Facebook Marketplace', sub: 'Ghosters, or a sob story with bad credit.' },
+      { title: '"They don\'t care who they put in"', sub: 'That\'s your agent. On 10% + VAT.' },
+      { title: '47 enquiries today', sub: 'Maybe 3 are real. Good luck finding them.' },
     ],
     identityLine: 'You want the right tenant. Not the loudest one.',
     identityAccent: 'right tenant',
 
-    // Act 3 — AGITATE
+    // Act 3 — AGITATE: ending on the real fear — a bad tenant is now unrecoverable
     agitateLines: [
       'Every no-show is an afternoon you can\'t get back.',
       'Every unqualified enquiry is noise hiding the signal.',
-      'Every void week is money that evaporates quietly.',
+      'And with Section 21 gone, the wrong one stays for a year.',
     ],
     anguishLine: 'Portals sell your listing to everyone. Then leave you to sort the mess.',
     anguishAccent: 'leave you to sort the mess',
@@ -80,7 +80,7 @@ export const CONTENT = {
     // Act 4 — BRIDGE
     bridgeLine: 'What if the right tenant came to you — already verified?',
     bridgeAccent: 'already verified',
-    bridgeSub: 'Budget confirmed. Move date aligned. Both sides serious before first contact.',
+    bridgeSub: 'Budget confirmed. Move date set. And you choose who gets the keys — not whoever shouted first.',
 
     // Act 5 — REVEAL
     revealLabel: 'FOR LANDLORDS',
@@ -98,39 +98,39 @@ export const CONTENT = {
 
   investor: {
     // Act 1 — INTERRUPT: the deal was under offer before they saw it
-    hookWords: ['Under', 'offer', 'before', 'you', 'saw', 'it?'],
-    hookSubline: 'Real demand data beats portal averages. Every time.',
+    hookWords: ['Another', '"off-market', 'gem"?'],
+    hookSubline: 'You can\'t tell who\'s real until it\'s too late.',
 
-    // Act 2 — IDENTIFY: investor pain
+    // Act 2 — IDENTIFY: the real investor pain is SOURCER TRUST (verbatim VoC)
     painCards: [
-      { title: 'Yield estimate', sub: 'Based on data from 6 months ago. Markets moved.' },
-      { title: 'Demand? Unclear.', sub: 'How many real tenants want this specific flat right now?' },
-      { title: 'Tenant quality', sub: 'You can\'t verify until it\'s too late to walk away.' },
-      { title: 'WhatsApp sourcer', sub: '"Deal of the decade." You\'ve heard it before.' },
+      { title: 'Numbers that don\'t stack up', sub: 'Most "deals" don\'t survive real diligence.' },
+      { title: 'Real operator, or course grad?', sub: 'No barrier to entry. You can\'t tell.' },
+      { title: '"Off-market gem"', sub: 'A WhatsApp blast. Soon deleted. Full of adverts.' },
+      { title: 'You find out too late', sub: 'After the deposit. After the contract.' },
     ],
-    identityLine: 'You need live demand signals — not portfolio averages.',
-    identityAccent: 'live demand signals',
+    identityLine: 'You can\'t tell a real operator from a course graduate.',
+    identityAccent: 'course graduate',
 
     // Act 3 — AGITATE
     agitateLines: [
-      'Every acquisition decision built on stale data carries hidden risk.',
-      'Every tenant you can\'t vet eats into your net yield.',
-      'Every deal you missed had a buyer who moved faster.',
+      'Every "deal" is inflated numbers — until you\'ve transacted.',
+      'Your sourcer network is three names on WhatsApp.',
+      'And nothing tells you who actually delivers.',
     ],
-    anguishLine: 'Portals were built for retail tenants. Your portfolio is not retail.',
-    anguishAccent: 'not retail',
+    anguishLine: 'Hype sells the deal. Nobody shows you the track record.',
+    anguishAccent: 'the track record',
 
     // Act 4 — BRIDGE
-    bridgeLine: 'What if you could see real tenant demand before you commit?',
-    bridgeAccent: 'before you commit',
-    bridgeSub: 'Verified profiles. Mutual match data. East London — live now.',
+    bridgeLine: 'What if trust came before the deal — not after?',
+    bridgeAccent: 'before the deal',
+    bridgeSub: 'Completed deals, track record, Companies House, redress registration — proof on every profile. See who delivers before you ever message.',
 
     // Act 5 — REVEAL
     revealLabel: 'FOR INVESTORS',
-    revealTagline: 'See live demand. Build your edge.',
+    revealTagline: 'See the track record. Then make the call.',
 
     // Act 6 — PROOF
-    proofHook: 'Mutual match means both sides are qualified.',
+    proofHook: 'Reputation is earned with proof. The more they prove, the more you trust.',
 
     // Act 7 — CLOSE
     identityFrame: 'Stop estimating. Start matching.',
