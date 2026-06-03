@@ -245,17 +245,17 @@ function Act1Interrupt({ content }) {
   const frame = useCurrentFrame();
   const words = content.hookWords;
 
-  // Faster cadence — each word slaps in on the quiet opening beats
-  // Words land across 0–75f; subline at 85f; cursor blinks 90–130f; exit 130–147f
-  const wordFrames = [5, 17, 29, 39, 49, 59, 67, 75].slice(0, words.length);
+  // Deliberate cadence — each word gets ~15 frames (0.5s) to land, then the
+  // whole line holds for ~1.7s before the cut. A rushed hook reads as noise.
+  const wordFrames = [8, 23, 38, 53, 68, 83, 98, 113].slice(0, words.length);
 
-  const subOp = fi(frame, [82, 100], [0, 1], easeOut);
-  const subY  = interpolate(clamp(sp(frame, 82, { damping: 22, stiffness: 240 })), [0, 1], [12, 0]);
+  const subOp = fi(frame, [94, 112], [0, 1], easeOut);
+  const subY  = interpolate(clamp(sp(frame, 94, { damping: 22, stiffness: 240 })), [0, 1], [12, 0]);
 
-  const exitOp = fi(frame, [130, 147], [1, 0], easeInOut);
+  const exitOp = fi(frame, [134, 147], [1, 0], easeInOut);
 
-  const lastWordF = wordFrames[wordFrames.length - 1] ?? 75;
-  const cursorVisible = frame > lastWordF + 6 && frame < 128;
+  const lastWordF = wordFrames[wordFrames.length - 1] ?? 83;
+  const cursorVisible = frame > lastWordF + 6 && frame < 132;
   const cursorOn      = cursorVisible && Math.floor((frame - lastWordF) / 7) % 2 === 0;
 
   // Subtle red vignette builds during hook — signals danger/urgency
@@ -838,7 +838,8 @@ function Act5Reveal({ content, userType }) {
             <div style={{ position: 'absolute', inset: 0, overflow: 'hidden' }}>
               <SwipeAnimation
                 imagePath={cardData.image}
-                tenantImage="/images/match-tenant.jpg"
+                counterImage={cardData.counterImage}
+                matchLine={cardData.matchLine}
                 matchScore={cardData.matchScore}
                 title={cardData.title}
                 location={cardData.location}
@@ -921,7 +922,7 @@ function Act5Reveal({ content, userType }) {
         width: 230,
       }}>
         {[
-          { label: 'Both sides like first', highlight: true },
+          { label: 'Match only when both like', highlight: true },
           { label: 'No cold outreach needed', highlight: false },
           { label: '9 match criteria', highlight: false },
           { label: 'Reputation travels', highlight: false },

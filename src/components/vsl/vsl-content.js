@@ -42,7 +42,7 @@ export const CONTENT = {
     revealTagline: 'Post once. Match with landlords who already want you.',
 
     // Act 6 — PROOF hook
-    proofHook: 'Both sides like first. Then you talk.',
+    proofHook: 'You match only when both like. Then you talk.',
 
     // Act 7 — CLOSE: hard close on the consequence
     identityFrame: 'Stop searching. Start matching.',
@@ -186,12 +186,12 @@ export const PLATFORM_FACTS = [
   { count: 9,  label: 'match types',          sub: 'Budget, area, move date & 6 more' },
   { count: 18, label: 'ways to post',          sub: 'Flexible for any landlord or agent' },
   { count: 0,  label: 'cost to join',          sub: 'Free to post. Free to swipe. Always.' },
-  { count: 2,  label: 'sides like first',      sub: 'Mutual match — both opt in' },
+  { count: 2,  label: 'sides must match',      sub: 'Mutual — never one-sided' },
 ];
 
 export const PLATFORM_FEATURES = [
   'Free to post. Free to swipe.',
-  'Mutual match — both sides like first.',
+  'Mutual match — a match needs both sides.',
   '9 match types: budget, area, move date & more.',
   '18 ways to post a listing.',
   'Reputation travels with every match.',
@@ -232,7 +232,7 @@ export const BEFORE_AFTER = {
   after: {
     label: 'RENTEAZY',
     points: [
-      'Both sides like first — then talk',
+      'Match only when both like — then talk',
       'Context and fit before hello',
       '9 match criteria filter bad fits out',
       'Reputation protects both sides',
@@ -240,43 +240,70 @@ export const BEFORE_AFTER = {
   },
 };
 
-/** Role-specific card data for Act 5 swipe demo */
+/**
+ * Role-specific card data for the Act 5 swipe demo.
+ *
+ * CRITICAL: the swipe card must depict what THAT role actually swipes:
+ *   - tenant  → a HOME (property photo)
+ *   - landlord/agent → a TENANT (a real person photo)
+ *   - investor → a DEAL (property photo)
+ * Only two real people photos exist: match-tenant.jpg (man), match-agent.jpg
+ * (woman). Every match-flat / match-room file is an interior. Labels MUST match
+ * the photo (no tenant name over a room).
+ *
+ * counterImage = the OTHER matched party shown in the "It's a match" pop, so the
+ * two avatars are logically correct (person ↔ home), never a random stranger.
+ * matchLine = honest, sequential copy: you liked, they liked back. A match only
+ * exists because BOTH chose — never "both liked first".
+ */
 export const CARD_DATA_BY_TYPE = {
+  // Tenant swipes a home; matches when the landlord likes their profile back.
   tenant: {
-    image:      '/images/match-flat.jpg',
-    matchScore: 94,
-    title:      'Hackney 2-bed',
-    location:   'London Fields, E8',
-    price:      '£2,200 pcm',
-    tags:       ['Bills incl.', 'Pets OK', 'Available now'],
-    repScore:   '4.9',
+    image:        '/images/match-flat.jpg',   // a home
+    counterImage: '/images/match-agent.jpg',  // the landlord, a person
+    matchScore:   94,
+    title:        'Hackney 2-bed',
+    location:     'London Fields, E8',
+    price:        '£2,200 pcm',
+    tags:         ['Bills incl.', 'Pets OK', 'Available now'],
+    repScore:     '4.9',
+    matchLine:    'You liked it. The landlord liked you back.',
   },
+  // Landlord swipes a tenant (a person); matches when the tenant wants the place.
   landlord: {
-    image:      '/images/match-demo-03.jpg',
-    matchScore: 91,
-    title:      'Priya S. · Young Professional',
-    location:   'Seeking Hackney / Bow, E3',
-    price:      'Budget £2,000 pcm',
-    tags:       ['Verified', 'Long-term', 'No pets'],
-    repScore:   '4.8',
+    image:        '/images/match-agent.jpg',  // a real person (tenant)
+    counterImage: '/images/match-flat.jpg',   // their property
+    matchScore:   91,
+    title:        'Priya S. · Tenant',
+    location:     'Seeking Hackney / Bow, E3',
+    price:        'Budget £2,000 pcm',
+    tags:         ['Verified', 'Move-ready', 'Long-term'],
+    repScore:     '4.8',
+    matchLine:    'You liked them. They want your place.',
   },
+  // Agent swipes a qualified tenant lead; matches on mutual interest.
   agent: {
-    image:      '/images/match-demo-05.jpg',
-    matchScore: 96,
-    title:      'Jordan & Alex · Couple',
-    location:   'Seeking Stratford / Forest Gate',
-    price:      'Budget £2,400 pcm',
-    tags:       ['Pre-qualified', 'Long-term', 'Verified'],
-    repScore:   '5.0',
+    image:        '/images/match-tenant.jpg', // a real person (tenant lead)
+    counterImage: '/images/match-flat-3.jpg', // the instruction / property
+    matchScore:   96,
+    title:        'Jordan M. · Tenant',
+    location:     'Seeking Stratford / Forest Gate',
+    price:        'Budget £2,400 pcm',
+    tags:         ['Pre-qualified', 'Verified', 'Long-term'],
+    repScore:     '5.0',
+    matchLine:    'Verified lead. Mutual interest confirmed.',
   },
+  // Investor swipes a deal; matches when a verified sourcer is behind it.
   investor: {
-    image:      '/images/match-flat-2.jpg',
-    matchScore: 88,
-    title:      'Stratford 1-bed',
-    location:   'Stratford, E15 · 5.8% yield est.',
-    price:      '£1,650 pcm',
-    tags:       ['High demand', 'Near Crossrail', 'Verified'],
-    repScore:   null,
+    image:        '/images/match-flat-2.jpg', // the deal (property)
+    counterImage: '/images/match-tenant.jpg', // the sourcer, a person
+    matchScore:   88,
+    title:        'Stratford 1-bed',
+    location:     'Stratford, E15 · 5.8% yield est.',
+    price:        '£1,650 pcm',
+    tags:         ['High demand', 'Near Crossrail', 'Verified'],
+    repScore:     null,
+    matchLine:    'Deal matched. The sourcer is verified.',
   },
 };
 

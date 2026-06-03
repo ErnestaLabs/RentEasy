@@ -346,16 +346,17 @@ export function SwipeCard({
  * Props mirror SwipeCard plus startFrame.
  */
 export function SwipeAnimation({
-  imagePath   = '/images/match-flat.jpg',
-  tenantImage = '/images/match-tenant.jpg',
-  matchScore  = 91,
-  title       = 'Stratford 1-bed',
-  location    = 'Stratford, E15',
-  price       = '£1,650 pcm',
-  tags        = ['1 bed', 'Pets OK', 'Bills incl.'],
-  startFrame  = 0,
-  width       = 320,
-  height      = 540,
+  imagePath    = '/images/match-flat.jpg',
+  counterImage = '/images/match-tenant.jpg',
+  matchLine    = 'You both said yes.',
+  matchScore   = 91,
+  title        = 'Stratford 1-bed',
+  location     = 'Stratford, E15',
+  price        = '£1,650 pcm',
+  tags         = ['1 bed', 'Pets OK', 'Bills incl.'],
+  startFrame   = 0,
+  width        = 320,
+  height       = 540,
 }) {
   const frame = useCurrentFrame();
   const rel   = frame - startFrame;  // relative frame
@@ -557,7 +558,7 @@ export function SwipeAnimation({
             transform: `translateY(${interpolate(matchProgress, [0, 1], [20, 0])}px)`,
             zIndex: 1,
           }}>
-            {/* Tenant avatar */}
+            {/* The card you swiped (left) */}
             <div style={{
               width: 72, height: 72, borderRadius: '50%',
               overflow: 'hidden',
@@ -566,7 +567,7 @@ export function SwipeAnimation({
               marginRight: -10,
             }}>
               <Img
-                src={staticFile(tenantImage)}
+                src={staticFile(imagePath)}
                 style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top' }}
               />
             </div>
@@ -587,7 +588,7 @@ export function SwipeAnimation({
               ✓
             </div>
 
-            {/* Property avatar / thumbnail */}
+            {/* The counterpart who liked back (right) */}
             <div style={{
               width: 72, height: 72, borderRadius: '50%',
               overflow: 'hidden',
@@ -596,8 +597,8 @@ export function SwipeAnimation({
               marginLeft: -10,
             }}>
               <Img
-                src={staticFile(imagePath)}
-                style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }}
+                src={staticFile(counterImage)}
+                style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top' }}
               />
             </div>
           </div>
@@ -612,7 +613,7 @@ export function SwipeAnimation({
             opacity: fi(frame, [startFrame + 38, startFrame + 48], [0, 1], easeOut),
             zIndex: 1,
           }}>
-            Both sides liked first
+            {matchLine}
           </div>
           <div style={{
             marginTop: 6,

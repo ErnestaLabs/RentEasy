@@ -31,11 +31,26 @@ export default function VSLPlayer({ userType = 'tenant' }) {
   // Pulse opacity: breathes between 0.6 and 1
   const pulseOpacity = 0.7 + Math.sin((pulseTick / 60) * Math.PI * 2 * 0.7) * 0.3;
 
+  // Force muted autoplay on mount — the `autoPlay` prop alone is unreliable
+  // across browsers/Remotion versions, so we also call play() imperatively
+  // (muted playback needs no user gesture).
+  useEffect(() => {
+    const id = setTimeout(() => {
+      try {
+        playerRef.current?.play();
+      } catch (_) {}
+    }, 120);
+    return () => clearTimeout(id);
+  }, []);
+
   function unmute() {
     setMuted(false);
     setHasInteracted(true);
-    // Seek to frame 0 so the viewer hears the track from the top
+    // Drive the Player imperatively — the controlled `muted` prop did NOT
+    // reliably emit audio. unmute() + seekTo(0) + play() inside the click
+    // gesture is what actually produces sound.
     try {
+      playerRef.current?.unmute();
       playerRef.current?.seekTo(0);
       playerRef.current?.play();
     } catch (_) {}
@@ -46,6 +61,9 @@ export default function VSLPlayer({ userType = 'tenant' }) {
       unmute();
     } else {
       setMuted(true);
+      try {
+        playerRef.current?.mute();
+      } catch (_) {}
     }
   }
 
@@ -71,7 +89,6 @@ export default function VSLPlayer({ userType = 'tenant' }) {
         loop
         clickToPlay={false}
         initiallyMuted
-        muted={muted}
         acknowledgeRemotionLicense
       />
 
