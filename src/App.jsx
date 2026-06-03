@@ -10,7 +10,7 @@ import RentEazyVoiceAgent from '@/components/voice/RentEazyVoiceAgent';
 // Code-split the VSL: Remotion is ~400KB and sits below the fold, so it must
 // not block the hero paint. Loads lazily when the user scrolls toward it.
 const VSLPlayer = React.lazy(() => import('@/components/vsl/VSLPlayer'));
-import { ArrowDownLeft, ArrowUp, BadgeCheck, Bell, Bookmark, Camera, Check, Compass, Copy, Flag, Flame, Gift, Heart, Home, MapPin, Megaphone, MessageCircle, PlusCircle, RotateCcw, Search, Send, Share2, ShieldCheck, Sparkles, UserPlus, UserRound, Users } from 'lucide-react';
+import { ArrowDownLeft, ArrowUp, BadgeCheck, Bell, Bookmark, CalendarCheck, Camera, Check, Compass, Copy, Flag, Flame, Gift, Heart, Home, MapPin, Megaphone, MessageCircle, PlusCircle, RotateCcw, Search, Send, Share2, ShieldCheck, Sparkles, Star, UserPlus, UserRound, Users } from 'lucide-react';
 
 const defaultRotatingHeroWords = ['tenant', 'agent', 'room', 'home', 'flat', 'landlord', 'match', 'place'];
 const localSocialAppUrl = 'http://localhost:3002';
@@ -1044,6 +1044,74 @@ const seededFeedAds = [
   },
 ];
 
+const seededMatches = [
+  {
+    id: 'match-demo-stratford',
+    participantIds: [currentUser.id, 'agent-eastline'],
+    participantNames: [currentUser.name, 'Eastline Rooms'],
+    participantTypes: ['Member', 'Agent'],
+    subjectType: 'post',
+    subjectId: 'post-stratford-room',
+    subjectTitle: 'Double room near Stratford station',
+    status: 'matched',
+    score: 88,
+    reasonBadges: ['Budget fit', 'Area fit', 'Viewing slots', 'No deal-breaker conflict'],
+    missingInfo: ['Confirm move date'],
+    openedBy: 'mutual_interest',
+    createdAt: '2026-06-01T10:00:00.000Z',
+    updatedAt: '2026-06-01T10:00:00.000Z',
+  },
+];
+
+const seededMatchMessages = [
+  {
+    id: 'message-demo-stratford-1',
+    matchId: 'match-demo-stratford',
+    authorId: 'agent-eastline',
+    authorName: 'Eastline Rooms',
+    body: 'This room is still available. If the area and budget fit, send a viewing window and we can keep the conversation inside RentEazy.',
+    createdAt: '2026-06-01T10:04:00.000Z',
+  },
+];
+
+const seededViewings = [
+  {
+    id: 'viewing-demo-stratford',
+    matchId: 'match-demo-stratford',
+    requesterId: currentUser.id,
+    participantIds: [currentUser.id, 'agent-eastline'],
+    subjectTitle: 'Double room near Stratford station',
+    scheduledFor: new Date(Date.now() + 30 * 60 * 60 * 1000).toISOString(),
+    status: 'requested',
+    mode: 'In-person',
+    location: 'Stratford',
+    notes: 'Bring availability and basic referencing questions.',
+    createdAt: '2026-06-01T10:08:00.000Z',
+    updatedAt: '2026-06-01T10:08:00.000Z',
+  },
+];
+
+const defaultReputationProfile = {
+  userId: currentUser.id,
+  score: 65,
+  tier: 'Bronze',
+  badges: ['Role needed', 'Mutual match history', 'Viewing record', 'More match info needed'],
+  completedFields: 1,
+  missingFields: ['role', 'area', 'budget', 'moveDate', 'lookingFor'],
+  components: {
+    profilePoints: 5,
+    answeredCount: 0,
+    postCount: 0,
+    commentCount: 0,
+    matchCount: 1,
+    viewingCount: 1,
+    reviewCount: 0,
+    eventPoints: 30,
+    reportPenalty: 0,
+  },
+  updatedAt: new Date().toISOString(),
+};
+
 const roleMarketLanes = {
   General: [
     ['Supply', 'Properties, rooms, stays, and availability', 'Properties'],
@@ -1358,7 +1426,7 @@ function InteractiveMatchCard({ canSwipe = true, onSwipeAction = () => {}, onBlo
     }
 
     setSwipeCount(nextSwipeCount);
-    onSwipeAction(action);
+    onSwipeAction(action, card);
     showTrial(action, nextSwipeCount);
 
     window.setTimeout(() => {
@@ -2885,6 +2953,171 @@ function AdsInventoryPanel({ onBoost }) {
   );
 }
 
+function ReputationScoreCard({ reputationProfile }) {
+  const profile = reputationProfile || defaultReputationProfile;
+  const components = profile.components || {};
+
+  return (
+    <section className="overflow-hidden rounded-[1.75rem] border border-white bg-white/92 shadow-[0_18px_44px_-34px_rgba(15,23,42,0.45),inset_0_1px_0_white]">
+      <div className="bg-[#092243] p-5 text-white">
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <p className="font-['JetBrains_Mono',monospace] text-xs text-[#8fd0ff]">RENTEAZY REPUTATION SCORE</p>
+            <h2 className="mt-2 text-4xl font-semibold tracking-tight">{profile.score}</h2>
+            <p className="mt-1 text-sm text-white/68">{profile.tier} tier · built from behaviour, not payment</p>
+          </div>
+          <div className="flex h-14 w-14 items-center justify-center rounded-full bg-white/12 ring-1 ring-white/14">
+            <ShieldCheck className="h-7 w-7 text-[#8bdc65]" />
+          </div>
+        </div>
+        <div className="mt-5 h-2 overflow-hidden rounded-full bg-white/12">
+          <div className="h-full rounded-full bg-linear-to-r from-[#8bdc65] to-[#8fd0ff]" style={{ width: `${profile.score}%` }}></div>
+        </div>
+      </div>
+      <div className="p-5">
+        <div className="grid grid-cols-2 gap-2 text-sm sm:grid-cols-4">
+          {[
+            [components.matchCount || 0, 'Matches'],
+            [components.viewingCount || 0, 'Viewings'],
+            [components.reviewCount || 0, 'Reviews'],
+            [components.answeredCount || 0, 'Answers'],
+          ].map(([value, label]) => (
+            <div key={label} className="rounded-2xl bg-slate-50 p-3 text-center">
+              <p className="text-xl text-slate-950">{value}</p>
+              <p className="text-xs text-slate-500">{label}</p>
+            </div>
+          ))}
+        </div>
+        <div className="mt-4 flex flex-wrap gap-2">
+          {(profile.badges || []).map((badge) => <span key={badge} className="rounded-full bg-[#edf7ff] px-3 py-1 text-xs text-[#154f79]">{badge}</span>)}
+        </div>
+        {profile.missingFields?.length > 0 && (
+          <p className="mt-4 text-sm leading-6 text-slate-600">Improve this by adding: {profile.missingFields.join(', ')}.</p>
+        )}
+      </div>
+    </section>
+  );
+}
+
+function MatchPipelinePanel({ matches, messages, viewings, reviews, onSendMessage, onRequestViewing, onSubmitReview }) {
+  const [selectedMatchId, setSelectedMatchId] = useState(matches[0]?.id || '');
+  const [messageBody, setMessageBody] = useState('');
+  const [viewingAt, setViewingAt] = useState(() => new Date(Date.now() + 26 * 60 * 60 * 1000).toISOString().slice(0, 16));
+  const [viewingNotes, setViewingNotes] = useState('');
+  const [reviewBody, setReviewBody] = useState('');
+  const [rating, setRating] = useState(5);
+  const selectedMatch = matches.find((match) => match.id === selectedMatchId) || matches[0];
+  const matchMessages = selectedMatch ? messages.filter((message) => message.matchId === selectedMatch.id).sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt)) : [];
+  const matchViewings = selectedMatch ? viewings.filter((viewing) => viewing.matchId === selectedMatch.id) : [];
+  const matchReviews = selectedMatch ? reviews.filter((review) => review.matchId === selectedMatch.id) : [];
+
+  useEffect(() => {
+    if (!selectedMatchId && matches[0]?.id) setSelectedMatchId(matches[0].id);
+  }, [matches, selectedMatchId]);
+
+  if (!matches.length) {
+    return (
+      <section className="rounded-[1.75rem] border border-white bg-white/92 p-5 shadow-[0_18px_44px_-34px_rgba(15,23,42,0.45),inset_0_1px_0_white]">
+        <p className="font-['JetBrains_Mono',monospace] text-xs text-[#2670a8]">MATCH PIPELINE</p>
+        <h2 className="mt-2 text-2xl font-normal tracking-tight text-slate-950">No mutual matches yet</h2>
+        <p className="mt-2 text-sm leading-6 text-slate-600">Like or Superlike a suitable swipe card. Chat opens only after a mutual match.</p>
+        <a href="/app/swipe" className="mt-4 inline-flex rounded-full bg-[#2f7d32] px-5 py-3 text-sm text-white">Open Swipe</a>
+      </section>
+    );
+  }
+
+  const submitMessage = (event) => {
+    event.preventDefault();
+    const clean = messageBody.trim();
+    if (!clean || !selectedMatch) return;
+    onSendMessage(selectedMatch.id, clean);
+    setMessageBody('');
+  };
+
+  const submitViewing = (event) => {
+    event.preventDefault();
+    if (!selectedMatch) return;
+    onRequestViewing(selectedMatch.id, {
+      scheduledFor: new Date(viewingAt).toISOString(),
+      mode: 'In-person',
+      location: selectedMatch.subjectTitle,
+      notes: viewingNotes.trim(),
+    });
+    setViewingNotes('');
+  };
+
+  const submitReview = (event) => {
+    event.preventDefault();
+    if (!selectedMatch) return;
+    onSubmitReview(selectedMatch.id, {
+      rating,
+      tags: rating >= 4 ? ['Responsive', 'Useful interaction'] : ['Needs follow-up'],
+      body: reviewBody.trim(),
+    });
+    setReviewBody('');
+  };
+
+  return (
+    <section className="rounded-[1.75rem] border border-white bg-white/92 p-5 shadow-[0_18px_44px_-34px_rgba(15,23,42,0.45),inset_0_1px_0_white]">
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <p className="font-['JetBrains_Mono',monospace] text-xs text-[#2670a8]">MATCH PIPELINE</p>
+          <h2 className="mt-2 text-2xl font-normal tracking-tight text-slate-950">Match → Chat → Viewing → Review</h2>
+          <p className="mt-1 text-sm leading-6 text-slate-500">Messages open only after mutual interest. Viewings and feedback build reputation.</p>
+        </div>
+        <span className="rounded-full bg-[#edf8ee] px-3 py-1 text-xs text-[#215d27]">{matches.length} active</span>
+      </div>
+      <div className="mt-4 flex gap-2 overflow-x-auto pb-1">
+        {matches.map((match) => (
+          <button key={match.id} type="button" onClick={() => setSelectedMatchId(match.id)} className={`min-w-56 rounded-2xl border p-3 text-left ${selectedMatch?.id === match.id ? 'border-[#2f7d32] bg-[#edf8ee]' : 'border-slate-200 bg-white'}`}>
+            <p className="truncate text-sm font-medium text-slate-950">{match.subjectTitle}</p>
+            <p className="mt-1 text-xs text-slate-500">{match.score}% fit · {match.status.replace(/_/g, ' ')}</p>
+          </button>
+        ))}
+      </div>
+      {selectedMatch && (
+        <div className="mt-4 grid gap-4 lg:grid-cols-[1fr_18rem]">
+          <div className="rounded-3xl bg-slate-50 p-4">
+            <div className="flex flex-wrap gap-2">
+              {selectedMatch.reasonBadges.map((badge) => <span key={badge} className="rounded-full bg-white px-3 py-1 text-xs text-slate-600">{badge}</span>)}
+            </div>
+            <div className="mt-4 max-h-64 space-y-3 overflow-y-auto">
+              {matchMessages.map((message) => (
+                <div key={message.id} className={`rounded-2xl p-3 ${message.authorId === currentUser.id ? 'bg-[#edf8ee]' : 'bg-white'}`}>
+                  <p className="text-sm leading-6 text-slate-800">{message.body}</p>
+                  <p className="mt-1 text-xs text-slate-400">{message.authorName} · {new Date(message.createdAt).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</p>
+                </div>
+              ))}
+            </div>
+            <form onSubmit={submitMessage} className="mt-4 flex gap-2">
+              <input value={messageBody} onChange={(event) => setMessageBody(event.target.value)} placeholder="Write a match message" className="min-w-0 flex-1 rounded-full border border-slate-200 bg-white px-4 py-3 text-sm outline-hidden focus:border-[#2f7d32]" />
+              <button className="rounded-full bg-[#2f7d32] px-4 py-3 text-sm text-white"><Send className="h-4 w-4" /></button>
+            </form>
+          </div>
+          <div className="space-y-3">
+            <form onSubmit={submitViewing} className="rounded-3xl border border-[#d5ecd7] bg-[#edf8ee] p-4">
+              <div className="flex items-center gap-2 text-[#215d27]"><CalendarCheck className="h-4 w-4" /><p className="text-sm font-medium">Request viewing</p></div>
+              <input type="datetime-local" value={viewingAt} onChange={(event) => setViewingAt(event.target.value)} className="mt-3 w-full rounded-2xl border border-[#c6e5c9] bg-white px-3 py-2 text-sm text-slate-900" />
+              <textarea value={viewingNotes} onChange={(event) => setViewingNotes(event.target.value)} rows={2} placeholder="Windows, questions, notes" className="mt-2 w-full resize-none rounded-2xl border border-[#c6e5c9] bg-white px-3 py-2 text-sm text-slate-900" />
+              <button className="mt-3 w-full rounded-full bg-[#2f7d32] px-4 py-2 text-sm text-white">Request</button>
+              {matchViewings.length > 0 && <p className="mt-2 text-xs leading-5 text-[#215d27]">{matchViewings.length} viewing record{matchViewings.length === 1 ? '' : 's'} saved.</p>}
+            </form>
+            <form onSubmit={submitReview} className="rounded-3xl border border-slate-200 bg-white p-4">
+              <div className="flex items-center gap-2 text-[#154f79]"><Star className="h-4 w-4" /><p className="text-sm font-medium">Double-sided review</p></div>
+              <select value={rating} onChange={(event) => setRating(Number(event.target.value))} className="mt-3 w-full rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm">
+                {[5, 4, 3, 2, 1].map((value) => <option key={value} value={value}>{value} stars</option>)}
+              </select>
+              <textarea value={reviewBody} onChange={(event) => setReviewBody(event.target.value)} rows={2} placeholder="Private until both sides submit" className="mt-2 w-full resize-none rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm" />
+              <button className="mt-3 w-full rounded-full bg-[#092243] px-4 py-2 text-sm text-white">Submit feedback</button>
+              {matchReviews.length > 0 && <p className="mt-2 text-xs text-slate-500">{matchReviews.length} review submitted.</p>}
+            </form>
+          </div>
+        </div>
+      )}
+    </section>
+  );
+}
+
 function TrustReputationPanel({ reports, comments, profile }) {
   const verifiedActions = comments.filter((comment) => comment.authorId === profile.id || comment.authorId === currentUser.id).length;
 
@@ -3123,6 +3356,11 @@ function RentEazyAppShell() {
   const [feedAds, setFeedAds] = useStoredState('renteazy-feed-ads', seededFeedAds);
   const [behavioralEvents, setBehavioralEvents] = useStoredState('renteazy-behavioral-events', []);
   const [hiddenAdIds, setHiddenAdIds] = useStoredState('renteazy-hidden-ads', []);
+  const [matches, setMatches] = useStoredState('renteazy-matches', seededMatches);
+  const [matchMessages, setMatchMessages] = useStoredState('renteazy-match-messages', seededMatchMessages);
+  const [viewings, setViewings] = useStoredState('renteazy-viewings', seededViewings);
+  const [reviews, setReviews] = useStoredState('renteazy-reviews', []);
+  const [reputationProfile, setReputationProfile] = useStoredState('renteazy-reputation-profile', defaultReputationProfile);
   const [openedOfferId, setOpenedOfferId] = useState('');
   const [sharePost, setSharePost] = useState(null);
   const [reportPost, setReportPost] = useState(null);
@@ -3160,6 +3398,11 @@ function RentEazyAppShell() {
     if (state.partnerOffers) setPartnerOffers(state.partnerOffers);
     if (state.feedAds) setFeedAds(state.feedAds);
     if (state.behavioralEvents) setBehavioralEvents(state.behavioralEvents);
+    if (state.matches) setMatches(state.matches);
+    if (state.matchMessages) setMatchMessages(state.matchMessages);
+    if (state.viewings) setViewings(state.viewings);
+    if (state.reviews) setReviews(state.reviews);
+    if (state.reputationProfile) setReputationProfile(state.reputationProfile);
   };
 
   const syncApiState = async (promise) => {
@@ -3360,10 +3603,76 @@ function RentEazyAppShell() {
     syncApiState(apiRequest(`/api/posts/${postId}/comment`, { method: 'POST', body: comment }));
   };
 
-  const handleSwipeAction = (action) => {
+  const handleSwipeAction = (action, card = {}) => {
     setUsageLimit((current) => ({ ...current, used: Math.min(current.allowance, current.used + 1) }));
     if (action === 'superlike') openUpsell('superlike-1');
-    syncApiState(apiRequest('/api/swipes', { method: 'POST', body: { action, targetType: 'swipe_card' } }));
+    syncApiState(apiRequest('/api/swipes', {
+      method: 'POST',
+      body: {
+        action,
+        targetType: 'swipe_card',
+        targetId: card.id,
+        subjectTitle: card.title,
+        score: card.matchScore,
+        reasonBadges: card.badges,
+        missingInfo: ['Confirm viewing availability'],
+        counterpartId: `source-${card.id || 'card'}`,
+        counterpartName: card.type === 'room' || card.type === 'flat' || card.type === 'studio' ? 'Listing source' : 'RentEazy member',
+        counterpartType: card.type || 'Member',
+      },
+    }));
+  };
+
+  const sendMatchMessage = (matchId, body) => {
+    const message = {
+      id: createPostId(),
+      matchId,
+      authorId: profile.id || currentUser.id,
+      authorName: profile.name || currentUser.name,
+      body,
+      createdAt: new Date().toISOString(),
+    };
+    setMatchMessages((current) => [message, ...current]);
+    syncApiState(apiRequest(`/api/matches/${matchId}/messages`, { method: 'POST', body: message }));
+  };
+
+  const requestViewing = (matchId, payload) => {
+    const match = matches.find((item) => item.id === matchId);
+    const viewing = {
+      id: createPostId(),
+      matchId,
+      requesterId: profile.id || currentUser.id,
+      participantIds: match?.participantIds || [profile.id || currentUser.id],
+      subjectTitle: match?.subjectTitle || 'RentEazy match',
+      scheduledFor: payload.scheduledFor,
+      status: 'requested',
+      mode: payload.mode,
+      location: payload.location,
+      notes: payload.notes,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+    setViewings((current) => [viewing, ...current]);
+    setMatches((current) => current.map((item) => item.id === matchId ? { ...item, status: 'viewing_requested', updatedAt: new Date().toISOString() } : item));
+    syncApiState(apiRequest(`/api/matches/${matchId}/viewings`, { method: 'POST', body: viewing }));
+  };
+
+  const submitMatchReview = (matchId, payload) => {
+    const match = matches.find((item) => item.id === matchId);
+    const review = {
+      id: createPostId(),
+      matchId,
+      reviewerId: profile.id || currentUser.id,
+      revieweeId: match?.participantIds?.find((id) => id !== (profile.id || currentUser.id)) || match?.participantIds?.[0] || '',
+      rating: payload.rating,
+      tags: payload.tags,
+      body: payload.body,
+      visibility: 'double_blind_until_both_submit',
+      status: 'submitted',
+      createdAt: new Date().toISOString(),
+    };
+    setReviews((current) => [review, ...current]);
+    syncApiState(apiRequest(`/api/matches/${matchId}/reviews`, { method: 'POST', body: review }));
   };
 
   const confirmMicroProduct = (product) => {
@@ -3618,6 +3927,9 @@ function RentEazyAppShell() {
               <div className="mt-5"><MatchSummaryStrip profile={profile} answers={answers} /></div>
               <div className="mt-5"><DailySwipePanel usageLimit={usageLimit} onBuyMore={openUpsell} /></div>
               <div className="mt-5"><InteractiveMatchCard canSwipe={remainingSwipes > 0} onSwipeAction={handleSwipeAction} onBlocked={() => openUpsell('extra-swipes-10')} /></div>
+              <div className="mt-5">
+                <MatchPipelinePanel matches={matches} messages={matchMessages} viewings={viewings} reviews={reviews} onSendMessage={sendMatchMessage} onRequestViewing={requestViewing} onSubmitReview={submitMatchReview} />
+              </div>
               <div className="mt-5 rounded-3xl border border-[#d5ecd7] bg-[#edf8ee] p-4 text-sm leading-6 text-[#215d27]">
                 After a match or viewing, Protect Basic keeps the interaction on record for £0.99/month.
               </div>
@@ -3631,6 +3943,7 @@ function RentEazyAppShell() {
                 <h1 className="text-4xl font-normal tracking-tight text-slate-950">Likes</h1>
                 <p className="mt-3 text-slate-600">Saved posts and liked posts stay here so you can come back to them quickly.</p>
               </div>
+              <MatchPipelinePanel matches={matches} messages={matchMessages} viewings={viewings} reviews={reviews} onSendMessage={sendMatchMessage} onRequestViewing={requestViewing} onSubmitReview={submitMatchReview} />
               <div className="rounded-[1.75rem] border border-white bg-white/86 p-5 shadow-[0_18px_44px_-34px_rgba(15,23,42,0.45),inset_0_1px_0_white]">
                 <p className="font-['JetBrains_Mono',monospace] text-xs text-[#2670a8]">WHO LIKED YOU</p>
                 <h2 className="mt-2 text-2xl font-normal tracking-tight text-slate-950">No hidden likes yet</h2>
@@ -3677,6 +3990,8 @@ function RentEazyAppShell() {
                 </div>
               </div>
               <ProfileEditor profile={profile} setProfile={setProfile} answers={answers} setAnswers={setAnswers} />
+              <ReputationScoreCard reputationProfile={reputationProfile} />
+              <MatchPipelinePanel matches={matches} messages={matchMessages} viewings={viewings} reviews={reviews} onSendMessage={sendMatchMessage} onRequestViewing={requestViewing} onSubmitReview={submitMatchReview} />
               <TrustReputationPanel reports={reports} comments={comments} profile={profile} />
               <ActivityInbox usageLimit={usageLimit} posts={posts} shares={shares} reports={reports} boosts={boosts} profile={profile} />
               <MiniShopPanel onSelectProduct={openUpsell} />
@@ -4260,6 +4575,62 @@ export default function App() {
                 </div>
               </div>
             ))}
+          </div>
+        </section>
+
+        {/* ── Be early — where it's live (cold-start objection) ────── */}
+        <section id="be-early" className="max-w-7xl mx-auto px-6 py-12">
+          <div className="relative overflow-hidden rounded-[2.75rem] border border-white/8 bg-linear-to-br from-[#0d2e57] to-[#06182f] shadow-[0_40px_90px_-45px_rgba(9,34,67,0.7),inset_0_1px_0_rgba(255,255,255,0.1)]">
+            <div className="grid items-center gap-8 p-8 md:p-12 lg:grid-cols-[1.05fr_0.95fr] lg:p-14">
+              <div>
+                <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-[#52a832]/35 bg-[#52a832]/18 px-3 py-1.5">
+                  <span className="relative flex h-2 w-2">
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#9bd383] opacity-60"></span>
+                    <span className="relative inline-flex h-2 w-2 rounded-full bg-[#9bd383]"></span>
+                  </span>
+                  <span className="font-['JetBrains_Mono',monospace] text-[10px] tracking-[0.14em] text-[#9bd383]">LIVE · EAST LONDON</span>
+                </div>
+                <h2 className="text-3xl font-normal leading-[1.05] tracking-tight text-white md:text-4xl lg:text-5xl">Be early. Build your reputation before your area fills.</h2>
+                <p className="mt-5 max-w-lg text-base font-light leading-8 text-white/62">RentEazy opens area by area, starting in East London. Early is the advantage: you see every match in your patch while it's small — and the reputation you build now travels with you as the network grows across the UK.</p>
+                <div className="mt-6 flex flex-wrap gap-2">
+                  {['E1', 'E2', 'E3', 'E8', 'E9', 'E14', 'E15', 'E20'].map((pc) => (
+                    <span key={pc} className="rounded-full border border-[#9bd383]/25 bg-[#9bd383]/14 px-3 py-1 font-['JetBrains_Mono',monospace] text-xs text-[#9bd383]">{pc}</span>
+                  ))}
+                  <span className="rounded-full border border-white/12 bg-white/6 px-3 py-1 font-['JetBrains_Mono',monospace] text-xs text-white/45">your area next →</span>
+                </div>
+                <a href="/signup?source=be_early&offer=match24h" className="mt-8 inline-flex items-center gap-2.5 rounded-full border border-[#25672a] bg-linear-to-b from-[#52a832] to-[#2f7d32] px-7 py-3.5 text-sm font-medium text-white shadow-[0_12px_28px_rgba(47,125,50,0.32),inset_0_1px_0_rgba(255,255,255,0.3)] transition-all hover:from-[#64bd44] hover:to-[#3b8d3d]">
+                  Claim your spot — free
+                  <iconify-icon icon="solar:arrow-right-linear" class="text-lg"></iconify-icon>
+                </a>
+              </div>
+              <div className="relative mx-auto flex aspect-square w-full max-w-sm items-center justify-center">
+                {[34, 56, 78, 100].map((s) => (
+                  <span key={s} className="absolute rounded-full border border-[#9bd383]/15" style={{ width: `${s}%`, height: `${s}%` }} />
+                ))}
+                {[0, 1, 2].map((i) => (
+                  <motion.span
+                    key={`pulse-${i}`}
+                    className="absolute rounded-full border border-[#9bd383]/40"
+                    initial={{ width: '22%', height: '22%', opacity: 0.55 }}
+                    animate={{ width: '100%', height: '100%', opacity: 0 }}
+                    transition={{ duration: 3.4, repeat: Infinity, delay: i * 1.13, ease: 'easeOut' }}
+                  />
+                ))}
+                {[['Manchester', '18%', '20%'], ['Birmingham', '32%', '40%'], ['Leeds', '68%', '18%'], ['Bristol', '26%', '70%']].map(([city, top, left]) => (
+                  <span key={city} className="absolute flex flex-col items-center" style={{ top, left }}>
+                    <span className="h-1.5 w-1.5 rounded-full bg-white/25"></span>
+                    <span className="mt-1 font-['JetBrains_Mono',monospace] text-[8px] tracking-[0.1em] text-white/25">{city}</span>
+                  </span>
+                ))}
+                <span className="relative z-10 flex flex-col items-center">
+                  <span className="flex h-4 w-4 rounded-full bg-[#52a832] shadow-[0_0_22px_5px_rgba(82,168,50,0.6)]"></span>
+                  <span className="mt-2 rounded-full bg-[#06182f]/70 px-2 py-0.5 font-['JetBrains_Mono',monospace] text-[10px] tracking-[0.12em] text-[#9bd383]">EAST LONDON · LIVE</span>
+                </span>
+                <div className="pointer-events-none absolute inset-x-0 bottom-0 text-center">
+                  <span className="font-['JetBrains_Mono',monospace] text-[10px] tracking-[0.12em] text-white/40">LIVE HERE NOW · UK NEXT</span>
+                </div>
+              </div>
+            </div>
           </div>
         </section>
 
