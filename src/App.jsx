@@ -563,7 +563,7 @@ const microProducts = [
 const currentUser = {
   id: 'demo-user',
   name: 'RentEazy member',
-  role: 'Tenant',
+  role: '',
 };
 
 const defaultUsageLimit = {
@@ -588,10 +588,10 @@ const defaultAppProfile = {
   id: currentUser.id,
   name: currentUser.name,
   role: currentUser.role,
-  area: 'East London',
-  budget: 'Up to £1,100 pcm',
-  moveDate: 'Within 6 weeks',
-  lookingFor: 'Room or buddy-up',
+  area: '',
+  budget: '',
+  moveDate: '',
+  lookingFor: '',
 };
 
 const matchingQuestions = {
@@ -1663,6 +1663,10 @@ function getRoleMarketLanes(role) {
   return roleMarketLanes[role] || roleMarketLanes.General;
 }
 
+function displayRole(role) {
+  return roleOptions.includes(role) ? role : 'Choose role';
+}
+
 function ClerkSessionBridge({ setProfile }) {
   const { getToken, isSignedIn, userId } = useAuth();
   const { user } = useUser();
@@ -1679,7 +1683,7 @@ function ClerkSessionBridge({ setProfile }) {
 
   useEffect(() => {
     if (!isSignedIn || !user) return;
-    const savedRole = getStoredJson('renteazy-signup-role', 'Tenant');
+    const savedRole = getStoredJson('renteazy-signup-role', '');
     const displayName = user.fullName || user.primaryEmailAddress?.emailAddress || 'RentEazy member';
     setProfile((current) => ({
       ...current,
@@ -1723,7 +1727,7 @@ function ClerkSignupBridge() {
     if (typeof window === 'undefined') return 'sign-up';
     return new URLSearchParams(window.location.search).get('mode') === 'sign-in' ? 'sign-in' : 'sign-up';
   });
-  const [role, setRole] = useStoredState('renteazy-signup-role', 'Tenant');
+  const [role, setRole] = useStoredState('renteazy-signup-role', '');
 
   return (
     <div className="min-h-screen bg-[#eef5f2] px-5 py-6 text-slate-900">
@@ -1754,7 +1758,8 @@ function ClerkSignupBridge() {
             {mode === 'sign-up' && (
               <label className="mt-5 block text-sm text-slate-600">
                 What brings you to RentEazy?
-                <select value={role} onChange={(event) => setRole(event.target.value)} className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-950 outline-hidden focus:border-[#2f7d32]">
+                <select value={role} onChange={(event) => setRole(event.target.value)} required className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-950 outline-hidden focus:border-[#2f7d32]">
+                  <option value="" disabled>Choose your role</option>
                   {roleOptions.map((option) => <option key={option}>{option}</option>)}
                 </select>
               </label>
@@ -1792,7 +1797,7 @@ function SignupBridge() {
   const [name, setName] = useStoredState('renteazy-signup-name', '');
   const [email, setEmail] = useStoredState('renteazy-signup-email', '');
   const [password, setPassword] = useState('');
-  const [role, setRole] = useStoredState('renteazy-signup-role', 'Tenant');
+  const [role, setRole] = useStoredState('renteazy-signup-role', '');
   const [status, setStatus] = useState('idle');
   const [error, setError] = useState('');
 
@@ -1858,7 +1863,8 @@ function SignupBridge() {
                   </label>
                   <label className="mt-4 block text-sm text-slate-600">
                     What brings you to RentEazy?
-                    <select value={role} onChange={(event) => setRole(event.target.value)} className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-950 outline-hidden focus:border-[#2f7d32]">
+                    <select value={role} onChange={(event) => setRole(event.target.value)} required className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-950 outline-hidden focus:border-[#2f7d32]">
+                      <option value="" disabled>Choose your role</option>
                       {roleOptions.map((option) => <option key={option}>{option}</option>)}
                     </select>
                   </label>
@@ -2160,7 +2166,7 @@ function ProfileEditor({ profile, setProfile, answers, setAnswers }) {
         <p className="mt-3 text-slate-600">This is your match profile. It syncs with your RentEazy account.</p>
         <div className="mt-6 grid gap-3 sm:grid-cols-2">
           <label className="text-sm text-slate-600">Name<input value={profile.name} onChange={(event) => setProfile((current) => ({ ...current, name: event.target.value }))} className="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 outline-hidden focus:border-[#2f7d32]" /></label>
-          <label className="text-sm text-slate-600">Role<select value={profile.role} onChange={(event) => setProfile((current) => ({ ...current, role: event.target.value }))} className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-hidden focus:border-[#2f7d32]">{roleOptions.map((role) => <option key={role}>{role}</option>)}</select></label>
+          <label className="text-sm text-slate-600">Role<select value={profile.role || ''} onChange={(event) => setProfile((current) => ({ ...current, role: event.target.value }))} className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-hidden focus:border-[#2f7d32]"><option value="" disabled>Choose your role</option>{roleOptions.map((role) => <option key={role}>{role}</option>)}</select></label>
           <label className="text-sm text-slate-600">Preferred area<input value={profile.area} onChange={(event) => setProfile((current) => ({ ...current, area: event.target.value }))} className="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 outline-hidden focus:border-[#2f7d32]" /></label>
           <label className="text-sm text-slate-600">Budget<input value={profile.budget} onChange={(event) => setProfile((current) => ({ ...current, budget: event.target.value }))} className="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 outline-hidden focus:border-[#2f7d32]" /></label>
           <label className="text-sm text-slate-600">Move timing<input value={profile.moveDate} onChange={(event) => setProfile((current) => ({ ...current, moveDate: event.target.value }))} className="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 outline-hidden focus:border-[#2f7d32]" /></label>
@@ -2342,6 +2348,61 @@ function AppHeroPanel({ profile, usageLimit, posts, shares, onPost }) {
             <p className="mt-1 line-clamp-2 text-sm font-semibold">{topPost?.title || 'Your Feed is ready'}</p>
             <p className="mt-1 text-xs text-slate-500">{topPost?.area || 'RentEazy network'}</p>
           </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function MarketCommandPanel({ profile, usageLimit, posts, shares, answers, onSelectTab }) {
+  const remaining = Math.max(0, usageLimit.allowance - usageLimit.used);
+  const match = getMatchSummary(profile, answers);
+  const quickLanes = [
+    ['Properties', 'Homes, rooms, stays'],
+    ['Looking', 'Demand and briefs'],
+    ['Operators', 'Hosts and operators'],
+    ['Investors', 'Capital and deals'],
+  ];
+
+  return (
+    <section className="rounded-[1.75rem] border border-white bg-white/92 p-4 shadow-[0_18px_44px_-34px_rgba(15,23,42,0.45),inset_0_1px_0_white]">
+      <div className="flex flex-col gap-4">
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <p className="font-['JetBrains_Mono',monospace] text-xs text-[#2670a8]">MARKET COMMAND</p>
+            <h2 className="mt-2 text-2xl font-semibold tracking-tight text-slate-950">{displayRole(profile.role)}</h2>
+            <p className="mt-1 text-sm leading-6 text-slate-500">Pick a lane, post a signal, or swipe the market.</p>
+          </div>
+          <a href="/app/profile" className="shrink-0 rounded-full bg-[#edf7ff] px-3 py-2 text-xs text-[#154f79]">Role</a>
+        </div>
+        <div className="grid grid-cols-3 gap-2 text-center">
+          {[
+            [remaining, 'Swipes'],
+            [posts.length, 'Posts'],
+            [shares.length, 'Shares'],
+          ].map(([value, label]) => (
+            <div key={label} className="rounded-2xl bg-slate-50 px-3 py-3">
+              <p className="text-lg font-semibold text-slate-950">{value}</p>
+              <p className="mt-0.5 text-[0.68rem] text-slate-500">{label}</p>
+            </div>
+          ))}
+        </div>
+        <div className="rounded-2xl bg-[#f4fff5] p-3 ring-1 ring-[#cfeeda]">
+          <div className="flex items-center justify-between gap-3">
+            <div className="min-w-0">
+              <p className="text-sm font-semibold text-[#123d22]">{match.score}% match readiness</p>
+              <p className="mt-1 truncate text-xs text-[#1f6b35]">{match.badges.join(' · ')}</p>
+            </div>
+            <a href="/app/profile" className="shrink-0 rounded-full bg-[#092243] px-3 py-2 text-xs text-white">Improve</a>
+          </div>
+        </div>
+        <div className="grid grid-cols-2 gap-2">
+          {quickLanes.map(([tab, body]) => (
+            <button key={tab} type="button" onClick={() => onSelectTab(tab)} className="rounded-2xl border border-slate-200 bg-white p-3 text-left transition hover:border-[#2f7d32]">
+              <span className="block text-sm font-medium text-slate-950">{tab}</span>
+              <span className="mt-1 block text-xs leading-5 text-slate-500">{body}</span>
+            </button>
+          ))}
         </div>
       </div>
     </section>
@@ -2974,7 +3035,7 @@ function RentEazyAppShell() {
             ))}
           </nav>
           <div className="flex items-center gap-2">
-            <a href="/app/profile" className="hidden rounded-full bg-[#edf7ff] px-3 py-1.5 text-xs text-[#154f79] sm:inline-flex">{profile.role}</a>
+            <a href="/app/profile" className="hidden rounded-full bg-[#edf7ff] px-3 py-1.5 text-xs text-[#154f79] sm:inline-flex">{displayRole(profile.role)}</a>
             <span className={`hidden rounded-full px-3 py-1.5 text-xs sm:inline-flex ${backendStatus === 'connected' ? 'bg-[#edf8ee] text-[#215d27]' : backendStatus === 'checking' ? 'bg-[#edf7ff] text-[#154f79]' : 'bg-[#fff7ed] text-[#9a3412]'}`}>{backendStatus === 'connected' ? 'API connected' : backendStatus === 'checking' ? 'API checking' : 'Offline mode'}</span>
             <span className="hidden rounded-full bg-[#edf8ee] px-3 py-1.5 text-xs text-[#215d27] sm:inline-flex">5 extra swipes available after sharing</span>
             {clerkEnabled ? <ClerkAccountControls /> : <button className="flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600"><Bell className="h-4 w-4" /></button>}
@@ -2990,44 +3051,13 @@ function RentEazyAppShell() {
                 <AppHeroPanel profile={profile} usageLimit={usageLimit} posts={posts} shares={shares} />
               </div>
               <div className="mb-4">
-                <AppPulseStrip wallet={wallet} purchases={purchases} boosts={boosts} reports={reports} shares={shares} />
-              </div>
-              <div className="mb-4">
-                <MatchSummaryStrip profile={profile} answers={answers} />
-              </div>
-              <div className="mb-4">
-                <MissionPanel posts={posts} shares={shares} likedIds={likedIds} savedIds={savedIds} answers={answers} onSelectProduct={openUpsell} />
-              </div>
-              <div className="mb-4">
-                <RoleLanesPanel profile={profile} onSelectTab={setActiveFeedTab} />
-              </div>
-              <div className="mb-4">
-                <DailySwipePanel usageLimit={usageLimit} onBuyMore={openUpsell} />
-              </div>
-              <div className="mb-4">
-                <DailyPicksPanel picks={dailyPicks} />
-              </div>
-              <div className="mb-4">
-                <TractionPanel posts={posts} likedIds={likedIds} savedIds={savedIds} shares={shares} comments={comments} onBoost={openUpsell} />
+                <MarketCommandPanel profile={profile} usageLimit={usageLimit} posts={posts} shares={shares} answers={answers} onSelectTab={setActiveFeedTab} />
               </div>
               <div className="mb-4 overflow-x-auto pb-1">
                 <div className="flex min-w-max gap-2">
                   {feedTabs.map((tab) => (
                     <button key={tab} onClick={() => setActiveFeedTab(tab)} className={`rounded-full px-4 py-2 text-sm ${activeFeedTab === tab ? 'bg-[#092243] text-white' : 'border border-slate-200 bg-white text-slate-600'}`}>{tab}</button>
                   ))}
-                </div>
-              </div>
-              <div className="mb-4 rounded-3xl border border-[#d5ecd7] bg-white/88 p-4 shadow-[0_14px_34px_-28px_rgba(15,23,42,0.45)]">
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-slate-950">Want more people to see this?</p>
-                    <p className="mt-1 text-sm leading-6 text-slate-600">Share Everywhere creates a caption, tracking link, copy actions, share sheet, and reward record.</p>
-                    <p className="mt-1 text-xs text-slate-500">Sponsored content is labelled where relevant. Share rewards add 5 extra swipes today.</p>
-                  </div>
-                  <button type="button" onClick={() => setSharePost(posts[0])} className="inline-flex shrink-0 items-center justify-center gap-2 rounded-full bg-[#2f7d32] px-4 py-3 text-sm text-white">
-                    <Share2 className="h-4 w-4" />
-                    Share Everywhere
-                  </button>
                 </div>
               </div>
               <ComposerPanel onCreatePost={addPost} compact profile={profile} />
@@ -3041,23 +3071,33 @@ function RentEazyAppShell() {
                 </div>
               )}
               <div className="mt-5 space-y-4">
-                {filteredPosts.map((post) => (
-                  <FeedPostCard
-                    key={post.id}
-                    post={post}
-                    liked={likedIds.includes(post.id)}
-                    saved={savedIds.includes(post.id)}
-                    followed={followedIds.includes(post.authorId)}
-                    commentCount={post.commentCount + comments.filter((comment) => comment.postId === post.id).length}
-                    onLike={toggleLike}
-                    onSave={toggleSave}
-                    onFollow={toggleFollow}
-                    onShare={setSharePost}
-                    onComment={setCommentPost}
-                    onBoost={(post) => boostPost(post.id)}
-                    onHide={hidePost}
-                    onReport={setReportPost}
-                  />
+                {filteredPosts.map((post, index) => (
+                  <React.Fragment key={post.id}>
+                    <FeedPostCard
+                      post={post}
+                      liked={likedIds.includes(post.id)}
+                      saved={savedIds.includes(post.id)}
+                      followed={followedIds.includes(post.authorId)}
+                      commentCount={post.commentCount + comments.filter((comment) => comment.postId === post.id).length}
+                      onLike={toggleLike}
+                      onSave={toggleSave}
+                      onFollow={toggleFollow}
+                      onShare={setSharePost}
+                      onComment={setCommentPost}
+                      onBoost={(post) => boostPost(post.id)}
+                      onHide={hidePost}
+                      onReport={setReportPost}
+                    />
+                    {index === 1 && (
+                      <div className="space-y-4">
+                        <DailySwipePanel usageLimit={usageLimit} onBuyMore={openUpsell} />
+                        <MissionPanel posts={posts} shares={shares} likedIds={likedIds} savedIds={savedIds} answers={answers} onSelectProduct={openUpsell} />
+                        <RoleLanesPanel profile={profile} onSelectTab={setActiveFeedTab} />
+                        <DailyPicksPanel picks={dailyPicks} />
+                        <TractionPanel posts={posts} likedIds={likedIds} savedIds={savedIds} shares={shares} comments={comments} onBoost={openUpsell} />
+                      </div>
+                    )}
+                  </React.Fragment>
                 ))}
                 {filteredPosts.length === 0 && (
                   <div className="rounded-[1.75rem] border border-white bg-white/86 p-6 text-center shadow-[0_18px_44px_-34px_rgba(15,23,42,0.45),inset_0_1px_0_white]">
@@ -3413,6 +3453,60 @@ export default function App() {
                 <iconify-icon icon="solar:arrow-down-linear" class="text-base"></iconify-icon>
               </span>
             </a>
+          </div>
+        </section>
+
+        {/* ── Choose your lane — audience self-select ──────────────── */}
+        <section id="who" className="max-w-7xl mx-auto px-6 pt-6 pb-2">
+          <div className="grid md:grid-cols-3 gap-4">
+            {[
+              {
+                icon: 'solar:user-rounded-bold', accent: '#2670a8', iconBg: '#edf7ff', iconBorder: '#cde7f8',
+                chipBg: '#edf7ff', chipText: '#154f79',
+                label: 'Renters & buddies',
+                promise: 'Match with a home — and the right people — that already want you. Your reputation comes with you to the next move.',
+                proof: 'Free to swipe', cta: 'Start swiping', href: '#match',
+              },
+              {
+                icon: 'solar:buildings-bold', accent: '#2f7d32', iconBg: '#edf8ee', iconBorder: '#d5ecd7',
+                chipBg: '#edf8ee', chipText: '#215d27',
+                label: 'Agents & landlords',
+                promise: 'See vetted tenants who match your home and are ready to view — and build a reputation that wins your next instruction.',
+                proof: 'Free to list', cta: 'For agents & landlords', href: '#partners',
+              },
+              {
+                icon: 'solar:graph-up-bold', accent: '#092243', iconBg: 'rgba(9,34,67,0.06)', iconBorder: 'rgba(9,34,67,0.12)',
+                chipBg: 'rgba(9,34,67,0.05)', chipText: '#092243',
+                label: 'Operators, investors & sourcers',
+                promise: 'Deal flow and demand signals from a market that remembers who actually delivers.',
+                proof: 'Match by strategy', cta: 'Explore opportunities', href: '#marketplace',
+              },
+            ].map((p, i) => (
+              <motion.a
+                key={p.label}
+                href={p.href}
+                className="group relative flex flex-col rounded-4xl bg-white/72 border border-white p-6 shadow-[0_14px_34px_-26px_rgba(15,23,42,0.32),inset_0_1px_0_white] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_24px_48px_-28px_rgba(15,23,42,0.42)]"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.45, delay: i * 0.08 }}
+              >
+                <div className="mb-4 flex items-center gap-3">
+                  <span className="flex h-11 w-11 items-center justify-center rounded-2xl border" style={{ backgroundColor: p.iconBg, borderColor: p.iconBorder }}>
+                    <iconify-icon icon={p.icon} style={{ color: p.accent }} class="text-2xl"></iconify-icon>
+                  </span>
+                  <p className="font-['JetBrains_Mono',monospace] text-[11px] font-medium tracking-[0.1em]" style={{ color: p.accent }}>{p.label.toUpperCase()}</p>
+                </div>
+                <p className="text-base leading-7 font-light text-slate-700">{p.promise}</p>
+                <div className="mt-5 flex items-center justify-between gap-3">
+                  <span className="inline-flex items-center rounded-full px-3 py-1 text-xs font-medium" style={{ backgroundColor: p.chipBg, color: p.chipText }}>{p.proof}</span>
+                  <span className="inline-flex items-center gap-1 text-sm font-medium" style={{ color: p.accent }}>
+                    {p.cta}
+                    <iconify-icon icon="solar:arrow-right-linear" class="text-base transition-transform group-hover:translate-x-0.5"></iconify-icon>
+                  </span>
+                </div>
+              </motion.a>
+            ))}
           </div>
         </section>
 
