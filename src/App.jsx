@@ -5066,12 +5066,13 @@ export default function App() {
             {productLadder.map((plan, i) => (
               <motion.div
                 key={plan.name}
-                className={`rounded-4xl border p-6 shadow-[0_14px_34px_-26px_rgba(15,23,42,0.32),inset_0_1px_0_white] transition-shadow duration-300 ${plan.featured ? 'bg-linear-to-b from-[#52a832] to-[#2f7d32] text-white border-[#25672a] shadow-[0_24px_56px_-30px_rgba(47,125,50,0.4),inset_0_1px_0_rgba(255,255,255,0.22)] hover:shadow-[0_32px_64px_-30px_rgba(47,125,50,0.55)]' : plan.premium ? 'bg-[#092243] text-white border-[#06182f]' : 'bg-white/72 border-white hover:shadow-[0_22px_44px_-26px_rgba(15,23,42,0.38)]'}`}
+                className={`relative overflow-hidden rounded-4xl border p-6 shadow-[0_14px_34px_-26px_rgba(15,23,42,0.32),inset_0_1px_0_white] transition-shadow duration-300 ${plan.featured ? 'bg-linear-to-b from-[#52a832] to-[#2f7d32] text-white border-[#25672a] shadow-[0_24px_56px_-30px_rgba(47,125,50,0.4),inset_0_1px_0_rgba(255,255,255,0.22)] hover:shadow-[0_32px_64px_-30px_rgba(47,125,50,0.55)]' : plan.premium ? 'bg-[#092243] text-white border-[#06182f]' : 'bg-white/72 border-white hover:shadow-[0_22px_44px_-26px_rgba(15,23,42,0.38)]'}`}
                 initial={{ opacity: 0, y: 24 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.45, delay: i * 0.08 }}
               >
+                {plan.featured && <BorderBeam size={140} duration={9} borderWidth={2} colorFrom="#ffffff" colorTo="#9bd383" />}
                 {plan.featured && (
                   <div className="mb-3 flex items-center gap-2 flex-wrap">
                     <div className="inline-flex items-center gap-1.5 rounded-full bg-white/22 px-3 py-1 text-[10px] text-white font-['JetBrains_Mono',monospace] tracking-[0.12em]">★ BEST VALUE</div>
@@ -5186,7 +5187,7 @@ export default function App() {
               </div>
 
               <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-3">
-                <a href="/signup?source=final_cta&offer=match24h" className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-full px-8 py-4 bg-linear-to-b from-[#52a832] to-[#2f7d32] border border-[#74c656]/30 text-white text-base font-medium shadow-[0_12px_32px_rgba(82,168,50,0.36)] transition-all duration-200 hover:from-[#64bd44] hover:to-[#3b8d3d] hover:shadow-[0_16px_40px_rgba(82,168,50,0.48)]">
+                <a href="/signup?source=final_cta&offer=match24h" className="hero-pill-shimmer relative overflow-hidden w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-full px-8 py-4 bg-linear-to-b from-[#52a832] to-[#2f7d32] border border-[#74c656]/30 text-white text-base font-medium shadow-[0_12px_32px_rgba(82,168,50,0.36)] transition-all duration-200 hover:from-[#64bd44] hover:to-[#3b8d3d] hover:shadow-[0_16px_40px_rgba(82,168,50,0.48)]">
                   Start free — no card required
                   <iconify-icon icon="solar:arrow-right-linear" class="text-xl"></iconify-icon>
                 </a>
