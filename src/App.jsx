@@ -3556,8 +3556,8 @@ export default function App() {
         <section id="vsl" className="max-w-5xl mx-auto px-6 pb-10 pt-4">
           <div className="mb-6 text-center">
             <p className="font-['JetBrains_Mono',monospace] text-xs font-medium tracking-normal text-[#2670a8] mb-3">SEE HOW IT WORKS · 30 SECONDS</p>
-            <h2 className="text-3xl md:text-4xl font-normal tracking-tight text-slate-950">One platform. Every side of the market.</h2>
-            <p className="mt-3 text-base text-slate-500 font-light max-w-2xl mx-auto">Demand, supply, services, stays, deals, capital, and local rental insight move through one network. Watch how.</p>
+            <h2 className="text-3xl md:text-4xl font-normal tracking-tight text-slate-950">Portals list. RentEazy matches.</h2>
+            <p className="mt-3 text-base text-slate-500 font-light max-w-2xl mx-auto">Every side swipes a scored deck. When both sides like, it's a match — and your reputation comes along. Here's how, in 30 seconds.</p>
             <div className="mt-4 flex items-center justify-center gap-3">
               {[['🏠', 'Renters & buddies'], ['🏢', 'Agents, agencies & hosts'], ['🔑', 'Landlords, operators & investors']].map(([icon, label]) => (
                 <span key={label} className="inline-flex items-center gap-1.5 rounded-full bg-slate-100 border border-slate-200 px-3 py-1 text-xs text-slate-600">{icon} {label}</span>
@@ -3770,6 +3770,7 @@ export default function App() {
               ['View 12 properties, waste 11 slots', 'Viewings only happen after a mutual match'],
               ['Chase agents by phone and email for updates', 'Match history and viewing trail kept in Protect'],
               ['Start over on Rightmove, Zoopla, SpareRoom', 'One platform for tenants, agents, and landlords'],
+              ['Find a place, then the portal forgets you — reputation back to zero', 'Your verified reputation travels with you, move to move'],
             ].map(([before, after], i) => (
               <div key={before} className={`grid grid-cols-[1fr_auto_1fr] ${i < 5 ? 'border-b border-slate-100' : ''}`}>
                 <div className="flex items-start gap-2.5 px-5 py-4 bg-[#fff5f5]">
@@ -4138,8 +4139,8 @@ export default function App() {
             <div className="grid lg:grid-cols-[0.85fr_1.15fr] gap-10 items-start">
               <div>
                 <p className="font-['JetBrains_Mono',monospace] text-xs font-medium tracking-normal text-[#2670a8] mb-4">AGENTS, LANDLORDS, AND TEAMS</p>
-                <h2 className="text-4xl md:text-5xl font-normal tracking-tight text-slate-950 leading-[1.05]">Your reputation compounds. The platform grows with you.</h2>
-                <p className="mt-5 text-base leading-8 text-slate-600 font-light">Every new tenant who joins RentEazy is another person who can see your rep score, your matched properties, and your track record. Agents with excellent ratings get found more.</p>
+                <h2 className="text-4xl md:text-5xl font-normal tracking-tight text-slate-950 leading-[1.05]">Your track record becomes your pipeline.</h2>
+                <p className="mt-5 text-base leading-8 text-slate-600 font-light">Every renter who joins sees your rep score, your matched properties, and your history. Portals make you start from zero on every listing — here, the agents and landlords who deliver get found first, and keep getting found.</p>
                 <div className="mt-7 flex flex-col sm:flex-row gap-3">
                   <a href="/signup?source=partners" className="rounded-full bg-[#092243] text-white px-5 py-3 text-sm hover:bg-[#0c2e5a] transition-colors">Join Free</a>
                   <a href="#pricing" className="rounded-full bg-white border border-slate-200 px-5 py-3 text-sm text-slate-700 hover:text-[#2f7d32] transition-colors">Add Team Seats</a>
