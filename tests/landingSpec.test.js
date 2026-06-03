@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { getLandingSpec, defaultLandingSpec, SECTION_POOL, HERO_VARIANTS } from '../src/landing/landingSpec.js';
+import { getLandingSpec, defaultLandingSpec, SECTION_POOL } from '../src/landing/landingSpec.js';
+import { getRoleContent } from '../src/landing/roleContent.js';
 
 const isSubsetOfPool = (order) => order.every((k) => SECTION_POOL.includes(k));
 const hasUniqueKeys = (order) => new Set(order).size === order.length;
@@ -96,12 +97,19 @@ describe('Hard constraints hold across many inputs', () => {
       expect(getLandingSpec(sess).socialProofBlock).not.toBe('map_activity');
     }
   });
-  it('headline + subheadline always match the chosen hero variant', () => {
+  it('headline + subheadline always match the chosen role + hero variant', () => {
     for (const sess of sessions) {
       const s = getLandingSpec(sess);
-      expect(s.headline).toBe(HERO_VARIANTS[s.heroVariant].headline);
-      expect(s.subheadline).toBe(HERO_VARIANTS[s.heroVariant].subheadline);
+      const hero = getRoleContent(s.role).hero[s.heroVariant];
+      expect(s.headline).toBe(hero.headline);
+      expect(s.subheadline).toBe(hero.sub);
     }
+  });
+  it('spec carries role-specific content (problem/dream/mechanism)', () => {
+    const s = getLandingSpec({ isReturning: true, profile: 'landlord' });
+    expect(s.role).toBe('landlord');
+    expect(s.content.problem.heading).toMatch(/47 enquiries/i);
+    expect(Array.isArray(s.content.mechanism)).toBe(true);
   });
 });
 
