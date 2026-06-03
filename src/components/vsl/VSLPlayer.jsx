@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { Player } from '@remotion/player';
 import { BorderBeam } from '@/components/ui/border-beam';
 import RentEazyVSL from './RentEazyVSL';
@@ -6,49 +6,19 @@ import RentEazyVSL from './RentEazyVSL';
 const DURATION_IN_FRAMES = 1800; // 60s × 30fps — 7-act VSL
 const FPS = 30;
 
-export default function VSLPlayer() {
+// userType drives the profile-specific VSL variant.
+export default function VSLPlayer({ userType = 'tenant' }) {
   const playerRef = useRef(null);
-  const containerRef = useRef(null);
-  const [playing, setPlaying] = useState(false);
+  const [playing, setPlaying] = useState(true); // autoPlay starts it muted
   const [muted, setMuted] = useState(true);
-  const hasAutoStarted = useRef(false);
 
-  const tryPlay = async () => {
-    try {
-      await playerRef.current?.play();
-    } catch (_) {}
-  };
-
-  const playWithSound = () => {
-    hasAutoStarted.current = true;
+  const unmute = () => {
     setMuted(false);
-    window.setTimeout(tryPlay, 0);
+    try { playerRef.current?.play(); } catch (_) {}
   };
-
-  // Autoplay when the player enters the viewport
-  useEffect(() => {
-    const el = containerRef.current;
-    if (!el) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const [entry] = entries;
-        if (entry.isIntersecting && !hasAutoStarted.current) {
-          hasAutoStarted.current = true;
-          // Small delay so Remotion is fully initialised
-          setTimeout(tryPlay, 180);
-        }
-      },
-      { threshold: 0.35 }
-    );
-
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
 
   return (
     <div
-      ref={containerRef}
       className="relative w-full overflow-hidden rounded-4xl bg-[#06182f]"
       style={{
         aspectRatio: '16/9',
@@ -62,64 +32,48 @@ export default function VSLPlayer() {
         compositionWidth={1280}
         compositionHeight={720}
         fps={FPS}
-        inputProps={{ userType: 'tenant' }}
+        inputProps={{ userType }}
         style={{ width: '100%', height: '100%', borderRadius: '2rem' }}
         controls={false}
+        autoPlay
         loop
         clickToPlay
+        initiallyMuted
         muted={muted}
         acknowledgeRemotionLicense
         onPlay={() => setPlaying(true)}
         onPause={() => setPlaying(false)}
       />
 
-      {/* Brand-coloured beam tracing the frame — draws the eye to the explainer
-          without shouting. Green → blue, never the component's default purple. */}
+      {/* Brand-coloured beam tracing the frame — green → blue, never the
+          component's default purple. */}
       <BorderBeam size={220} duration={11} borderWidth={2} colorFrom="#52a832" colorTo="#5bc4ff" />
       <BorderBeam size={220} duration={11} delay={5.5} borderWidth={2} colorFrom="#5bc4ff" colorTo="#52a832" />
 
-      {/* Play button — shown until first play event fires */}
-      {!playing && (
-        <div className="pointer-events-none absolute inset-0 flex items-center justify-center transition-opacity duration-300">
-          <button
-            type="button"
-            onClick={playWithSound}
-            className="pointer-events-auto group flex flex-col items-center justify-center rounded-full bg-white/16 border border-white/24 backdrop-blur-md transition-all duration-200 hover:bg-white/28 hover:scale-105 active:scale-95"
-            aria-label="Play video with sound"
-            style={{ width: 92, height: 92 }}
-          >
-            <svg viewBox="0 0 24 24" fill="white" className="h-8 w-8 translate-x-0.5" aria-hidden="true">
-              <path d="M8 5v14l11-7z" />
-            </svg>
-            <span className="mt-1 text-[10px] font-medium text-white/78">sound on</span>
-          </button>
+      {/* It autoplays muted — the only affordance is a subtle sound toggle. */}
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 flex items-end justify-between px-5 pb-4">
+        <div className="rounded-full border border-white/10 bg-black/38 px-3 py-1.5 backdrop-blur-xs">
+          <span className="font-['JetBrains_Mono',monospace] text-[10px] tracking-[0.12em] text-white/38">RENTEAZY · 1:00</span>
         </div>
-      )}
+        <button
+          type="button"
+          onClick={muted ? unmute : () => setMuted(true)}
+          className="pointer-events-auto inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-black/40 px-3.5 py-2 text-xs text-white/85 backdrop-blur-xs transition-all hover:bg-white/10"
+          aria-label={muted ? 'Unmute' : 'Mute'}
+        >
+          <span className="text-sm">{muted ? '🔇' : '🔊'}</span>
+          {muted && <span className="font-medium">Tap for sound</span>}
+        </button>
+      </div>
 
-      {/* Controls — shown when playing */}
-      {playing && (
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 flex items-end justify-between px-5 pb-4">
-          <div className="rounded-full border border-white/10 bg-black/38 px-3 py-1.5 backdrop-blur-xs">
-            <span className="font-['JetBrains_Mono',monospace] text-[10px] tracking-[0.12em] text-white/38">RENTEAZY · 1:00</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              className="pointer-events-auto rounded-full border border-white/15 bg-black/38 px-3 py-2 text-sm backdrop-blur-xs transition-all hover:bg-white/10"
-              onClick={muted ? playWithSound : () => setMuted(true)}
-              title={muted ? 'Unmute' : 'Mute'}
-            >
-              {muted ? '🔇' : '🔊'}
-            </button>
-            <button
-              type="button"
-              className="pointer-events-auto rounded-full border border-white/12 bg-black/38 px-4 py-2 text-xs text-white/45 backdrop-blur-xs transition-colors hover:text-white/85"
-              onClick={() => playerRef.current?.toggle()}
-            >
-              ❚❚
-            </button>
-          </div>
-        </div>
+      {/* Big tap-to-unmute target while muted (the video is already playing) */}
+      {muted && (
+        <button
+          type="button"
+          onClick={unmute}
+          aria-label="Tap for sound"
+          className="absolute inset-0 z-0 h-full w-full cursor-pointer bg-transparent"
+        />
       )}
     </div>
   );
