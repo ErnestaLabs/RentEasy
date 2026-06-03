@@ -50,7 +50,7 @@ export const CONTENT = {
     identityFrame: 'Stop searching. Start matching.',
     identityAccentWord: 'matching',
     ctaLabel: 'Find your match — it\'s free',
-    consequenceLine: 'SpareRoom isn\'t going anywhere. Neither is the queue behind you.',
+    consequenceLine: 'SpareRoom isn\'t going anywhere. Neither is the queue in front of you.',
   },
 
   landlord: {
@@ -259,17 +259,18 @@ export const BEFORE_AFTER = {
  * exists because BOTH chose — never "both liked first".
  */
 export const CARD_DATA_BY_TYPE = {
-  // Tenant swipes a home; matches when the landlord likes their profile back.
+  // Tenant swipes a room in a flatshare (SpareRoom territory); matches when the
+  // existing flatmates pick them back.
   tenant: {
-    image:        '/images/match-flat.jpg',   // a home
-    counterImage: '/images/match-agent.jpg',  // the landlord, a person
+    image:        '/images/match-room-2.jpg', // a real bedroom
+    counterImage: '/images/match-agent.jpg',  // a flatmate, a person
     matchScore:   94,
-    title:        'Hackney 2-bed',
-    location:     'London Fields, E8',
-    price:        '£2,200 pcm',
-    tags:         ['Bills incl.', 'Pets OK', 'Available now'],
+    title:        'Double room',
+    location:     'In a 3-bed flatshare · London Fields, E8',
+    price:        '£1,050 pcm',
+    tags:         ['Bills incl.', 'Furnished', 'Pro flatmates'],
     repScore:     '4.9',
-    matchLine:    'You liked it. The landlord liked you back.',
+    matchLine:    'You liked the room. The flatmates picked you back.',
   },
   // Landlord swipes a tenant (a person); matches when the tenant wants the place.
   landlord: {
