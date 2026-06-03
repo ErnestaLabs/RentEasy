@@ -6,10 +6,11 @@ import IPhoneMockup from '@/components/ui/iphone-mockup';
 import Marquee from '@/components/ui/marquee';
 import { NumberTicker } from '@/components/ui/number-ticker';
 import { BorderBeam } from '@/components/ui/border-beam';
+import RentEazyVoiceAgent from '@/components/voice/RentEazyVoiceAgent';
 // Code-split the VSL: Remotion is ~400KB and sits below the fold, so it must
 // not block the hero paint. Loads lazily when the user scrolls toward it.
 const VSLPlayer = React.lazy(() => import('@/components/vsl/VSLPlayer'));
-import { ArrowDownLeft, ArrowUp, BadgeCheck, Bell, Bookmark, Camera, Check, Compass, Copy, Flag, Flame, Heart, Home, MapPin, MessageCircle, PlusCircle, RotateCcw, Send, Share2, UserPlus, UserRound } from 'lucide-react';
+import { ArrowDownLeft, ArrowUp, BadgeCheck, Bell, Bookmark, Camera, Check, Compass, Copy, Flag, Flame, Gift, Heart, Home, MapPin, Megaphone, MessageCircle, PlusCircle, RotateCcw, Search, Send, Share2, ShieldCheck, Sparkles, UserPlus, UserRound, Users } from 'lucide-react';
 
 const defaultRotatingHeroWords = ['tenant', 'agent', 'room', 'home', 'flat', 'landlord', 'match', 'place'];
 const localSocialAppUrl = 'http://localhost:3002';
@@ -494,6 +495,8 @@ const feedTabs = [
   'Sourcers',
   'Investors',
   'Advice',
+  'Groups',
+  'Perks',
   'Following',
 ];
 
@@ -879,6 +882,165 @@ const seededFeedPosts = [
     commentCount: 0,
     saveCount: 0,
     shareCount: 0,
+  },
+];
+
+const seededGroups = [
+  {
+    id: 'group-east-london-renters',
+    name: 'East London Renters',
+    groupType: 'Area community',
+    area: 'East London',
+    description: 'Rooms, viewings, local questions, moving tips, and honest rental-market updates around Stratford, Bow, Hackney, and nearby areas.',
+    visibility: 'open',
+    memberCount: 128,
+    postCount: 42,
+    roles: ['Tenant', 'House Buddy', 'Landlord', 'Individual Agent'],
+    createdAt: '2026-06-01T08:00:00.000Z',
+    updatedAt: '2026-06-01T08:00:00.000Z',
+  },
+  {
+    id: 'group-london-landlords',
+    name: 'London Landlords',
+    groupType: 'Role network',
+    area: 'London',
+    description: 'Tenant demand, agent routes, operator requests, compliance reminders, maintenance referrals, and local market signals.',
+    visibility: 'open',
+    memberCount: 84,
+    postCount: 31,
+    roles: ['Landlord', 'Individual Agent', 'Agency / Business', 'Operator'],
+    createdAt: '2026-06-01T08:10:00.000Z',
+    updatedAt: '2026-06-01T08:10:00.000Z',
+  },
+  {
+    id: 'group-operator-hosts',
+    name: 'Operators & Short-Stay Hosts',
+    groupType: 'Professional circle',
+    area: 'UK',
+    description: 'Serviced stays, co-hosting, relocation demand, landlord conversations, and operational best practice.',
+    visibility: 'open',
+    memberCount: 57,
+    postCount: 18,
+    roles: ['Operator', 'Short-Term Host', 'Short-Term Guest', 'Landlord'],
+    createdAt: '2026-06-01T08:20:00.000Z',
+    updatedAt: '2026-06-01T08:20:00.000Z',
+  },
+  {
+    id: 'group-investor-sourcer-deals',
+    name: 'Investor & Sourcer Deal Room',
+    groupType: 'Deal community',
+    area: 'UK',
+    description: 'Numbers-first briefs, sourcing requests, operator demand, and investor criteria without return guarantees.',
+    visibility: 'open',
+    memberCount: 66,
+    postCount: 24,
+    roles: ['Investor', 'Sourcer', 'Operator', 'Landlord'],
+    createdAt: '2026-06-01T08:30:00.000Z',
+    updatedAt: '2026-06-01T08:30:00.000Z',
+  },
+];
+
+const seededPartnerOffers = [
+  {
+    id: 'perk-broadband-move',
+    title: 'Broadband setup for move-in',
+    partnerName: 'Move-ready broadband partner',
+    category: 'Broadband',
+    description: 'Compare move-in broadband options when a tenancy or short stay becomes likely.',
+    cta: 'View options',
+    eligibleRoles: ['Tenant', 'House Buddy', 'Short-Term Guest'],
+    lifecycleTrigger: 'tenancy_started',
+    trustLevel: 'verified_partner',
+    reward: 'Useful near move-in',
+    sponsoredStatus: 'Partner',
+    createdAt: '2026-06-01T08:40:00.000Z',
+  },
+  {
+    id: 'perk-storage',
+    title: 'Storage while you move',
+    partnerName: 'Local storage partner',
+    category: 'Storage',
+    description: 'Short-term storage options for users between homes, rooms, and stays.',
+    cta: 'Check storage',
+    eligibleRoles: ['Tenant', 'House Buddy', 'Short-Term Guest'],
+    lifecycleTrigger: 'moving_soon',
+    trustLevel: 'verified_partner',
+    reward: 'Helpful during move window',
+    sponsoredStatus: 'Partner',
+    createdAt: '2026-06-01T08:50:00.000Z',
+  },
+  {
+    id: 'perk-landlord-insurance',
+    title: 'Landlord insurance check',
+    partnerName: 'Property insurance partner',
+    category: 'Insurance',
+    description: 'Insurance options for landlords listing or preparing to let a property.',
+    cta: 'Review cover',
+    eligibleRoles: ['Landlord', 'Agency / Business', 'Operator'],
+    lifecycleTrigger: 'property_listed',
+    trustLevel: 'verified_partner',
+    reward: 'Relevant before tenancy',
+    sponsoredStatus: 'Partner',
+    createdAt: '2026-06-01T09:00:00.000Z',
+  },
+  {
+    id: 'perk-operator-saas',
+    title: 'Portfolio tools for operators',
+    partnerName: 'Property operations partner',
+    category: 'Property SaaS',
+    description: 'Tools for occupancy, guest operations, reporting, and handover workflows.',
+    cta: 'Explore tools',
+    eligibleRoles: ['Operator', 'Short-Term Host', 'Agency / Business'],
+    lifecycleTrigger: 'portfolio_growth',
+    trustLevel: 'verified_partner',
+    reward: 'Useful after several units',
+    sponsoredStatus: 'Partner',
+    createdAt: '2026-06-01T09:10:00.000Z',
+  },
+  {
+    id: 'perk-investor-finance',
+    title: 'Finance conversation for investors',
+    partnerName: 'Property finance partner',
+    category: 'Mortgage broker',
+    description: 'Speak to a property finance specialist when your investor criteria and target area are clear.',
+    cta: 'Start conversation',
+    eligibleRoles: ['Investor', 'Sourcer', 'Landlord'],
+    lifecycleTrigger: 'deal_interest',
+    trustLevel: 'verified_partner',
+    reward: 'Useful when numbers are ready',
+    sponsoredStatus: 'Partner',
+    createdAt: '2026-06-01T09:20:00.000Z',
+  },
+];
+
+const seededFeedAds = [
+  {
+    id: 'ad-moving-clean',
+    advertiserName: 'Move-clean partner',
+    title: 'End-of-tenancy and move-in cleaning',
+    body: 'Book cleaning help around your move date. Shown to people actively moving or preparing a property.',
+    category: 'Cleaning',
+    sponsoredStatus: 'Sponsored',
+    eligibleRoles: ['Tenant', 'House Buddy', 'Landlord', 'Operator', 'Short-Term Host'],
+    targetingSignals: ['move date', 'availability', 'property listed'],
+    frequencyCapPerDay: 2,
+    impressionCount: 0,
+    clickCount: 0,
+    createdAt: '2026-06-01T09:30:00.000Z',
+  },
+  {
+    id: 'ad-landlord-photos',
+    advertiserName: 'Property photography partner',
+    title: 'Better listing photos before you post',
+    body: 'A practical service for landlords, agents, operators, and hosts preparing a real listing.',
+    category: 'Property photography',
+    sponsoredStatus: 'Promoted',
+    eligibleRoles: ['Landlord', 'Individual Agent', 'Agency / Business', 'Operator', 'Short-Term Host'],
+    targetingSignals: ['new listing', 'low media count', 'business profile'],
+    frequencyCapPerDay: 2,
+    impressionCount: 0,
+    clickCount: 0,
+    createdAt: '2026-06-01T09:40:00.000Z',
   },
 ];
 
@@ -1908,7 +2070,7 @@ function ComposerPanel({ onCreatePost, compact = false, profile = currentUser })
     onCreatePost({
       id: createPostId(),
       authorId: profile.id || currentUser.id,
-      authorType: profile.role || currentUser.role,
+      authorType: profile.role || currentUser.role || 'Member',
       authorName: profile.name || currentUser.name,
       postType,
       title: cleanTitle,
@@ -2294,6 +2456,207 @@ function AppPulseStrip({ wallet, purchases, boosts, reports, shares }) {
         ))}
       </div>
     </div>
+  );
+}
+
+function SocialHomeHeader({ profile, usageLimit, groups, memberships, posts, onSelectTab }) {
+  const remaining = Math.max(0, usageLimit.allowance - usageLimit.used);
+  const joinedCount = memberships.length;
+  const roleLabel = displayRole(profile.role);
+  const popularAreas = [...new Set(posts.map((post) => post.area).filter(Boolean))].slice(0, 3);
+
+  return (
+    <section className="overflow-hidden rounded-[2rem] border border-white bg-white/92 shadow-[0_22px_54px_-38px_rgba(15,23,42,0.48),inset_0_1px_0_white]">
+      <div className="bg-linear-to-br from-[#092243] via-[#123f63] to-[#2f7d32] p-5 text-white sm:p-6">
+        <div className="flex items-start justify-between gap-4">
+          <div className="min-w-0">
+            <p className="text-sm text-white/68">Home</p>
+            <h1 className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">What’s happening in your rental world?</h1>
+            <p className="mt-3 max-w-2xl text-sm leading-6 text-white/72">Browse people, places, posts, groups, deals, stays, and useful local updates in one calm Feed.</p>
+          </div>
+          <a href="/app/profile" className="shrink-0 rounded-full bg-white/14 px-3 py-2 text-xs text-white ring-1 ring-white/16">{roleLabel}</a>
+        </div>
+        <div className="mt-5 grid grid-cols-3 gap-2">
+          {[
+            [remaining, 'Swipes today'],
+            [joinedCount, 'Groups joined'],
+            [posts.length, 'Live posts'],
+          ].map(([value, label]) => (
+            <div key={label} className="rounded-2xl bg-white/12 px-3 py-3 ring-1 ring-white/12">
+              <p className="text-xl font-semibold">{value}</p>
+              <p className="mt-1 text-[0.68rem] text-white/58">{label}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+      <div className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center">
+        <a href="/app/post" className="flex min-w-0 flex-1 items-center gap-3 rounded-full bg-slate-50 px-4 py-3 text-left text-sm text-slate-500 ring-1 ring-slate-100">
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#edf8ee] text-[#2f7d32]"><UserRound className="h-4 w-4" /></span>
+          <span className="truncate">Post a listing, question, update, deal, stay, or local tip</span>
+        </a>
+        <div className="flex shrink-0 gap-2">
+          <button type="button" onClick={() => onSelectTab('Groups')} className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700"><Users className="h-4 w-4" />Groups</button>
+          <a href="/app/swipe" className="inline-flex items-center gap-2 rounded-full bg-[#2f7d32] px-4 py-3 text-sm text-white"><Flame className="h-4 w-4" />Swipe</a>
+        </div>
+      </div>
+      {popularAreas.length > 0 && (
+        <div className="flex flex-wrap gap-2 px-4 pb-4">
+          {popularAreas.map((area) => (
+            <button key={area} type="button" onClick={() => onSelectTab('For You')} className="rounded-full bg-[#edf7ff] px-3 py-1.5 text-xs text-[#154f79]">{area}</button>
+          ))}
+        </div>
+      )}
+    </section>
+  );
+}
+
+function SocialStoryRail({ posts, groups, onSelectTab }) {
+  const stories = [
+    { id: 'for-you', title: 'For You', body: 'Best market signals', icon: Sparkles, tab: 'For You', tone: 'bg-[#092243] text-white' },
+    { id: 'groups', title: 'Groups', body: `${groups.length} open`, icon: Users, tab: 'Groups', tone: 'bg-[#edf8ee] text-[#215d27]' },
+    { id: 'properties', title: 'Properties', body: `${posts.filter((post) => ['Property', 'Room', 'Serviced Accommodation'].includes(post.postType)).length} posts`, icon: Home, tab: 'Properties', tone: 'bg-[#edf7ff] text-[#154f79]' },
+    { id: 'deals', title: 'Deals', body: 'Investors + sourcers', icon: BadgeCheck, tab: 'Investors', tone: 'bg-[#fff7ed] text-[#9a3412]' },
+    { id: 'perks', title: 'Perks', body: 'Useful partners', icon: Gift, tab: 'Perks', tone: 'bg-white text-slate-700' },
+  ];
+
+  return (
+    <div className="overflow-x-auto pb-1">
+      <div className="flex min-w-max gap-3">
+        {stories.map(({ id, title, body, icon: Icon, tab, tone }) => (
+          <button key={id} type="button" onClick={() => onSelectTab(tab)} className={`w-32 rounded-[1.35rem] border border-white p-4 text-left shadow-[0_14px_34px_-30px_rgba(15,23,42,0.48)] ${tone}`}>
+            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-white/18 ring-1 ring-current/10"><Icon className="h-5 w-5" /></span>
+            <span className="mt-5 block text-sm font-semibold">{title}</span>
+            <span className="mt-1 block text-xs opacity-70">{body}</span>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function GroupsPanel({ groups, memberships, onJoinGroup, onCreateGroup, compact = false }) {
+  const [creating, setCreating] = useState(false);
+  const [draft, setDraft] = useState({ name: '', groupType: 'Area community', area: '', description: '' });
+  const memberGroupIds = memberships.map((item) => item.groupId);
+  const visibleGroups = compact ? groups.slice(0, 3) : groups;
+
+  const submit = (event) => {
+    event.preventDefault();
+    if (!draft.name.trim() || !draft.description.trim()) return;
+    onCreateGroup(draft);
+    setDraft({ name: '', groupType: 'Area community', area: '', description: '' });
+    setCreating(false);
+  };
+
+  return (
+    <section className="rounded-[1.75rem] border border-white bg-white/92 p-4 shadow-[0_18px_44px_-34px_rgba(15,23,42,0.45),inset_0_1px_0_white]">
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <p className="font-['JetBrains_Mono',monospace] text-xs text-[#2670a8]">GROUPS</p>
+          <h2 className="mt-2 text-2xl font-normal tracking-tight text-slate-950">Find your rental people</h2>
+          <p className="mt-1 text-sm leading-6 text-slate-500">Area communities, role networks, and deal rooms keep the Feed alive between searches.</p>
+        </div>
+        <button type="button" onClick={() => setCreating((value) => !value)} className="shrink-0 rounded-full bg-[#092243] px-4 py-2 text-sm text-white">Create group</button>
+      </div>
+      {creating && (
+        <form onSubmit={submit} className="mt-4 grid gap-3 rounded-3xl bg-slate-50 p-3">
+          <div className="grid gap-3 sm:grid-cols-2">
+            <input value={draft.name} onChange={(event) => setDraft((current) => ({ ...current, name: event.target.value }))} placeholder="Group name" className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-hidden focus:border-[#2f7d32]" />
+            <select value={draft.groupType} onChange={(event) => setDraft((current) => ({ ...current, groupType: event.target.value }))} className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-hidden focus:border-[#2f7d32]">
+              {['Area community', 'Role network', 'Professional circle', 'Deal community'].map((type) => <option key={type}>{type}</option>)}
+            </select>
+          </div>
+          <input value={draft.area} onChange={(event) => setDraft((current) => ({ ...current, area: event.target.value }))} placeholder="Area or market" className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-hidden focus:border-[#2f7d32]" />
+          <textarea value={draft.description} onChange={(event) => setDraft((current) => ({ ...current, description: event.target.value }))} rows={3} placeholder="What should people use this group for?" className="resize-none rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-hidden focus:border-[#2f7d32]" />
+          <button className="rounded-full bg-[#2f7d32] px-5 py-3 text-sm text-white">Create open group</button>
+        </form>
+      )}
+      <div className="mt-4 grid gap-3 sm:grid-cols-2">
+        {visibleGroups.map((group) => {
+          const joined = memberGroupIds.includes(group.id);
+          return (
+            <article key={group.id} className="rounded-3xl border border-slate-200 bg-white p-4">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="text-xs text-[#2670a8]">{group.groupType} · {group.area}</p>
+                  <h3 className="mt-1 text-lg font-semibold tracking-tight text-slate-950">{group.name}</h3>
+                </div>
+                <span className="shrink-0 rounded-full bg-[#edf8ee] px-3 py-1 text-xs text-[#215d27]">{group.visibility}</span>
+              </div>
+              <p className="mt-3 text-sm leading-6 text-slate-600">{group.description}</p>
+              <div className="mt-4 flex items-center justify-between gap-3">
+                <p className="text-xs text-slate-500">{group.memberCount} members · {group.postCount} posts</p>
+                <button type="button" onClick={() => onJoinGroup(group.id)} className={`rounded-full px-4 py-2 text-sm ${joined ? 'bg-[#edf8ee] text-[#215d27]' : 'bg-[#092243] text-white'}`}>{joined ? 'Joined' : 'Join'}</button>
+              </div>
+            </article>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
+function PerksRail({ partnerOffers, profile, onOpenOffer, compact = false }) {
+  const role = profile.role || 'General';
+  const matching = partnerOffers.filter((offer) => offer.eligibleRoles?.includes(role));
+  const offers = (matching.length ? matching : partnerOffers).slice(0, compact ? 3 : partnerOffers.length);
+
+  return (
+    <section className="rounded-[1.75rem] border border-white bg-white/92 p-4 shadow-[0_18px_44px_-34px_rgba(15,23,42,0.45),inset_0_1px_0_white]">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <p className="font-['JetBrains_Mono',monospace] text-xs text-[#2670a8]">PERKS</p>
+          <h2 className="mt-2 text-2xl font-normal tracking-tight text-slate-950">Useful when the timing is right</h2>
+          <p className="mt-1 text-sm leading-6 text-slate-500">Partner offers appear when they fit the move, listing, stay, deal, or portfolio moment.</p>
+        </div>
+        <Gift className="mt-1 h-5 w-5 text-[#2f7d32]" />
+      </div>
+      <div className="mt-4 grid gap-3">
+        {offers.map((offer) => (
+          <button key={offer.id} type="button" onClick={() => onOpenOffer(offer)} className="rounded-3xl border border-slate-200 bg-white p-4 text-left transition hover:border-[#2f7d32]">
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <p className="text-xs text-[#2670a8]">{offer.category} · {offer.sponsoredStatus}</p>
+                <h3 className="mt-1 text-base font-semibold text-slate-950">{offer.title}</h3>
+              </div>
+              <span className="shrink-0 rounded-full bg-[#edf8ee] px-3 py-1 text-xs text-[#215d27]">{offer.cta}</span>
+            </div>
+            <p className="mt-2 text-sm leading-6 text-slate-600">{offer.description}</p>
+            <p className="mt-2 text-xs text-slate-400">{offer.reward}</p>
+          </button>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function NativeAdCard({ ad, onOpen, onHide, onReport }) {
+  if (!ad) return null;
+
+  return (
+    <article className="rounded-[1.75rem] border border-[#fed7aa] bg-[#fffaf2] p-5 shadow-[0_18px_44px_-34px_rgba(15,23,42,0.35)]">
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="rounded-full bg-white px-3 py-1 text-xs text-[#9a3412]">{ad.sponsoredStatus}</span>
+            <span className="text-xs text-[#9a3412]/70">{ad.category}</span>
+          </div>
+          <h2 className="mt-3 text-2xl font-normal tracking-tight text-slate-950">{ad.title}</h2>
+          <p className="mt-1 text-sm text-slate-500">{ad.advertiserName}</p>
+        </div>
+        <Megaphone className="h-5 w-5 shrink-0 text-[#9a3412]" />
+      </div>
+      <p className="mt-4 text-sm leading-7 text-slate-700">{ad.body}</p>
+      <div className="mt-4 flex flex-wrap gap-2">
+        {(ad.targetingSignals || []).map((signal) => <span key={signal} className="rounded-full bg-white px-3 py-1 text-xs text-slate-500">{signal}</span>)}
+      </div>
+      <div className="mt-5 flex flex-wrap items-center gap-2">
+        <button type="button" onClick={() => onOpen(ad)} className="rounded-full bg-[#092243] px-4 py-2 text-sm text-white">Open offer</button>
+        <button type="button" onClick={() => onHide(ad.id)} className="rounded-full bg-white px-4 py-2 text-sm text-slate-600">Hide</button>
+        <button type="button" onClick={() => onReport({ id: ad.id, title: ad.title, postType: ad.category, sponsoredStatus: ad.sponsoredStatus })} className="rounded-full bg-white px-4 py-2 text-sm text-slate-600">Report</button>
+      </div>
+      <p className="mt-3 text-xs leading-5 text-[#9a3412]">Labelled and capped. Paid visibility does not change trust or suitability.</p>
+    </article>
   );
 }
 
@@ -2754,6 +3117,13 @@ function RentEazyAppShell() {
   const [boosts, setBoosts] = useStoredState('renteazy-boost-campaigns', []);
   const [appStreak, setAppStreak] = useStoredState('renteazy-app-streak', defaultAppStreak);
   const [wallet, setWallet] = useStoredState('renteazy-wallet', { id: 'wallet-demo-user', userId: currentUser.id, balance: 0, updatedAt: new Date().toISOString() });
+  const [groups, setGroups] = useStoredState('renteazy-groups', seededGroups);
+  const [groupMemberships, setGroupMemberships] = useStoredState('renteazy-group-memberships', [{ id: 'membership-demo-east-london', groupId: 'group-east-london-renters', userId: currentUser.id, role: 'member', createdAt: new Date().toISOString() }]);
+  const [partnerOffers, setPartnerOffers] = useStoredState('renteazy-partner-offers', seededPartnerOffers);
+  const [feedAds, setFeedAds] = useStoredState('renteazy-feed-ads', seededFeedAds);
+  const [behavioralEvents, setBehavioralEvents] = useStoredState('renteazy-behavioral-events', []);
+  const [hiddenAdIds, setHiddenAdIds] = useStoredState('renteazy-hidden-ads', []);
+  const [openedOfferId, setOpenedOfferId] = useState('');
   const [sharePost, setSharePost] = useState(null);
   const [reportPost, setReportPost] = useState(null);
   const [commentPost, setCommentPost] = useState(null);
@@ -2785,6 +3155,11 @@ function RentEazyAppShell() {
     if (state.boosts) setBoosts(state.boosts);
     if (state.wallet) setWallet(state.wallet);
     if (state.appStreak) setAppStreak(state.appStreak);
+    if (state.groups) setGroups(state.groups);
+    if (state.groupMemberships) setGroupMemberships(state.groupMemberships);
+    if (state.partnerOffers) setPartnerOffers(state.partnerOffers);
+    if (state.feedAds) setFeedAds(state.feedAds);
+    if (state.behavioralEvents) setBehavioralEvents(state.behavioralEvents);
   };
 
   const syncApiState = async (promise) => {
@@ -2879,6 +3254,81 @@ function RentEazyAppShell() {
 
   const toggleId = (setter, id) => {
     setter((current) => current.includes(id) ? current.filter((item) => item !== id) : [...current, id]);
+  };
+
+  const trackBehaviorEvent = (eventType, targetType = 'app', targetId = '', metadata = {}) => {
+    const event = {
+      id: createPostId(),
+      userId: profile.id || currentUser.id,
+      eventType,
+      targetType,
+      targetId,
+      metadata,
+      createdAt: new Date().toISOString(),
+    };
+    setBehavioralEvents((current) => [event, ...current].slice(0, 100));
+    syncApiState(apiRequest('/api/events', { method: 'POST', body: event }));
+    return event;
+  };
+
+  const joinGroup = (groupId) => {
+    const existing = groupMemberships.find((item) => item.groupId === groupId);
+    if (existing) {
+      setGroupMemberships((current) => current.filter((item) => item.groupId !== groupId));
+      setGroups((current) => current.map((group) => group.id === groupId ? { ...group, memberCount: Math.max(0, group.memberCount - 1) } : group));
+    } else {
+      setGroupMemberships((current) => [{ id: createPostId(), groupId, userId: profile.id || currentUser.id, role: 'member', createdAt: new Date().toISOString() }, ...current]);
+      setGroups((current) => current.map((group) => group.id === groupId ? { ...group, memberCount: group.memberCount + 1 } : group));
+    }
+    syncApiState(apiRequest(`/api/groups/${groupId}/join`, { method: 'POST' }));
+  };
+
+  const createGroup = (draft) => {
+    const group = {
+      id: createPostId(),
+      name: draft.name.trim(),
+      groupType: draft.groupType,
+      area: draft.area.trim() || profile.area || 'UK',
+      description: draft.description.trim(),
+      visibility: 'open',
+      memberCount: 1,
+      postCount: 0,
+      roles: profile.role ? [profile.role] : ['General'],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+    setGroups((current) => [group, ...current]);
+    setGroupMemberships((current) => [{ id: createPostId(), groupId: group.id, userId: profile.id || currentUser.id, role: 'owner', createdAt: new Date().toISOString() }, ...current]);
+    syncApiState(apiRequest('/api/groups', { method: 'POST', body: group }));
+  };
+
+  const openPartnerOffer = (offer) => {
+    setOpenedOfferId(offer.id);
+    trackBehaviorEvent('partner_offer_opened', 'partner_offer', offer.id, { category: offer.category, lifecycleTrigger: offer.lifecycleTrigger });
+  };
+
+  const openNativeAd = (ad) => {
+    trackBehaviorEvent('native_ad_opened', 'feed_ad', ad.id, { category: ad.category, sponsoredStatus: ad.sponsoredStatus });
+  };
+
+  const hideNativeAd = (adId) => {
+    setHiddenAdIds((current) => [...new Set([...current, adId])]);
+    trackBehaviorEvent('native_ad_hidden', 'feed_ad', adId);
+  };
+
+  const reportNativeAd = (ad) => {
+    const report = {
+      id: createPostId(),
+      reporterId: currentUser.id,
+      targetType: 'feed_ad',
+      targetId: ad.id,
+      reason: 'Other',
+      details: `${ad.sponsoredStatus || 'Sponsored'} card reported from Feed`,
+      status: 'open',
+      createdAt: new Date().toISOString(),
+    };
+    setReports((current) => [report, ...current]);
+    trackBehaviorEvent('native_ad_reported', 'feed_ad', ad.id, { category: ad.category });
   };
 
   const trackShare = (postId, channel) => {
@@ -2997,6 +3447,7 @@ function RentEazyAppShell() {
 
   const filteredPosts = posts.filter((post) => {
     if (hiddenPostIds.includes(post.id)) return false;
+    if (activeFeedTab === 'Groups' || activeFeedTab === 'Perks') return false;
     if (activeFeedTab === 'For You') return true;
     if (activeFeedTab === 'Following') return followedIds.includes(post.authorId);
     if (activeFeedTab === 'Properties') return ['Property', 'Room', 'Serviced Accommodation'].includes(post.postType);
@@ -3048,10 +3499,10 @@ function RentEazyAppShell() {
           {routeTab === 'Feed' && (
             <>
               <div className="mb-4">
-                <AppHeroPanel profile={profile} usageLimit={usageLimit} posts={posts} shares={shares} />
+                <SocialHomeHeader profile={profile} usageLimit={usageLimit} groups={groups} memberships={groupMemberships} posts={posts} onSelectTab={setActiveFeedTab} />
               </div>
               <div className="mb-4">
-                <MarketCommandPanel profile={profile} usageLimit={usageLimit} posts={posts} shares={shares} answers={answers} onSelectTab={setActiveFeedTab} />
+                <SocialStoryRail posts={posts} groups={groups} onSelectTab={setActiveFeedTab} />
               </div>
               <div className="mb-4 overflow-x-auto pb-1">
                 <div className="flex min-w-max gap-2">
@@ -3060,7 +3511,7 @@ function RentEazyAppShell() {
                   ))}
                 </div>
               </div>
-              <ComposerPanel onCreatePost={addPost} compact profile={profile} />
+              {activeFeedTab !== 'Groups' && activeFeedTab !== 'Perks' && <ComposerPanel onCreatePost={addPost} compact profile={profile} />}
               {newPost && (
                 <div className="mt-4 rounded-3xl border border-[#d5ecd7] bg-[#edf8ee] p-4">
                   <p className="text-sm font-medium text-[#215d27]">Want more people to see this?</p>
@@ -3070,36 +3521,60 @@ function RentEazyAppShell() {
                   </div>
                 </div>
               )}
+              {openedOfferId && (
+                <div className="mt-4 rounded-3xl border border-[#d5ecd7] bg-[#edf8ee] px-4 py-3 text-sm text-[#215d27]">
+                  Perk opened. RentEazy records the signal so future offers can be more relevant.
+                </div>
+              )}
               <div className="mt-5 space-y-4">
-                {filteredPosts.map((post, index) => (
-                  <React.Fragment key={post.id}>
-                    <FeedPostCard
-                      post={post}
-                      liked={likedIds.includes(post.id)}
-                      saved={savedIds.includes(post.id)}
-                      followed={followedIds.includes(post.authorId)}
-                      commentCount={post.commentCount + comments.filter((comment) => comment.postId === post.id).length}
-                      onLike={toggleLike}
-                      onSave={toggleSave}
-                      onFollow={toggleFollow}
-                      onShare={setSharePost}
-                      onComment={setCommentPost}
-                      onBoost={(post) => boostPost(post.id)}
-                      onHide={hidePost}
-                      onReport={setReportPost}
-                    />
-                    {index === 1 && (
-                      <div className="space-y-4">
-                        <DailySwipePanel usageLimit={usageLimit} onBuyMore={openUpsell} />
-                        <MissionPanel posts={posts} shares={shares} likedIds={likedIds} savedIds={savedIds} answers={answers} onSelectProduct={openUpsell} />
-                        <RoleLanesPanel profile={profile} onSelectTab={setActiveFeedTab} />
-                        <DailyPicksPanel picks={dailyPicks} />
-                        <TractionPanel posts={posts} likedIds={likedIds} savedIds={savedIds} shares={shares} comments={comments} onBoost={openUpsell} />
-                      </div>
-                    )}
-                  </React.Fragment>
-                ))}
-                {filteredPosts.length === 0 && (
+                {activeFeedTab === 'Groups' ? (
+                  <GroupsPanel groups={groups} memberships={groupMemberships} onJoinGroup={joinGroup} onCreateGroup={createGroup} />
+                ) : activeFeedTab === 'Perks' ? (
+                  <PerksRail partnerOffers={partnerOffers} profile={profile} onOpenOffer={openPartnerOffer} />
+                ) : (
+                  filteredPosts.map((post, index) => (
+                    <React.Fragment key={post.id}>
+                      <FeedPostCard
+                        post={post}
+                        liked={likedIds.includes(post.id)}
+                        saved={savedIds.includes(post.id)}
+                        followed={followedIds.includes(post.authorId)}
+                        commentCount={post.commentCount + comments.filter((comment) => comment.postId === post.id).length}
+                        onLike={toggleLike}
+                        onSave={toggleSave}
+                        onFollow={toggleFollow}
+                        onShare={setSharePost}
+                        onComment={setCommentPost}
+                        onBoost={(post) => boostPost(post.id)}
+                        onHide={hidePost}
+                        onReport={setReportPost}
+                      />
+                      {index === 0 && (
+                        <GroupsPanel groups={groups} memberships={groupMemberships} onJoinGroup={joinGroup} onCreateGroup={createGroup} compact />
+                      )}
+                      {index === 1 && (
+                        <div className="space-y-4">
+                          <DailySwipePanel usageLimit={usageLimit} onBuyMore={openUpsell} />
+                          <MissionPanel posts={posts} shares={shares} likedIds={likedIds} savedIds={savedIds} answers={answers} onSelectProduct={openUpsell} />
+                          <DailyPicksPanel picks={dailyPicks} />
+                        </div>
+                      )}
+                      {index === 2 && feedAds.filter((ad) => !hiddenAdIds.includes(ad.id))[0] && (
+                        <NativeAdCard ad={feedAds.filter((ad) => !hiddenAdIds.includes(ad.id))[0]} onOpen={openNativeAd} onHide={hideNativeAd} onReport={reportNativeAd} />
+                      )}
+                      {index === 3 && (
+                        <PerksRail partnerOffers={partnerOffers} profile={profile} onOpenOffer={openPartnerOffer} compact />
+                      )}
+                      {index === 4 && (
+                        <div className="space-y-4">
+                          <RoleLanesPanel profile={profile} onSelectTab={setActiveFeedTab} />
+                          <TractionPanel posts={posts} likedIds={likedIds} savedIds={savedIds} shares={shares} comments={comments} onBoost={openUpsell} />
+                        </div>
+                      )}
+                    </React.Fragment>
+                  ))
+                )}
+                {filteredPosts.length === 0 && activeFeedTab !== 'Groups' && activeFeedTab !== 'Perks' && (
                   <div className="rounded-[1.75rem] border border-white bg-white/86 p-6 text-center shadow-[0_18px_44px_-34px_rgba(15,23,42,0.45),inset_0_1px_0_white]">
                     <p className="text-2xl font-normal tracking-tight text-slate-950">Your Feed is ready.</p>
                     <p className="mt-2 text-sm leading-6 text-slate-600">Follow people, browse categories, or post what you are looking for.</p>
@@ -3345,6 +3820,7 @@ export default function App() {
   return (
     <div className="bg-[#f5f8fb] text-slate-900 font-['Inter',sans-serif] min-h-screen relative overflow-x-hidden antialiased selection:bg-[#dff4e2] selection:text-[#092243]">
       <StickyMobileCTA />
+      <RentEazyVoiceAgent />
       <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
         <div className="rent-eazy-float-bubble absolute top-[-12%] left-[-12%] w-[52vw] h-[52vw] rounded-full bg-[#cfe9fb]/42 blur-[7.5rem]"></div>
         <div className="rent-eazy-float-bubble absolute bottom-[-18%] right-[-10%] w-[62vw] h-[62vw] rounded-full bg-[#dff4e2]/42 blur-[8.75rem]"></div>
