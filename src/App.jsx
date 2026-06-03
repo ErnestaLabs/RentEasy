@@ -5673,7 +5673,7 @@ export default function App() {
             </div>
 
             <div className="text-center lg:text-left">
-              <p className="mt-8 lg:mt-5 xl:mt-6 text-base md:text-lg leading-8 text-slate-600 font-light max-w-xl mx-auto lg:mx-0">Stop applying to listings. Start matching with people who already want you.</p>
+              <p className="mt-8 lg:mt-5 xl:mt-6 text-base md:text-lg leading-8 text-slate-600 font-light max-w-xl mx-auto lg:mx-0">{pc.hero.heroShort}</p>
               <div className="mt-10 lg:mt-6 xl:mt-8 flex flex-col items-center lg:items-start gap-3">
                 <a href="/signup?source=hero_primary&offer=match24h" className="inline-flex items-center justify-center gap-2.5 rounded-full px-8 py-4 bg-linear-to-b from-[#52a832] to-[#2f7d32] border border-[#25672a] text-white text-base font-medium shadow-[0_12px_28px_rgba(47,125,50,0.3),inset_0_1px_0_rgba(255,255,255,0.35)] transition-all duration-200 hover:shadow-[0_16px_36px_rgba(47,125,50,0.44)] hover:from-[#64bd44] hover:to-[#3b8d3d] active:scale-95">
                   Start Matching — it's free
