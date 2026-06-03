@@ -3,7 +3,7 @@ import { Player } from '@remotion/player';
 import { BorderBeam } from '@/components/ui/border-beam';
 import RentEazyVSL from './RentEazyVSL';
 
-const DURATION_IN_FRAMES = 900;
+const DURATION_IN_FRAMES = 1800; // 60s × 30fps — 7-act VSL
 const FPS = 30;
 
 export default function VSLPlayer() {
@@ -62,6 +62,7 @@ export default function VSLPlayer() {
         compositionWidth={1280}
         compositionHeight={720}
         fps={FPS}
+        inputProps={{ userType: 'tenant' }}
         style={{ width: '100%', height: '100%', borderRadius: '2rem' }}
         controls={false}
         loop
@@ -99,7 +100,7 @@ export default function VSLPlayer() {
       {playing && (
         <div className="pointer-events-none absolute inset-x-0 bottom-0 flex items-end justify-between px-5 pb-4">
           <div className="rounded-full border border-white/10 bg-black/38 px-3 py-1.5 backdrop-blur-xs">
-            <span className="font-['JetBrains_Mono',monospace] text-[10px] tracking-[0.12em] text-white/38">RENTEAZY · 0:30</span>
+            <span className="font-['JetBrains_Mono',monospace] text-[10px] tracking-[0.12em] text-white/38">RENTEAZY · 1:00</span>
           </div>
           <div className="flex items-center gap-2">
             <button
