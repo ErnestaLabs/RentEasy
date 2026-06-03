@@ -1,9 +1,11 @@
 import React from 'react';
 import {
   AbsoluteFill,
+  Audio,
   Sequence,
   interpolate,
   spring,
+  staticFile,
   useCurrentFrame,
   useVideoConfig,
 } from 'remotion';
@@ -178,9 +180,16 @@ function SceneTenant() {
         </div>
       </div>
       {/* Label */}
-      <div style={{ position: 'absolute', bottom: '8%', left: 0, right: 0, textAlign: 'center', opacity: labelOp, transform: `translateY(${labelY}px)` }}>
-        <div style={{ fontSize: 46, fontWeight: 300, color: C.white, letterSpacing: '-0.025em' }}>Tenants swipe what fits.</div>
+      <div style={{ position: 'absolute', bottom: '6%', left: 0, right: 0, textAlign: 'center', opacity: labelOp, transform: `translateY(${labelY}px)` }}>
+        <div style={{ fontSize: 46, fontWeight: 300, color: C.white, letterSpacing: '-0.025em' }}>Everyone swipes here.</div>
         <div style={{ fontSize: 16, color: C.greenPale, marginTop: 8, fontWeight: 300 }}>Scored cards. No noise. No cold messages.</div>
+        <div style={{ display: 'flex', gap: 8, justifyContent: 'center', marginTop: 14, flexWrap: 'wrap' }}>
+          {[['Tenants', 'homes & rooms'], ['Agents', 'tenants'], ['Landlords', 'tenants & agents']].map(([who, what]) => (
+            <div key={who} style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 100, padding: '5px 13px', fontSize: 12, color: 'rgba(255,255,255,0.62)' }}>
+              <span style={{ color: C.greenPale, fontWeight: 600 }}>{who}</span> swipe {what}
+            </div>
+          ))}
+        </div>
       </div>
     </AbsoluteFill>
   );
@@ -546,8 +555,9 @@ function SceneFinale() {
   const pill2Op = fi(frame, [40, 58], [0, 1]);
   const pill3Op = fi(frame, [52, 70], [0, 1]);
 
-  const ctaScale = 0.8 + spring({ frame: frame - 52, fps, config: { damping: 14, stiffness: 200 } }) * 0.2;
-  const ctaOp    = fi(frame, [58, 76], [0, 1]);
+  const closeOp  = fi(frame, [44, 60], [0, 1]);
+  const ctaScale = 0.8 + spring({ frame: frame - 56, fps, config: { damping: 14, stiffness: 200 } }) * 0.2;
+  const ctaOp    = fi(frame, [60, 78], [0, 1]);
   const glow     = 0.5 + Math.sin(frame / 8) * 0.08;
 
   return (
@@ -565,23 +575,30 @@ function SceneFinale() {
       {/* Audience pills */}
       <div style={{ marginTop: 28, display: 'flex', gap: 12, justifyContent: 'center' }}>
         <div style={{ opacity: pill1Op, background: 'rgba(82,168,50,0.18)', border: '1px solid rgba(82,168,50,0.4)', borderRadius: 100, padding: '8px 18px' }}>
-          <span style={{ color: C.greenPale, fontSize: 13, fontWeight: 400 }}>🏠 Tenants</span>
+          <span style={{ color: C.greenPale, fontSize: 13, fontWeight: 400 }}>🏠 Renters & buddies</span>
         </div>
         <div style={{ opacity: pill2Op, background: 'rgba(91,196,255,0.14)', border: '1px solid rgba(91,196,255,0.35)', borderRadius: 100, padding: '8px 18px' }}>
-          <span style={{ color: '#5bc4ff', fontSize: 13, fontWeight: 400 }}>🏢 Agents & Agencies</span>
+          <span style={{ color: '#5bc4ff', fontSize: 13, fontWeight: 400 }}>🏢 Agents, agencies & hosts</span>
         </div>
         <div style={{ opacity: pill3Op, background: 'rgba(245,158,11,0.12)', border: '1px solid rgba(245,158,11,0.3)', borderRadius: 100, padding: '8px 18px' }}>
-          <span style={{ color: '#fbbf24', fontSize: 13, fontWeight: 400 }}>🔑 Landlords</span>
+          <span style={{ color: '#fbbf24', fontSize: 13, fontWeight: 400 }}>🔑 Landlords, operators & investors</span>
         </div>
       </div>
 
-      <div style={{ marginTop: 36, opacity: ctaOp, transform: `scale(${ctaScale})`, textAlign: 'center' }}>
+      <div style={{ marginTop: 26, textAlign: 'center', opacity: closeOp }}>
+        <div style={{ fontSize: 26, fontWeight: 300, color: C.white, letterSpacing: '-0.02em' }}>Your next rental signal is already moving.</div>
+      </div>
+
+      <div style={{ marginTop: 18, opacity: ctaOp, transform: `scale(${ctaScale})`, textAlign: 'center' }}>
         <div style={{
           background: `linear-gradient(135deg, ${C.green}, ${C.greenDark})`,
-          borderRadius: 100, padding: '16px 44px', color: 'white', fontSize: 17, fontWeight: 400, display: 'inline-block',
+          borderRadius: 100, padding: '17px 46px', color: 'white', fontSize: 18, fontWeight: 500, display: 'inline-block',
           boxShadow: `0 18px 44px rgba(47,125,50,0.44), 0 0 0 1px rgba(255,255,255,0.2)`,
         }}>
-          Start free — for everyone
+          Start free — 2 minutes, no card
+        </div>
+        <div style={{ marginTop: 14, fontFamily: FONT.mono, fontSize: 12, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.1em' }}>
+          renteazy.co.uk · free to post · free to swipe
         </div>
       </div>
     </AbsoluteFill>
@@ -592,6 +609,7 @@ function SceneFinale() {
 export default function RentEazyVSL() {
   return (
     <AbsoluteFill style={{ background: C.navy, fontFamily: FONT.sans }}>
+      <Audio src={staticFile('/audio/summer.mp3')} volume={0.72} />
       <Sequence from={0}   durationInFrames={90}><SceneHook /></Sequence>
       <Sequence from={90}  durationInFrames={90}><SceneTenant /></Sequence>
       <Sequence from={180} durationInFrames={210}><SceneAgentRep /></Sequence>

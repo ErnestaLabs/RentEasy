@@ -13,11 +13,16 @@ export default function VSLPlayer() {
   const [muted, setMuted] = useState(true);
   const hasAutoStarted = useRef(false);
 
-  const tryPlay = () => {
+  const tryPlay = async () => {
     try {
-      playerRef.current?.play();
-      setPlaying(true);
+      await playerRef.current?.play();
     } catch (_) {}
+  };
+
+  const playWithSound = () => {
+    hasAutoStarted.current = true;
+    setMuted(false);
+    window.setTimeout(tryPlay, 0);
   };
 
   // Autoplay when the player enters the viewport
@@ -40,11 +45,6 @@ export default function VSLPlayer() {
     observer.observe(el);
     return () => observer.disconnect();
   }, []);
-
-  const unmute = () => {
-    setMuted(false);
-    tryPlay();
-  };
 
   return (
     <div
@@ -82,14 +82,15 @@ export default function VSLPlayer() {
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center transition-opacity duration-300">
           <button
             type="button"
-            onClick={() => { hasAutoStarted.current = true; tryPlay(); }}
-            className="pointer-events-auto group flex items-center justify-center rounded-full bg-white/14 border border-white/22 backdrop-blur-md transition-all duration-200 hover:bg-white/28 hover:scale-105 active:scale-95"
-            aria-label="Play video"
-            style={{ width: 72, height: 72 }}
+            onClick={playWithSound}
+            className="pointer-events-auto group flex flex-col items-center justify-center rounded-full bg-white/16 border border-white/24 backdrop-blur-md transition-all duration-200 hover:bg-white/28 hover:scale-105 active:scale-95"
+            aria-label="Play video with sound"
+            style={{ width: 92, height: 92 }}
           >
             <svg viewBox="0 0 24 24" fill="white" className="h-8 w-8 translate-x-0.5" aria-hidden="true">
               <path d="M8 5v14l11-7z" />
             </svg>
+            <span className="mt-1 text-[10px] font-medium text-white/78">sound on</span>
           </button>
         </div>
       )}
@@ -104,7 +105,7 @@ export default function VSLPlayer() {
             <button
               type="button"
               className="pointer-events-auto rounded-full border border-white/15 bg-black/38 px-3 py-2 text-sm backdrop-blur-xs transition-all hover:bg-white/10"
-              onClick={muted ? unmute : () => setMuted(true)}
+              onClick={muted ? playWithSound : () => setMuted(true)}
               title={muted ? 'Unmute' : 'Mute'}
             >
               {muted ? '🔇' : '🔊'}

@@ -2128,7 +2128,7 @@ function AppHeroPanel({ profile, usageLimit, posts, shares, onPost }) {
         <div className="p-5 sm:p-7">
           <div className="flex flex-wrap items-center gap-2">
             <span className="rounded-full bg-white/12 px-3 py-1 text-xs text-white/82 ring-1 ring-white/12">Whole rental market</span>
-            <span className="rounded-full bg-white/12 px-3 py-1 text-xs text-white/82 ring-1 ring-white/12">{profile.role}</span>
+            <span className="rounded-full bg-white/12 px-3 py-1 text-xs text-white/82 ring-1 ring-white/12">{roleOptions.length} roles connected</span>
             <span className="rounded-full bg-[#8bdc65] px-3 py-1 text-xs font-semibold text-[#092243]">{remaining} swipes left</span>
           </div>
           <h1 className="mt-5 max-w-xl text-4xl font-semibold leading-[0.95] tracking-tight sm:text-5xl">The rental market, live.</h1>
@@ -2210,7 +2210,7 @@ function RoleLanesPanel({ profile, onSelectTab }) {
         <div>
           <p className="font-['JetBrains_Mono',monospace] text-xs text-[#2670a8]">MARKET LANES</p>
           <h2 className="mt-2 text-2xl font-normal tracking-tight text-slate-950">Whole-market Feed</h2>
-          <p className="mt-1 text-sm text-slate-500">Tuned for {profile.role}, but not limited to one side.</p>
+          <p className="mt-1 text-sm text-slate-500">Role-aware, but never one-sided.</p>
         </div>
         <a href="/app/profile" className="rounded-full bg-[#edf7ff] px-3 py-1 text-xs text-[#154f79]">Change role</a>
       </div>
@@ -3214,9 +3214,9 @@ export default function App() {
           <div className="mb-6 text-center">
             <p className="font-['JetBrains_Mono',monospace] text-xs font-medium tracking-normal text-[#2670a8] mb-3">SEE HOW IT WORKS · 30 SECONDS</p>
             <h2 className="text-3xl md:text-4xl font-normal tracking-tight text-slate-950">One platform. Every side of the market.</h2>
-            <p className="mt-3 text-base text-slate-500 font-light max-w-2xl mx-auto">Tenants find matches. Agents compound their reputation. Landlords choose their route. Watch how.</p>
+            <p className="mt-3 text-base text-slate-500 font-light max-w-2xl mx-auto">Demand, supply, services, stays, deals, capital, and local rental insight move through one network. Watch how.</p>
             <div className="mt-4 flex items-center justify-center gap-3">
-              {[['🏠', 'Tenants'], ['🏢', 'Agents & Agencies'], ['🔑', 'Landlords']].map(([icon, label]) => (
+              {[['🏠', 'Renters & buddies'], ['🏢', 'Agents, agencies & hosts'], ['🔑', 'Landlords, operators & investors']].map(([icon, label]) => (
                 <span key={label} className="inline-flex items-center gap-1.5 rounded-full bg-slate-100 border border-slate-200 px-3 py-1 text-xs text-slate-600">{icon} {label}</span>
               ))}
             </div>
@@ -3232,6 +3232,18 @@ export default function App() {
           >
             <VSLPlayer />
           </React.Suspense>
+
+          {/* Close them here — capture intent the moment the video lands */}
+          <div className="mt-7 flex flex-col items-center gap-3 text-center">
+            <a
+              href="/signup?source=vsl&offer=match24h"
+              className="inline-flex items-center justify-center gap-2.5 rounded-full px-8 py-4 bg-linear-to-b from-[#52a832] to-[#2f7d32] border border-[#25672a] text-white text-base font-medium shadow-[0_12px_28px_rgba(47,125,50,0.3),inset_0_1px_0_rgba(255,255,255,0.35)] transition-all duration-200 hover:shadow-[0_16px_36px_rgba(47,125,50,0.44)] hover:from-[#64bd44] hover:to-[#3b8d3d] active:scale-95"
+            >
+              Start free — your match is already swiping
+              <iconify-icon icon="solar:arrow-right-linear" class="text-xl"></iconify-icon>
+            </a>
+            <p className="text-xs text-slate-400 font-light">No card required · Profile ready in 2 minutes · Free to post &amp; swipe</p>
+          </div>
         </section>
 
         {/* ── How it works ────────────────────────────────────────── */}
