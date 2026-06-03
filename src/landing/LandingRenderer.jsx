@@ -33,6 +33,14 @@ const FEATURED = {
   investor: { label: 'Opportunities matched to your strategy', cards: [['/images/match-flat-2.jpg', 'E3 HMO · 6-bed', '11.2% gross yield', 'Sourcer 4.8★'], ['/images/match-demo-02.jpg', 'Manchester BTL', '7.4% gross yield', 'Verified'], ['/images/match-demo-03.jpg', 'SE1 SA unit', '£620/wk', 'Operator ready']] },
 };
 
+// role → the proof a member adds to EARN reputation. Honest: rep is never given,
+// it's built from verifiable proof the member uploads. The more proof, the more rep.
+const REP_PROOF = {
+  tenant: { label: 'As a renter, you prove', items: ['References & past-landlord reviews', 'Rent-payment history', 'ID & right-to-rent', 'Proof of income'] },
+  landlord: { label: 'As a landlord or agent, you prove', items: ['Ownership & property docs', 'Reviews from past tenants', 'Your response & resolution record', 'Verified listings'] },
+  investor: { label: 'As an investor or sourcer, you prove', items: ['Companies House record', 'AML / ICO / Redress registration', 'Completed deals & track record', 'Reviews from investors you’ve worked with'] },
+};
+
 const SECTION_REGISTRY = {
   hero: (spec) => (
     <section data-section="hero" data-hero key="hero" className="mx-auto max-w-5xl px-6 pt-16 pb-12 text-center">
@@ -116,14 +124,26 @@ const SECTION_REGISTRY = {
     );
   },
 
-  trust_and_safety: () => (
-    <section data-section="trust_and_safety" key="trust_and_safety" className="mx-auto max-w-7xl px-6 py-12">
-      <div className="rounded-[2.5rem] border border-[#cde7f8] bg-[#edf7ff] p-8 md:p-12">
-        <h2 className={`${display} text-3xl font-normal tracking-tight text-slate-950 md:text-4xl`}>Reputation behind every offer.</h2>
-        <p className="mt-4 max-w-xl text-base font-light leading-7 text-slate-600">See who you’re dealing with before anyone wastes a viewing. Reputation is shown behind every agent and landlord — and it travels with you, move to move.</p>
-      </div>
-    </section>
-  ),
+  trust_and_safety: (spec) => {
+    const proof = REP_PROOF[spec.role] || REP_PROOF.tenant;
+    return (
+      <section data-section="trust_and_safety" key="trust_and_safety" className="mx-auto max-w-7xl px-6 py-12">
+        <div className="rounded-[2.5rem] border border-[#cde7f8] bg-[#edf7ff] p-8 md:p-12">
+          <p className="font-['JetBrains_Mono',monospace] text-[11px] tracking-[0.16em]" style={{ color: spec.content.accent }}>REPUTATION YOU EARN</p>
+          <h2 className={`${display} mt-2 text-3xl font-normal tracking-tight text-slate-950 md:text-4xl`}>The more you prove, the more you match.</h2>
+          <p className="mt-4 max-w-2xl text-base font-light leading-7 text-slate-600">Reputation here isn’t given — it’s built. Add proof and your reputation grows: every point is earned, nothing is faked. It sits on your profile, shows before anyone wastes a viewing, and travels with you — match to match.</p>
+          <p className="mt-7 font-['JetBrains_Mono',monospace] text-[11px] tracking-[0.14em] text-slate-400">{proof.label.toUpperCase()}</p>
+          <div className="mt-3 flex flex-wrap gap-2.5">
+            {proof.items.map((item) => (
+              <span key={item} className="inline-flex items-center gap-2 rounded-full border border-[#cde7f8] bg-white px-3.5 py-2 text-sm text-slate-700">
+                <span style={{ color: spec.content.accent }}>✓</span>{item}
+              </span>
+            ))}
+          </div>
+        </div>
+      </section>
+    );
+  },
 
   social_proof: (spec) => {
     if (spec.socialProofBlock === 'none') return null;
