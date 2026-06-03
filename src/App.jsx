@@ -3,6 +3,7 @@ import "iconify-icon";
 import { motion } from 'framer-motion';
 import IPhoneMockup from '@/components/ui/iphone-mockup';
 import Marquee from '@/components/ui/marquee';
+import { NumberTicker } from '@/components/ui/number-ticker';
 // Code-split the VSL: Remotion is ~400KB and sits below the fold, so it must
 // not block the hero paint. Loads lazily when the user scrolls toward it.
 const VSLPlayer = React.lazy(() => import('@/components/vsl/VSLPlayer'));
@@ -840,11 +841,17 @@ const seededFeedPosts = [
 ];
 
 const roleMarketLanes = {
+  General: [
+    ['Supply', 'Properties, rooms, stays, and availability', 'Properties'],
+    ['Demand', 'Looking posts, briefs, and active searches', 'Looking'],
+    ['Services', 'Agents, operators, hosts, and business updates', 'Agents'],
+    ['Capital and deals', 'Investor briefs, sourcer deals, and opportunities', 'Investors'],
+  ],
   Tenant: [
-    ['Rooms', 'Move-ready rooms and flatshares', 'Properties'],
-    ['Looking posts', 'People searching near you', 'Looking'],
-    ['Short-term stays', 'Flexible stays while you search', 'Short-Term'],
-    ['Advice', 'Viewing, referencing, and area help', 'Advice'],
+    ['Places and rooms', 'Homes, rooms, flatshares, and stays', 'Properties'],
+    ['People to team with', 'Looking posts and buddy-up opportunities', 'Looking'],
+    ['Short-term options', 'Flexible stays while plans settle', 'Short-Term'],
+    ['Market guidance', 'Viewing, referencing, and area help', 'Advice'],
   ],
   'House Buddy': [
     ['Buddy-ups', 'People ready to team up', 'House Buddies'],
@@ -918,7 +925,7 @@ function EasyPeazyMark({ footer = false }) {
 
 function BrandLogo({ footer = false }) {
   return (
-    <a href="#" className="inline-flex shrink-0 flex-col items-center" aria-label="RentEazy">
+    <a href="/" className="inline-flex shrink-0 flex-col items-center" aria-label="RentEazy">
       <img
         src={footer ? '/images/renteazy-main-logo-transparent.png' : '/images/renteazy-main-logo-transparent-nav.png'}
         alt="RentEazy"
@@ -1103,7 +1110,7 @@ function InteractiveMatchCard({ canSwipe = true, onSwipeAction = () => {}, onBlo
     }
     if (nextSwipeCount > 0 && nextSwipeCount % totalCards === 0) {
       setModal({
-        title: 'You finished the demo deck.',
+        title: "You finished today's starter deck.",
         text: 'Your real matches are waiting. Create a free account and unlock your RentEazy Match deck for 24 hours.',
       });
       return;
@@ -1207,13 +1214,13 @@ function InteractiveMatchCard({ canSwipe = true, onSwipeAction = () => {}, onBlo
               <p className="text-lg font-normal tracking-tight text-slate-950">{modal.title}</p>
               <p className="mt-2 text-sm leading-6 text-slate-600">{modal.text}</p>
             </div>
-            <button type="button" aria-label="Keep swiping demo" onClick={() => setModal(null)} className="h-9 w-9 shrink-0 rounded-full border border-slate-200 bg-white text-slate-500">
+            <button type="button" aria-label="Keep swiping" onClick={() => setModal(null)} className="h-9 w-9 shrink-0 rounded-full border border-slate-200 bg-white text-slate-500">
               <iconify-icon icon="solar:close-circle-linear" class="text-xl"></iconify-icon>
             </button>
           </div>
           <div className="mt-4 flex flex-col sm:flex-row gap-2">
             <a href="/signup?trial=match24h&source=landing_swipe" className="inline-flex items-center justify-center rounded-full bg-[#2f7d32] px-5 py-3 text-sm text-white">Try Match free for 24 hours</a>
-            <button type="button" onClick={() => setModal(null)} className="inline-flex items-center justify-center rounded-full bg-slate-50 border border-slate-200 px-5 py-3 text-sm text-slate-600">Keep swiping demo</button>
+            <button type="button" onClick={() => setModal(null)} className="inline-flex items-center justify-center rounded-full bg-slate-50 border border-slate-200 px-5 py-3 text-sm text-slate-600">Keep swiping</button>
           </div>
         </div>
       )}
@@ -1270,7 +1277,7 @@ function InteractiveMatchCard({ canSwipe = true, onSwipeAction = () => {}, onBlo
         <span className="text-[#154f79]">{feedback}</span>
         <span className="text-slate-500">{likeCount} liked</span>
       </div>
-      <p className="mx-4 sm:mx-5 mb-5 text-center text-xs text-slate-400">This is a demo. Create a free account to unlock your real matches.</p>
+      <p className="mx-4 sm:mx-5 mb-5 text-center text-xs text-slate-400">Limited free swipes refresh daily. Answer quick questions to improve this deck.</p>
       <div className="mx-4 sm:mx-5 mb-5 flex justify-center gap-1.5" aria-hidden="true">
         {heroSwipeCards.slice(0, 12).map((item, index) => <span key={item.id} className={`h-1.5 rounded-full transition-all ${index === activeIndex % 12 ? 'w-6 bg-[#2f7d32]' : 'w-1.5 bg-slate-300'}`}></span>)}
       </div>
@@ -1412,7 +1419,7 @@ function HeroSwipeDeck() {
                 <p className="mt-3 text-sm leading-6 text-slate-600">Create a free account. After signup, unlock RentEazy Match free for 24 hours.</p>
                 <div className="mt-5 flex flex-col gap-2">
                   <a href="/signup?source=hero_swipe_demo&offer=match24h" className="inline-flex items-center justify-center rounded-full bg-[#2f7d32] px-5 py-3 text-sm text-white">Create free account</a>
-                  <button type="button" onClick={() => { setShowSignupPrompt(false); setTurnCount(0); setFeedback('Live rental deck'); }} className="inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-5 py-3 text-sm text-slate-600">Keep swiping demo</button>
+                  <button type="button" onClick={() => { setShowSignupPrompt(false); setTurnCount(0); setFeedback('Live rental deck'); }} className="inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-5 py-3 text-sm text-slate-600">Keep swiping</button>
                 </div>
               </div>
             </div>
@@ -1603,7 +1610,7 @@ function getMatchSummary(profile, answers) {
 }
 
 function getRoleMarketLanes(role) {
-  return roleMarketLanes[role] || roleMarketLanes.Tenant;
+  return roleMarketLanes[role] || roleMarketLanes.General;
 }
 
 function SignupBridge() {
@@ -1695,7 +1702,7 @@ function SignupBridge() {
               <button disabled={status === 'submitting'} className="mt-6 inline-flex w-full items-center justify-center rounded-full bg-[#2f7d32] px-5 py-3 text-sm text-white disabled:opacity-60">
                 {status === 'submitting' ? 'Opening RentEazy...' : mode === 'register' ? 'Create account and open Feed' : 'Sign in and open Feed'}
               </button>
-              <a href={appFeedUrl} className="mt-3 inline-flex w-full items-center justify-center rounded-full border border-slate-200 bg-white px-5 py-3 text-sm text-slate-600">Browse demo Feed first</a>
+              <a href={appFeedUrl} className="mt-3 inline-flex w-full items-center justify-center rounded-full border border-slate-200 bg-white px-5 py-3 text-sm text-slate-600">Browse Feed first</a>
             </form>
           </div>
         </div>
@@ -1976,7 +1983,7 @@ function ProfileEditor({ profile, setProfile, answers, setAnswers }) {
     <div className="grid gap-5 lg:grid-cols-[1fr_22rem]">
       <div className="rounded-4xl border border-white bg-white/86 p-6 shadow-[0_18px_44px_-34px_rgba(15,23,42,0.45),inset_0_1px_0_white]">
         <h1 className="text-4xl font-normal tracking-tight text-slate-950">Profile</h1>
-        <p className="mt-3 text-slate-600">This is your match profile. It saves locally in this launch preview.</p>
+        <p className="mt-3 text-slate-600">This is your match profile. It syncs with your RentEazy account.</p>
         <div className="mt-6 grid gap-3 sm:grid-cols-2">
           <label className="text-sm text-slate-600">Name<input value={profile.name} onChange={(event) => setProfile((current) => ({ ...current, name: event.target.value }))} className="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 outline-hidden focus:border-[#2f7d32]" /></label>
           <label className="text-sm text-slate-600">Role<select value={profile.role} onChange={(event) => setProfile((current) => ({ ...current, role: event.target.value }))} className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-hidden focus:border-[#2f7d32]">{roleOptions.map((role) => <option key={role}>{role}</option>)}</select></label>
@@ -1998,15 +2005,15 @@ function MatchSummaryStrip({ profile, answers }) {
   const match = getMatchSummary(profile, answers);
 
   return (
-    <div className="rounded-3xl border border-white bg-white/86 p-4 shadow-[0_14px_34px_-28px_rgba(15,23,42,0.45)]">
+    <div className="rounded-[1.6rem] border border-[#bfe8cb] bg-[#f4fff5] p-4 shadow-[0_18px_38px_-30px_rgba(21,93,39,0.42)]">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <p className="text-sm font-medium text-slate-950">{match.score}% match readiness</p>
+          <p className="text-sm font-semibold text-[#123d22]">{match.score}% match readiness</p>
           <div className="mt-2 flex flex-wrap gap-2">
-            {match.badges.map((badge) => <span key={badge} className="rounded-full bg-[#edf7ff] px-3 py-1 text-xs text-[#154f79]">{badge}</span>)}
+            {match.badges.map((badge) => <span key={badge} className="rounded-full bg-white px-3 py-1 text-xs text-[#1f6b35] ring-1 ring-[#cfeeda]">{badge}</span>)}
           </div>
         </div>
-        <a href="/app/profile" className="inline-flex shrink-0 items-center justify-center rounded-full bg-[#092243] px-4 py-3 text-sm text-white">Improve my matches</a>
+        <a href="/app/profile" className="inline-flex shrink-0 items-center justify-center rounded-full bg-[#092243] px-4 py-3 text-sm text-white shadow-[0_12px_24px_-18px_rgba(9,34,67,0.75)]">Improve my matches</a>
       </div>
     </div>
   );
@@ -2017,14 +2024,14 @@ function DailySwipePanel({ usageLimit, onBuyMore }) {
   const resetTime = new Date(usageLimit.resetsAt).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
 
   return (
-    <div className="rounded-3xl border border-white bg-white/86 p-4 shadow-[0_14px_34px_-28px_rgba(15,23,42,0.45)]">
+    <div className="overflow-hidden rounded-[1.6rem] bg-[#092243] p-4 text-white shadow-[0_22px_52px_-34px_rgba(9,34,67,0.95)]">
       <div className="flex items-center justify-between gap-4">
         <div>
-          <p className="font-['JetBrains_Mono',monospace] text-xs text-[#2670a8]">DAILY SWIPES</p>
-          <p className="mt-2 text-2xl font-normal tracking-tight text-slate-950">{remaining} left today</p>
-          <p className="mt-1 text-sm text-slate-500">Your daily swipes reset at {resetTime}.</p>
+          <p className="font-['JetBrains_Mono',monospace] text-xs text-[#8fd0ff]">DAILY SWIPES</p>
+          <p className="mt-2 text-3xl font-semibold tracking-tight">{remaining} left today</p>
+          <p className="mt-1 text-sm text-white/68">Reset at {resetTime}</p>
         </div>
-        <button type="button" onClick={() => onBuyMore('extra-swipes-10')} className="shrink-0 rounded-full bg-[#2f7d32] px-4 py-3 text-sm text-white">Get 10 more for 9p</button>
+        <button type="button" onClick={() => onBuyMore('extra-swipes-10')} className="shrink-0 rounded-full bg-[#8bdc65] px-4 py-3 text-sm font-semibold text-[#092243]">+10 for 9p</button>
       </div>
     </div>
   );
@@ -2090,24 +2097,80 @@ function MissionPanel({ posts, shares, likedIds, savedIds, answers, onSelectProd
 
 function AppPulseStrip({ wallet, purchases, boosts, reports, shares }) {
   const items = [
-    ['ACTIVITY', shares.length ? `${shares.length} shares` : 'Ready'],
-    ['RENTEAZY ADS', boosts.length ? `${boosts.length} boosts` : 'Ready'],
-    ['REPUTATION', reports.length ? `${reports.length} reports` : 'Clear'],
-    ['WALLET', `${wallet.balance} credits`],
-    ['SHOP', purchases.length ? `${purchases.length} purchases` : 'Ready'],
+    ['Activity', shares.length ? `${shares.length} shares` : 'Ready'],
+    ['Ads', boosts.length ? `${boosts.length} boosts` : 'Ready'],
+    ['Trust', reports.length ? `${reports.length} reports` : 'Clear'],
+    ['Credits', `${wallet.balance}`],
+    ['Shop', purchases.length ? `${purchases.length} buys` : 'Ready'],
   ];
 
   return (
     <div className="overflow-x-auto pb-1">
       <div className="flex min-w-max gap-2">
         {items.map(([label, value]) => (
-          <div key={label} className="rounded-2xl border border-white bg-white/86 px-4 py-3 shadow-[0_10px_28px_-24px_rgba(15,23,42,0.45)]">
-            <p className="font-['JetBrains_Mono',monospace] text-[0.65rem] text-[#2670a8]">{label}</p>
-            <p className="mt-1 text-sm text-slate-950">{value}</p>
+          <div key={label} className="rounded-full border border-[#cfe9fb] bg-white px-4 py-2 shadow-[0_12px_26px_-24px_rgba(15,23,42,0.45)]">
+            <p className="text-xs text-slate-500"><span className="font-semibold text-slate-950">{value}</span> {label}</p>
           </div>
         ))}
       </div>
     </div>
+  );
+}
+
+function AppHeroPanel({ profile, usageLimit, posts, shares, onPost }) {
+  const remaining = Math.max(0, usageLimit.allowance - usageLimit.used);
+  const livePosts = posts.length;
+  const topPost = posts.find((post) => post.media?.[0]) || posts[0];
+
+  return (
+    <section className="overflow-hidden rounded-[2rem] bg-[#0b2a4a] text-white shadow-[0_30px_80px_-46px_rgba(9,34,67,0.95)]">
+      <div className="grid gap-0 md:grid-cols-[1fr_18rem]">
+        <div className="p-5 sm:p-7">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="rounded-full bg-white/12 px-3 py-1 text-xs text-white/82 ring-1 ring-white/12">Whole rental market</span>
+            <span className="rounded-full bg-white/12 px-3 py-1 text-xs text-white/82 ring-1 ring-white/12">{profile.role}</span>
+            <span className="rounded-full bg-[#8bdc65] px-3 py-1 text-xs font-semibold text-[#092243]">{remaining} swipes left</span>
+          </div>
+          <h1 className="mt-5 max-w-xl text-4xl font-semibold leading-[0.95] tracking-tight sm:text-5xl">The rental market, live.</h1>
+          <p className="mt-4 max-w-xl text-sm leading-7 text-white/72">Demand, supply, services, stays, deals, capital, local insight, and trusted activity in one Feed.</p>
+          <div className="mt-6 flex flex-wrap gap-3">
+            <a href="/app/post" onClick={onPost} className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-semibold text-[#092243]">
+              <PlusCircle className="h-4 w-4" />
+              Post free
+            </a>
+            <a href="/app/swipe" className="inline-flex items-center gap-2 rounded-full bg-[#8bdc65] px-5 py-3 text-sm font-semibold text-[#092243]">
+              <Flame className="h-4 w-4" />
+              Swipe today
+            </a>
+          </div>
+          <div className="mt-7 grid grid-cols-3 gap-2 text-center">
+            {[
+              [livePosts, 'Live posts'],
+              [shares.length, 'Shares'],
+              [roleOptions.length, 'Roles'],
+            ].map(([value, label]) => (
+              <div key={label} className="rounded-2xl bg-white/10 px-3 py-3 ring-1 ring-white/10">
+                <p className="truncate text-lg font-semibold">{value}</p>
+                <p className="mt-0.5 text-[0.68rem] text-white/55">{label}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="relative min-h-56 overflow-hidden bg-[#154f79] md:min-h-full">
+          {topPost?.media?.[0] ? (
+            <img src={topPost.media[0]} alt="" className="absolute inset-0 h-full w-full object-cover opacity-92" />
+          ) : (
+            <div className="absolute inset-0 bg-[#154f79]" />
+          )}
+          <div className="absolute inset-0 bg-linear-to-t from-[#06182f]/78 via-[#06182f]/12 to-transparent" />
+          <div className="absolute bottom-4 left-4 right-4 rounded-3xl bg-white/92 p-4 text-[#092243] shadow-[0_18px_40px_-28px_rgba(0,0,0,0.8)]">
+            <p className="text-xs font-semibold text-[#2f7d32]">{topPost?.postType || 'Feed'}</p>
+            <p className="mt-1 line-clamp-2 text-sm font-semibold">{topPost?.title || 'Your Feed is ready'}</p>
+            <p className="mt-1 text-xs text-slate-500">{topPost?.area || 'RentEazy network'}</p>
+          </div>
+        </div>
+      </div>
+    </section>
   );
 }
 
@@ -2119,7 +2182,7 @@ function ActivityInbox({ usageLimit, posts, shares, reports, boosts, profile }) 
     { id: 'profile-match', title: 'Better matches are available.', body: 'Answer 3 quick questions to improve your match explanations.', tone: 'blue' },
     latestOwnPost ? { id: 'post-traction', title: 'Your latest post is live.', body: 'Share it externally for 5 extra swipes today.', tone: 'green' } : { id: 'first-post', title: 'Post something useful.', body: 'A listing, search, question, deal, stay, or area insight starts your activity loop.', tone: 'blue' },
     shares.length ? { id: 'share-reward', title: 'Share reward tracked.', body: `${shares.length} share intent${shares.length === 1 ? '' : 's'} saved.`, tone: 'green' } : { id: 'share-open', title: 'Share Everywhere is ready.', body: 'Copy a caption, use a tracking link, and reward the share.', tone: 'blue' },
-    boosts.length ? { id: 'boost-active', title: 'Boost campaign scaffold active.', body: `${boosts.length} boost record${boosts.length === 1 ? '' : 's'} in preview.`, tone: 'green' } : { id: 'boost-ready', title: 'Boosts start from 29p.', body: 'Visibility is paid; trust still comes from behaviour.', tone: 'blue' },
+    boosts.length ? { id: 'boost-active', title: 'Boost campaign active.', body: `${boosts.length} boost record${boosts.length === 1 ? '' : 's'} on this account.`, tone: 'green' } : { id: 'boost-ready', title: 'Boosts start from 29p.', body: 'Visibility is paid; trust still comes from behaviour.', tone: 'blue' },
     reports.length ? { id: 'reports', title: 'Reports queued.', body: `${reports.length} report${reports.length === 1 ? '' : 's'} awaiting review.`, tone: 'red' } : { id: 'safety', title: 'Safety queue is quiet.', body: 'Report buttons work on normal and sponsored posts.', tone: 'blue' },
   ];
 
@@ -2146,11 +2209,18 @@ function RoleLanesPanel({ profile, onSelectTab }) {
       <div className="flex items-center justify-between gap-3">
         <div>
           <p className="font-['JetBrains_Mono',monospace] text-xs text-[#2670a8]">MARKET LANES</p>
-          <h2 className="mt-2 text-2xl font-normal tracking-tight text-slate-950">{profile.role}</h2>
+          <h2 className="mt-2 text-2xl font-normal tracking-tight text-slate-950">Whole-market Feed</h2>
+          <p className="mt-1 text-sm text-slate-500">Tuned for {profile.role}, but not limited to one side.</p>
         </div>
         <a href="/app/profile" className="rounded-full bg-[#edf7ff] px-3 py-1 text-xs text-[#154f79]">Change role</a>
       </div>
       <div className="mt-4 grid gap-2 sm:grid-cols-2">
+        {roleMarketLanes.General.map(([title, body, tab]) => (
+          <button key={`general-${title}`} type="button" onClick={() => onSelectTab(tab)} className="rounded-2xl bg-[#092243] p-3 text-left text-white shadow-[0_14px_30px_-24px_rgba(9,34,67,0.9)]">
+            <p className="text-sm font-medium">{title}</p>
+            <p className="mt-1 text-xs leading-5 text-white/62">{body}</p>
+          </button>
+        ))}
         {lanes.map(([title, body, tab]) => (
           <button key={title} type="button" onClick={() => onSelectTab(tab)} className="rounded-2xl border border-slate-200 bg-white p-3 text-left hover:border-[#2f7d32]">
             <p className="text-sm font-medium text-slate-950">{title}</p>
@@ -2241,7 +2311,7 @@ function MiniShopPanel({ onSelectProduct, compact = false }) {
     <div className="rounded-[1.75rem] border border-white bg-white/86 p-5 shadow-[0_18px_44px_-34px_rgba(15,23,42,0.45),inset_0_1px_0_white]">
       <p className="font-['JetBrains_Mono',monospace] text-xs text-[#2670a8]">MINI SHOP</p>
       <h2 className="mt-2 text-2xl font-normal tracking-tight text-slate-950">Tiny upgrades</h2>
-      <p className="mt-2 text-sm leading-6 text-slate-600">Most boosts and actions are under £1. Credits are scaffolded for tiny payments.</p>
+      <p className="mt-2 text-sm leading-6 text-slate-600">Most boosts and actions are under £1. Credits keep tiny actions simple and transparent.</p>
       <div className="mt-4 grid gap-2">
         {products.map((product) => (
           <button key={product.id} type="button" onClick={() => onSelectProduct(product.id)} className="flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-left hover:border-[#2f7d32]">
@@ -2274,9 +2344,9 @@ function MicroUpsellModal({ product, onClose, onConfirm }) {
         <div className="mt-5 rounded-2xl bg-slate-50 p-4">
           <p className="text-sm text-slate-500">Price</p>
           <p className="mt-1 text-3xl font-normal text-slate-950">{product.price}</p>
-          <p className="mt-2 text-xs leading-5 text-slate-500">Checkout is scaffolded in this frontend preview. Costs are shown plainly and not hidden behind credits.</p>
+          <p className="mt-2 text-xs leading-5 text-slate-500">Costs are shown plainly and not hidden behind credits.</p>
         </div>
-        <button type="button" onClick={() => onConfirm(product)} className="mt-5 inline-flex w-full items-center justify-center rounded-full bg-[#2f7d32] px-5 py-3 text-sm text-white">Add in preview</button>
+        <button type="button" onClick={() => onConfirm(product)} className="mt-5 inline-flex w-full items-center justify-center rounded-full bg-[#2f7d32] px-5 py-3 text-sm text-white">Add to account</button>
       </div>
     </div>
   );
@@ -2490,11 +2560,15 @@ function RentEazyAppShell() {
     }
   }, [appStreak.lastActivityAt, setAppStreak]);
 
-  const addPost = (post) => {
+  const addPost = async (post) => {
     setPosts((current) => [post, ...current]);
     setNewPost(post);
     setSharePost(post);
-    syncApiState(apiRequest('/api/posts', { method: 'POST', body: post }));
+    const savedPost = await syncApiState(apiRequest('/api/posts', { method: 'POST', body: post }));
+    if (savedPost?.id) {
+      setNewPost(savedPost);
+      setSharePost(savedPost);
+    }
   };
 
   const openUpsell = (productId) => {
@@ -2553,8 +2627,8 @@ function RentEazyAppShell() {
       sku: product.sku,
       amount: product.amount,
       currency: product.currency,
-      status: 'preview_scaffold',
-      provider: 'frontend-preview',
+      status: 'recorded',
+      provider: 'renteazy-local',
       createdAt: new Date().toISOString(),
     };
     setPurchases((current) => [purchase, ...current]);
@@ -2645,12 +2719,14 @@ function RentEazyAppShell() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#f5f8fb] pb-24 text-slate-900 antialiased">
-      {sharePost && <ShareEverywhereModal post={sharePost} onClose={() => setSharePost(null)} onShared={trackShare} />}
+    <div className="min-h-screen bg-[#eef5f2] pb-24 text-slate-900 antialiased">
+      {(sharePost || (routeTab === 'Post' && newPost)) && (
+        <ShareEverywhereModal post={sharePost || newPost} onClose={() => setSharePost(null)} onShared={trackShare} />
+      )}
       {reportPost && <ReportModal post={reportPost} onClose={() => setReportPost(null)} onReport={submitReport} />}
       {commentPost && <CommentModal post={commentPost} comments={comments.filter((comment) => comment.postId === commentPost.id)} onClose={() => setCommentPost(null)} onComment={addComment} />}
       <MicroUpsellModal product={activeUpsellProduct} onClose={closeUpsell} onConfirm={confirmMicroProduct} />
-      <header className="sticky top-0 z-40 border-b border-white bg-white/84 px-4 py-3 backdrop-blur-xl">
+      <header className="sticky top-0 z-40 border-b border-white/70 bg-[#eef5f2]/88 px-4 py-3 backdrop-blur-xl">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-3">
           <BrandLogo />
           <nav className="hidden items-center gap-2 md:flex">
@@ -2674,6 +2750,9 @@ function RentEazyAppShell() {
         <section className="min-w-0">
           {routeTab === 'Feed' && (
             <>
+              <div className="mb-4">
+                <AppHeroPanel profile={profile} usageLimit={usageLimit} posts={posts} shares={shares} />
+              </div>
               <div className="mb-4">
                 <AppPulseStrip wallet={wallet} purchases={purchases} boosts={boosts} reports={reports} shares={shares} />
               </div>
@@ -2804,7 +2883,7 @@ function RentEazyAppShell() {
               <div className="rounded-[1.75rem] border border-white bg-white/86 p-5 shadow-[0_18px_44px_-34px_rgba(15,23,42,0.45),inset_0_1px_0_white]">
                 <p className="font-['JetBrains_Mono',monospace] text-xs text-[#2670a8]">WHO LIKED YOU</p>
                 <h2 className="mt-2 text-2xl font-normal tracking-tight text-slate-950">No hidden likes yet</h2>
-                <p className="mt-2 text-sm leading-6 text-slate-600">When real users like your posts or profile, blurred likes can appear here. Nothing is faked in this preview.</p>
+                <p className="mt-2 text-sm leading-6 text-slate-600">When real users like your posts or profile, blurred likes can appear here. No likes are shown until real activity exists.</p>
                 <div className="mt-4 flex flex-wrap gap-2">
                   <button type="button" onClick={() => openUpsell('reveal-like-1')} className="rounded-full bg-[#092243] px-4 py-2 text-sm text-white">Unlock Likes</button>
                   <button type="button" onClick={() => openUpsell('extra-swipes-10')} className="rounded-full bg-[#2f7d32] px-4 py-2 text-sm text-white">Get 10 more for 9p</button>
@@ -2871,7 +2950,7 @@ function RentEazyAppShell() {
           <div className="rounded-[1.75rem] border border-white bg-white/86 p-5 text-sm leading-7 text-slate-600 shadow-[0_18px_44px_-34px_rgba(15,23,42,0.45)]">
             <p className="font-['JetBrains_Mono',monospace] text-xs text-[#2670a8]">WALLET</p>
             <p className="mt-2 text-2xl text-slate-950">{wallet.balance} credits</p>
-            <p>{purchases.length} preview purchases · {entitlements.length} entitlements · {appStreak.count} day streak</p>
+            <p>{purchases.length} purchases · {entitlements.length} entitlements · {appStreak.count} day streak</p>
           </div>
         </aside>
       </main>
@@ -2890,6 +2969,70 @@ function RentEazyAppShell() {
   );
 }
 
+const legalContent = {
+  terms: {
+    eyebrow: 'TERMS OF SERVICE',
+    title: 'Terms of Service',
+    intro:
+      'These terms govern your use of RentEazy. By creating a profile, posting, or matching, you agree to use the platform fairly and lawfully.',
+    sections: [
+      ['What RentEazy is', 'RentEazy is a matching platform for the rental market. We are not a letting agency and do not own, manage, or guarantee any property. A match means mutual interest — it is not a tenancy, an offer, or approval.'],
+      ['Your responsibilities', 'Provide accurate information in your profile and posts. Do not post misleading listings, impersonate others, harass members, or break the law. We may remove content or suspend accounts that breach these terms.'],
+      ['Matches and viewings', 'Final rental approval always depends on referencing, affordability, availability, and the landlord or agent decision. Match scores are indicative only and never override those decisions.'],
+      ['Paid features', 'Boosts, Superlikes, and seats improve visibility only when there is genuine fit. They do not change suitability, fit, or any final decision. Prices shown are launch prices and may change for new members.'],
+      ['Contact', 'Questions about these terms? Email hello@renteazy.co.uk and we will reply within one business day.'],
+    ],
+  },
+  privacy: {
+    eyebrow: 'PRIVACY POLICY',
+    title: 'Privacy Policy',
+    intro:
+      'This explains what we collect, why, and the choices you have. We collect only what we need to make matching work, and we do not sell your personal data.',
+    sections: [
+      ['What we collect', 'Account details (name, email), the profile information you choose to share (budget, areas, move date, requirements), and activity needed to run matching, swipes, and the Feed.'],
+      ['How we use it', 'To create your profile, surface relevant matches, run the Feed, and keep the platform safe. We do not sell your personal data to third parties.'],
+      ['Fonts and assets', 'We self-host our fonts, so your IP address is not shared with a font CDN when you load the site.'],
+      ['Your choices', 'You can edit or delete your profile at any time. To request a copy of your data or deletion, email us and we will action it.'],
+      ['Contact', 'Privacy questions or requests? Email hello@renteazy.co.uk and we will reply within one business day.'],
+    ],
+  },
+};
+
+function LegalPage({ kind }) {
+  const doc = legalContent[kind] || legalContent.terms;
+  return (
+    <div className="min-h-screen bg-[#f5f8fb] font-['Inter',sans-serif] text-slate-900 antialiased">
+      <header className="border-b border-slate-200 bg-white/80 backdrop-blur-xl">
+        <div className="mx-auto flex max-w-3xl items-center justify-between px-6 py-4">
+          <BrandLogo />
+          <a href="/" className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-4 py-2 text-xs text-slate-600 transition-colors hover:text-[#2f7d32]">
+            <iconify-icon icon="solar:arrow-left-linear" class="text-base"></iconify-icon>
+            Back to home
+          </a>
+        </div>
+      </header>
+      <main className="mx-auto max-w-3xl px-6 py-16">
+        <p className="font-['JetBrains_Mono',monospace] text-xs font-medium tracking-normal text-[#2670a8]">{doc.eyebrow}</p>
+        <h1 className="mt-3 text-4xl font-normal tracking-tight text-slate-950 md:text-5xl">{doc.title}</h1>
+        <p className="mt-3 text-xs text-slate-400 font-['JetBrains_Mono',monospace]">Last updated 3 June 2026</p>
+        <p className="mt-6 text-base leading-8 text-slate-600 font-light">{doc.intro}</p>
+        <div className="mt-10 space-y-8">
+          {doc.sections.map(([heading, body]) => (
+            <section key={heading}>
+              <h2 className="text-xl font-normal tracking-tight text-slate-950">{heading}</h2>
+              <p className="mt-3 text-base leading-8 text-slate-600 font-light">{body}</p>
+            </section>
+          ))}
+        </div>
+        <div className="mt-12 rounded-4xl border border-white bg-white/72 p-6 text-sm leading-7 text-slate-500 shadow-[0_14px_34px_-26px_rgba(15,23,42,0.32),inset_0_1px_0_white]">
+          This is a plain-English summary. A full, finalised legal document is available on request while RentEazy is in launch — email{' '}
+          <a href="mailto:hello@renteazy.co.uk" className="text-[#2f7d32] underline">hello@renteazy.co.uk</a>.
+        </div>
+      </main>
+    </div>
+  );
+}
+
 export default function App() {
   const rotatingHeroWords = useMemo(() => defaultRotatingHeroWords, []);
   const pathname = typeof window === 'undefined' ? '/' : window.location.pathname;
@@ -2900,6 +3043,14 @@ export default function App() {
 
   if (pathname.startsWith('/signup') || pathname.startsWith('/waitlist')) {
     return <SignupBridge />;
+  }
+
+  if (pathname.startsWith('/terms')) {
+    return <LegalPage kind="terms" />;
+  }
+
+  if (pathname.startsWith('/privacy')) {
+    return <LegalPage kind="privacy" />;
   }
 
   return (
@@ -3033,6 +3184,26 @@ export default function App() {
                   <p className="text-sm font-medium text-slate-900">{label}</p>
                   <p className="text-xs text-slate-500">{sub}</p>
                 </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* ── Stats band — real counts, animated on scroll ─────────── */}
+        <section className="max-w-7xl mx-auto px-6 py-6">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 rounded-4xl bg-linear-to-br from-[#0d2e57] to-[#06182f] border border-white/8 px-6 py-9 shadow-[0_24px_60px_-40px_rgba(9,34,67,0.7),inset_0_1px_0_rgba(255,255,255,0.1)]">
+            {[
+              { value: matchTypes.length, prefix: '', suffix: '', label: 'Match types', sub: 'tenant ↔ property, buddy, agent & more' },
+              { value: postTypes.length, prefix: '', suffix: '', label: 'Ways to post', sub: 'rooms, briefs, deals, advice' },
+              { value: roleOptions.length, prefix: '', suffix: '', label: 'Roles welcome', sub: 'tenants through to investors' },
+              { value: 0, prefix: '£', suffix: '', label: 'To get started', sub: 'free to post & free to swipe' },
+            ].map((s) => (
+              <div key={s.label} className="text-center">
+                <p className="font-['Bricolage_Grotesque_Variable'] text-4xl md:text-5xl font-normal tracking-tight text-white">
+                  {s.prefix}<NumberTicker value={s.value} className="text-[#9bd383]" />{s.suffix}
+                </p>
+                <p className="mt-2 text-sm font-medium text-white/90">{s.label}</p>
+                <p className="mt-1 text-xs text-white/50">{s.sub}</p>
               </div>
             ))}
           </div>
@@ -3826,15 +3997,15 @@ export default function App() {
               {/* Link columns */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-8 text-center sm:text-left">
                 {[
-                  ['Product', ['Feed', 'Match', 'Swipe', 'Protect', 'Concierge']],
-                  ['For', ['Tenants', 'Agents', 'Landlords', 'Operators', 'Investors']],
-                  ['Pricing', ['Free Feed', 'Monthly', 'Yearly', 'Team Seats', 'Volume Discounts']],
-                  ['Company', ['FAQ', 'About', 'Terms', 'Privacy', 'Contact']],
+                  ['Product', [['Feed', '#feed'], ['Match', '#match'], ['Swipe', '#swipe-ui'], ['Protect', '#paid-mechanics'], ['Concierge', '#concierge']]],
+                  ['For', [['Tenants', '#match'], ['Agents', '#partners'], ['Landlords', '#partners'], ['Operators', '#marketplace'], ['Investors', '#marketplace']]],
+                  ['Pricing', [['Free Feed', '#pricing'], ['Monthly', '#pricing'], ['Yearly', '#pricing'], ['Team Seats', '#partners'], ['Volume Discounts', '#pricing']]],
+                  ['Company', [['FAQ', '#faq'], ['About', '#how-it-works'], ['Terms', '/terms'], ['Privacy', '/privacy'], ['Contact', 'mailto:hello@renteazy.co.uk']]],
                 ].map(([title, links]) => (
                   <div key={title}>
                     <p className="font-['JetBrains_Mono',monospace] text-[10px] font-medium tracking-normal text-slate-400 uppercase mb-4">{title}</p>
                     <div className="flex flex-col gap-3 text-sm text-slate-500 font-light">
-                      {links.map(l => <a key={l} href="#" className="hover:text-[#2f7d32] transition-colors">{l}</a>)}
+                      {links.map(([label, href]) => <a key={label} href={href} className="hover:text-[#2f7d32] transition-colors">{label}</a>)}
                     </div>
                   </div>
                 ))}
@@ -3847,9 +4018,9 @@ export default function App() {
             <div className="mt-6 pt-6 border-t border-slate-200/70 flex flex-col md:flex-row items-center justify-between gap-4">
               <p className="text-xs text-slate-400 font-light">© 2026 RentEazy Ltd. All rights reserved.</p>
               <div className="flex items-center gap-4 text-xs text-slate-400 font-light">
-                <a href="#" className="hover:text-[#2f7d32] transition-colors">Terms</a>
+                <a href="/terms" className="hover:text-[#2f7d32] transition-colors">Terms</a>
                 <span className="w-1 h-1 rounded-full bg-slate-300" aria-hidden="true"></span>
-                <a href="#" className="hover:text-[#2f7d32] transition-colors">Privacy</a>
+                <a href="/privacy" className="hover:text-[#2f7d32] transition-colors">Privacy</a>
                 <span className="w-1 h-1 rounded-full bg-slate-300" aria-hidden="true"></span>
                 <a href="mailto:hello@renteazy.co.uk" className="hover:text-[#2f7d32] transition-colors">hello@renteazy.co.uk</a>
               </div>
