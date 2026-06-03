@@ -7,6 +7,10 @@ import Marquee from '@/components/ui/marquee';
 import { NumberTicker } from '@/components/ui/number-ticker';
 import { BorderBeam } from '@/components/ui/border-beam';
 import RentEazyVoiceAgent from '@/components/voice/RentEazyVoiceAgent';
+import ProfileChooser from '@/profile/ProfileChooser';
+import { useProfile } from '@/profile/useProfile';
+import { getProfile } from '@/profile/profiles';
+import { buildRentEazyFeed, createFeedSignal, createFeedCardSchema } from '@/lib/feedEngine';
 // Code-split the VSL: Remotion is ~400KB and sits below the fold, so it must
 // not block the hero paint. Loads lazily when the user scrolls toward it.
 const VSLPlayer = React.lazy(() => import('@/components/vsl/VSLPlayer'));
@@ -1112,6 +1116,491 @@ const defaultReputationProfile = {
   updatedAt: new Date().toISOString(),
 };
 
+const seededLifecycleTasks = [
+  {
+    id: 'task-today-better-matches',
+    userId: currentUser.id,
+    roleType: 'General',
+    cadence: 'today',
+    title: 'Answer 3 match questions',
+    body: 'Improve ranking, match explanations, and which cards appear first.',
+    actionLabel: 'Improve matches',
+    targetPath: '/app/profile',
+    reward: 'Better match score',
+    status: 'open',
+    createdAt: new Date().toISOString(),
+    dueAt: new Date(Date.now() + 8 * 60 * 60 * 1000).toISOString(),
+    completedAt: null,
+  },
+  {
+    id: 'task-today-swipe-deck',
+    userId: currentUser.id,
+    roleType: 'General',
+    cadence: 'today',
+    title: 'Use today’s swipe allowance',
+    body: 'Each pass, like, and Superlike teaches RentEazy what fits.',
+    actionLabel: 'Open Swipe',
+    targetPath: '/app/swipe',
+    reward: 'Better daily picks',
+    status: 'open',
+    createdAt: new Date().toISOString(),
+    dueAt: new Date(Date.now() + 12 * 60 * 60 * 1000).toISOString(),
+    completedAt: null,
+  },
+  {
+    id: 'task-week-post-market-signal',
+    userId: currentUser.id,
+    roleType: 'General',
+    cadence: 'week',
+    title: 'Post a useful market signal',
+    body: 'A question, availability update, brief, deal, or area insight gives the network more live inventory.',
+    actionLabel: 'Create post',
+    targetPath: '/app/post',
+    reward: 'Feed reach signal',
+    status: 'open',
+    createdAt: new Date().toISOString(),
+    dueAt: new Date(Date.now() + 72 * 60 * 60 * 1000).toISOString(),
+    completedAt: null,
+  },
+  {
+    id: 'task-long-reputation-asset',
+    userId: currentUser.id,
+    roleType: 'General',
+    cadence: 'long',
+    title: 'Build your portable rental reputation',
+    body: 'Matches, viewings, reviews, and helpful participation compound into your RentEazy Reputation Score.',
+    actionLabel: 'View profile',
+    targetPath: '/app/profile',
+    reward: 'Reputation growth',
+    status: 'open',
+    createdAt: new Date().toISOString(),
+    dueAt: new Date(Date.now() + 240 * 60 * 60 * 1000).toISOString(),
+    completedAt: null,
+  },
+];
+
+const seededReferrals = [
+  {
+    id: 'referral-demo-buddy',
+    userId: currentUser.id,
+    inviteType: 'House Buddy',
+    target: 'A future flatmate',
+    status: 'ready_to_share',
+    reward: '5 extra swipes after first accepted invite',
+    trackingUrl: 'https://renteazy.co.uk/join?ref=demo-user&invite=buddy',
+    createdAt: new Date().toISOString(),
+    acceptedAt: null,
+  },
+];
+
+const seededResidentProfiles = [
+  {
+    id: 'resident-demo-current-home',
+    userId: currentUser.id,
+    status: 'active_resident',
+    homeLabel: 'Stratford room search record',
+    area: 'Stratford',
+    tenancyStart: new Date(Date.now() - 21 * 24 * 60 * 60 * 1000).toISOString(),
+    leaseEndsAt: new Date(Date.now() + 260 * 24 * 60 * 60 * 1000).toISOString(),
+    landlordOrAgentName: 'Eastline Rooms',
+    reputationImpact: 'Active resident records can support future references when verified.',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+];
+
+const seededMaintenanceRequests = [
+  {
+    id: 'maintenance-demo-window',
+    userId: currentUser.id,
+    residentProfileId: 'resident-demo-current-home',
+    title: 'Window handle needs attention',
+    category: 'Repair',
+    priority: 'Normal',
+    status: 'logged',
+    notes: 'Logged as an example resident-mode record. Keep updates timestamped inside RentEazy.',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+];
+
+const seededRentRecords = [
+  {
+    id: 'rent-record-demo-june',
+    userId: currentUser.id,
+    residentProfileId: 'resident-demo-current-home',
+    month: '2026-06',
+    amount: 925,
+    currency: 'GBP',
+    status: 'recorded_on_time',
+    verificationStatus: 'self_recorded',
+    reputationPoints: 5,
+    createdAt: new Date().toISOString(),
+  },
+];
+
+const seededLandlordProperties = [
+  {
+    id: 'property-demo-bow',
+    ownerId: currentUser.id,
+    title: 'Bow one-bed opportunity',
+    area: 'Bow',
+    propertyType: 'One-bed flat',
+    status: 'pipeline',
+    expectedRent: 1650,
+    currency: 'GBP',
+    vacancyRisk: 'Medium',
+    benchmarkNote: 'Similar one-beds in the Feed are clustering around the mid-£1,600s.',
+    tenantDemandCount: 18,
+    operatorInterestCount: 4,
+    agentInterestCount: 3,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+];
+
+const seededProfessionalProfiles = [
+  {
+    id: 'pro-demo-agent',
+    userId: currentUser.id,
+    roleType: 'Individual Agent',
+    displayName: 'RentEazy demo professional',
+    areas: ['Stratford', 'Bow', 'Greenwich'],
+    responseRate: 92,
+    responseTimeHours: 3,
+    verifiedDeals: 2,
+    followerCount: 24,
+    pipelineCount: 6,
+    reputationTier: 'Silver',
+    leaderboardRank: 8,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    id: 'pro-demo-sourcer',
+    userId: 'sourcer-yorkshire',
+    roleType: 'Sourcer',
+    displayName: 'Yorkshire Deal Desk',
+    areas: ['Leeds', 'Manchester'],
+    responseRate: 88,
+    responseTimeHours: 5,
+    verifiedDeals: 4,
+    followerCount: 63,
+    pipelineCount: 9,
+    reputationTier: 'Gold',
+    leaderboardRank: 3,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+];
+
+const seededTenantDemandSignals = [
+  {
+    id: 'demand-amelia-hackney',
+    sourcePostId: 'post-looking-hackney',
+    roleType: 'Tenant',
+    displayName: 'Amelia R.',
+    area: 'Hackney / Bow',
+    budget: 'Up to £1,050 pcm',
+    moveDate: 'This month',
+    propertyInterest: 'Room or buddy-up two-bed',
+    strength: 86,
+    status: 'new',
+    reasonBadges: ['Budget fit', 'Move date fit', 'Ready to view'],
+    matchedPropertyIds: ['property-demo-bow'],
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    id: 'demand-nadia-clapham',
+    sourcePostId: 'post-buddy-clapham',
+    roleType: 'House Buddy',
+    displayName: 'Nadia K.',
+    area: 'Clapham',
+    budget: '£1,100 each',
+    moveDate: 'Mid-July',
+    propertyInterest: 'Two-bed buddy-up',
+    strength: 78,
+    status: 'new',
+    reasonBadges: ['Lifestyle fit', 'Area fit', 'No deal-breaker conflict'],
+    matchedPropertyIds: [],
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    id: 'demand-greenwich-ready',
+    sourcePostId: 'post-agent-update-viewings',
+    roleType: 'Tenant demand',
+    displayName: 'Greenwich viewing pool',
+    area: 'Greenwich',
+    budget: 'Rooms from £890 pcm',
+    moveDate: 'Flexible',
+    propertyInterest: 'Rooms and studios',
+    strength: 72,
+    status: 'market_signal',
+    reasonBadges: ['Documents ready', 'Viewing availability', 'Area demand'],
+    matchedPropertyIds: [],
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+];
+
+const seededDealWatchlist = [
+  {
+    id: 'watch-demo-northwest',
+    userId: currentUser.id,
+    dealPostId: 'post-investor-northwest',
+    dealType: 'Investor Brief',
+    area: 'Manchester / Liverpool',
+    strategy: 'Buy-to-let and serviced options',
+    status: 'watching',
+    score: 82,
+    reasonBadges: ['Investor criteria fit', 'Numbers first', 'Sourcer route'],
+    notes: 'Track sourcer responses and clean-number opportunities.',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+];
+
+const seededOperatorPortfolioSignals = [
+  {
+    id: 'operator-signal-west-london',
+    operatorId: currentUser.id,
+    area: 'West London',
+    propertyType: 'Family houses and flats',
+    model: 'Management / co-hosting',
+    unitsTracked: 8,
+    occupancySignal: 'Strong weekday demand',
+    landlordDemandCount: 6,
+    investorBriefCount: 3,
+    complianceStatus: 'Ready to verify',
+    nextAction: 'Publish operator requirements for landlords and investors.',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+];
+
+const seededMarketIntroductions = [
+  {
+    id: 'intro-demo-amelia-bow',
+    userId: currentUser.id,
+    sourceType: 'tenant_demand',
+    sourceId: 'demand-amelia-hackney',
+    targetType: 'landlord_property',
+    targetId: 'property-demo-bow',
+    status: 'shortlisted',
+    reason: 'Budget, move timing, and area fit the Bow pipeline.',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+];
+
+const seededNotifications = [
+  {
+    id: 'notification-demo-swipes',
+    userId: currentUser.id,
+    type: 'daily_swipes_ready',
+    title: 'Your daily swipes are ready.',
+    body: 'Use them to improve today’s matching signals.',
+    read: false,
+    createdAt: new Date().toISOString(),
+  },
+  {
+    id: 'notification-demo-viewing',
+    userId: currentUser.id,
+    type: 'viewing_window',
+    title: 'Viewing record ready to update.',
+    body: 'Add notes after the viewing so the match history stays useful.',
+    read: false,
+    createdAt: new Date().toISOString(),
+  },
+];
+
+const roleReturnReasons = {
+  General: ['Fresh posts from the rental market', 'Daily swipes and picks', 'Reputation progress'],
+  Tenant: ['New rooms, homes, stays, and buddy posts', 'Viewing slots and matched replies', 'Move-in perks when timing fits'],
+  'House Buddy': ['Buddy-up posts and rooms', 'Lifestyle fit prompts', 'Shared-area communities'],
+  Landlord: ['Tenant demand and agent routes', 'Operator and investor interest', 'Listing traction and local signals'],
+  'Individual Agent': ['Viewing-ready demand', 'Landlord opportunity posts', 'Response reputation and pipeline'],
+  'Agency / Business': ['Team demand signals', 'Sponsored reach options', 'Area activity and pipeline'],
+  'Short-Term Guest': ['Flexible stays and relocation updates', 'Move timing perks', 'Saved stay options'],
+  'Short-Term Host': ['Guest demand and relocation needs', 'Operator/community signals', 'Useful partner offers'],
+  Operator: ['Landlord opportunities', 'Investor briefs and sourcer deals', 'Portfolio partner offers'],
+  Sourcer: ['Investor briefs', 'Operator demand', 'Deal-room communities'],
+  Investor: ['Sourcer deals', 'Operator opportunities', 'Area and yield-adjacent market insight'],
+};
+
+function roleRelevantPostTypes(role) {
+  const map = {
+    Tenant: ['Property', 'Room', 'Looking', 'House Buddy', 'Short-Term Stay', 'Serviced Accommodation', 'Advice', 'Question', 'Area Insight', 'Availability'],
+    'House Buddy': ['Room', 'House Buddy', 'Looking', 'Property', 'Advice', 'Question', 'Area Insight'],
+    Landlord: ['Looking', 'House Buddy', 'Landlord Opportunity', 'Agent Update', 'Operator Offer', 'Investor Brief', 'Advice', 'Area Insight'],
+    'Individual Agent': ['Looking', 'House Buddy', 'Property', 'Room', 'Landlord Opportunity', 'Agent Update', 'Area Insight', 'Availability'],
+    'Agency / Business': ['Looking', 'House Buddy', 'Property', 'Room', 'Landlord Opportunity', 'Agent Update', 'Operator Offer', 'Area Insight'],
+    Operator: ['Landlord Opportunity', 'Property', 'Serviced Accommodation', 'Operator Offer', 'Investor Brief', 'Sourcer Deal', 'Area Insight'],
+    Sourcer: ['Investor Brief', 'Sourcer Deal', 'Landlord Opportunity', 'Operator Offer', 'Area Insight'],
+    Investor: ['Sourcer Deal', 'Investor Brief', 'Landlord Opportunity', 'Operator Offer', 'Area Insight'],
+    'Short-Term Guest': ['Short-Term Stay', 'Serviced Accommodation', 'Availability', 'Advice', 'Question', 'Area Insight'],
+    'Short-Term Host': ['Short-Term Stay', 'Serviced Accommodation', 'Operator Offer', 'Landlord Opportunity', 'Area Insight', 'Availability'],
+  };
+  return map[role] || ['Property', 'Room', 'Looking', 'House Buddy', 'Short-Term Stay', 'Landlord Opportunity', 'Investor Brief', 'Sourcer Deal', 'Advice', 'Question', 'Area Insight'];
+}
+
+function postTextIncludes(post, signal) {
+  if (!signal) return false;
+  const haystack = [post.title, post.body, post.area, post.budget, ...(post.tags || [])].join(' ').toLowerCase();
+  return String(signal).toLowerCase().split(/[,\s/]+/).filter((part) => part.length > 2).some((part) => haystack.includes(part));
+}
+
+function calculateFeedRanking(post, { profile, answers, followedIds, likedIds, savedIds, comments }) {
+  const relevantTypes = roleRelevantPostTypes(profile.role);
+  const areaSignals = [profile.area, answers['tenant-areas'], answers['buddy-areas'], answers['investor-areas']].filter(Boolean);
+  const budgetSignals = [profile.budget, answers['tenant-budget'], answers['buddy-budget'], answers['investor-budget']].filter(Boolean);
+  const reasons = [];
+  const negativeSignals = [];
+  let score = 38;
+
+  if (relevantTypes.includes(post.postType)) {
+    score += 22;
+    reasons.push('Role fit');
+  }
+  if (areaSignals.some((signal) => postTextIncludes(post, signal))) {
+    score += 14;
+    reasons.push('Area fit');
+  }
+  if (budgetSignals.some((signal) => postTextIncludes(post, signal))) {
+    score += 10;
+    reasons.push('Budget signal');
+  }
+  if (followedIds.includes(post.authorId)) {
+    score += 12;
+    reasons.push('Followed source');
+  }
+  const commentCount = comments.filter((comment) => comment.postId === post.id).length + Number(post.commentCount || 0);
+  const socialProof = Number(post.likeCount || 0) + Number(post.saveCount || 0) + commentCount + Number(post.shareCount || 0);
+  if (socialProof > 0) {
+    score += Math.min(10, socialProof * 2);
+    reasons.push('Social proof');
+  }
+  const ageHours = Math.max(0, (Date.now() - new Date(post.createdAt).getTime()) / 3600000);
+  if (ageHours < 24) {
+    score += 7;
+    reasons.push('Fresh');
+  } else if (ageHours > 168) {
+    score -= 5;
+    negativeSignals.push('Older post');
+  }
+  if (post.sponsoredStatus) {
+    score += 3;
+    reasons.push(`${post.sponsoredStatus} and labelled`);
+  }
+  if (likedIds.includes(post.id) || savedIds.includes(post.id)) {
+    score += 5;
+    reasons.push('Saved or liked by you');
+  }
+
+  const objective = ['Question', 'Advice', 'Area Insight'].includes(post.postType)
+    ? 'Progress'
+    : socialProof > 0 || followedIds.includes(post.authorId)
+      ? 'Social proof'
+      : 'Discovery';
+
+  return {
+    postId: post.id,
+    score: Math.max(0, Math.min(100, Math.round(score))),
+    objective,
+    reasons: [...new Set(reasons)].slice(0, 5),
+    negativeSignals,
+    calculatedAt: new Date().toISOString(),
+  };
+}
+
+function buildLocalRecommendationInsights({ profile, answers, feedRankings, behavioralEvents, partnerOffers }) {
+  const events = behavioralEvents || [];
+  const eventCounts = events.reduce((acc, event) => {
+    acc[event.eventType] = (acc[event.eventType] || 0) + 1;
+    return acc;
+  }, {});
+  const objectiveCounts = (feedRankings || []).reduce((acc, ranking) => {
+    acc[ranking.objective] = (acc[ranking.objective] || 0) + 1;
+    return acc;
+  }, {});
+  const reasonCounts = (feedRankings || []).flatMap((ranking) => ranking.reasons || []).reduce((acc, reason) => {
+    acc[reason] = (acc[reason] || 0) + 1;
+    return acc;
+  }, {});
+  const likedSwipes = events.filter((event) => event.eventType === 'swipe_action' && ['like', 'superlike'].includes(event.metadata?.action));
+  const passedSwipes = events.filter((event) => event.eventType === 'swipe_action' && event.metadata?.action === 'pass');
+  const answeredQuestions = Object.values(answers || {}).filter((value) => String(value || '').trim()).length;
+  const role = profile.role || 'General';
+
+  return {
+    learnedSignals: {
+      role,
+      area: profile.area || answers['tenant-areas'] || answers['buddy-areas'] || answers['investor-areas'] || '',
+      answeredQuestions,
+      likedSwipes: likedSwipes.length,
+      passedSwipes: passedSwipes.length,
+      feedInteractions: (eventCounts.post_liked || 0) + (eventCounts.post_saved || 0) + (eventCounts.post_shared || 0) + (eventCounts.post_commented || 0),
+      perkOpens: eventCounts.partner_offer_opened || 0,
+    },
+    feedMix: {
+      discovery: objectiveCounts.Discovery || 0,
+      progress: objectiveCounts.Progress || 0,
+      socialProof: objectiveCounts['Social proof'] || 0,
+      topReasons: Object.entries(reasonCounts).sort((a, b) => b[1] - a[1]).slice(0, 4).map(([reason]) => reason),
+    },
+    swipeDeck: {
+      likedCount: likedSwipes.length,
+      passedCount: passedSwipes.length,
+      prioritySignals: likedSwipes.length ? ['Show more cards like recent likes', 'Keep suitability above paid visibility'] : ['Collect first swipe signals'],
+      suppressedSignals: passedSwipes.length ? ['Reduce cards similar to recent passes'] : [],
+    },
+    perkRecommendations: (partnerOffers || [])
+      .filter((offer) => !offer.eligibleRoles?.length || offer.eligibleRoles.includes(role) || !profile.role)
+      .slice(0, 4)
+      .map((offer) => ({ offerId: offer.id, title: offer.title, reason: offer.eligibleRoles?.includes(role) ? `${role} fit` : 'Relevant rental-market perk' })),
+    nextActions: [
+      answeredQuestions < 3 && { id: 'answer-questions', label: 'Answer 3 questions', targetPath: '/app/profile', reason: 'Improves matching and Feed rank explanations' },
+      likedSwipes.length + passedSwipes.length < 3 && { id: 'swipe-more', label: 'Swipe 3 cards', targetPath: '/app/swipe', reason: 'Teaches the deck what to show next' },
+      !eventCounts.post_created && { id: 'post-signal', label: 'Create a useful post', targetPath: '/app/post', reason: 'Adds inventory and improves the network' },
+    ].filter(Boolean).slice(0, 3),
+    updatedAt: new Date().toISOString(),
+  };
+}
+
+function scoreSwipeCard(card, { profile, answers, recommendationInsights, behavioralEvents }) {
+  const roleTypes = roleRelevantPostTypes(profile.role);
+  const areaSignals = [profile.area, answers['tenant-areas'], answers['buddy-areas'], answers['investor-areas']].filter(Boolean);
+  const likedSwipeIds = new Set((behavioralEvents || []).filter((event) => event.eventType === 'swipe_action' && ['like', 'superlike'].includes(event.metadata?.action)).map((event) => event.targetId));
+  const passedSwipeIds = new Set((behavioralEvents || []).filter((event) => event.eventType === 'swipe_action' && event.metadata?.action === 'pass').map((event) => event.targetId));
+  let score = Number(card.matchScore || 50);
+  const reasons = ['Base match score'];
+
+  if (roleTypes.some((type) => card.type?.toLowerCase().includes(type.toLowerCase().split(' ')[0]) || card.badges?.some((badge) => badge.toLowerCase().includes(type.toLowerCase().split(' ')[0])))) {
+    score += 8;
+    reasons.push('Role fit');
+  }
+  if (areaSignals.some((signal) => postTextIncludes({ ...card, body: card.detailLine, area: card.location, budget: card.price, tags: card.badges }, signal))) {
+    score += 7;
+    reasons.push('Area signal');
+  }
+  if (likedSwipeIds.has(card.id)) {
+    score += 10;
+    reasons.push('Previously liked');
+  }
+  if (passedSwipeIds.has(card.id)) {
+    score -= 14;
+    reasons.push('Reduced after pass');
+  }
+  if (recommendationInsights?.swipeDeck?.likedCount > 0 && card.badges?.some((badge) => ['Budget fit', 'Area fit', 'Operator', 'Investor brief', 'Buddy match'].includes(badge))) {
+    score += 4;
+    reasons.push('Matches recent deck signals');
+  }
+
+  return { ...card, recommendationScore: Math.max(0, Math.min(100, Math.round(score))), recommendationReasons: [...new Set(reasons)].slice(0, 4) };
+}
+
 const roleMarketLanes = {
   General: [
     ['Supply', 'Properties, rooms, stays, and availability', 'Properties'],
@@ -1356,7 +1845,7 @@ function DemoCardVisual({ card, dimmed = false, quiet = false }) {
   );
 }
 
-function InteractiveMatchCard({ canSwipe = true, onSwipeAction = () => {}, onBlocked = () => {} }) {
+function InteractiveMatchCard({ cards = heroSwipeCards, canSwipe = true, onSwipeAction = () => {}, onBlocked = () => {} }) {
   const [activeIndex, setActiveIndex] = useState(0);
   const [dragX, setDragX] = useState(0);
   const [dragY, setDragY] = useState(0);
@@ -1367,9 +1856,10 @@ function InteractiveMatchCard({ canSwipe = true, onSwipeAction = () => {}, onBlo
   const [modal, setModal] = useState(null);
   const startXRef = useRef(0);
   const startYRef = useRef(0);
-  const card = heroSwipeCards[activeIndex];
-  const nextCard = heroSwipeCards[(activeIndex + 1) % heroSwipeCards.length];
-  const totalCards = heroSwipeCards.length;
+  const deck = cards.length ? cards : heroSwipeCards;
+  const card = deck[activeIndex % deck.length];
+  const nextCard = deck[(activeIndex + 1) % deck.length];
+  const totalCards = deck.length;
   const progress = ((activeIndex + 1) / totalCards) * 100;
 
   const showTrial = (kind, nextSwipeCount) => {
@@ -1430,7 +1920,7 @@ function InteractiveMatchCard({ canSwipe = true, onSwipeAction = () => {}, onBlo
     showTrial(action, nextSwipeCount);
 
     window.setTimeout(() => {
-      setActiveIndex((current) => (current + 1) % heroSwipeCards.length);
+      setActiveIndex((current) => (current + 1) % deck.length);
       setDragX(0);
       setDragY(0);
     }, 220);
@@ -1551,7 +2041,7 @@ function InteractiveMatchCard({ canSwipe = true, onSwipeAction = () => {}, onBlo
       </div>
       <p className="mx-4 sm:mx-5 mb-5 text-center text-xs text-slate-400">Limited free swipes refresh daily. Answer quick questions to improve this deck.</p>
       <div className="mx-4 sm:mx-5 mb-5 flex justify-center gap-1.5" aria-hidden="true">
-        {heroSwipeCards.slice(0, 12).map((item, index) => <span key={item.id} className={`h-1.5 rounded-full transition-all ${index === activeIndex % 12 ? 'w-6 bg-[#2f7d32]' : 'w-1.5 bg-slate-300'}`}></span>)}
+        {deck.slice(0, 12).map((item, index) => <span key={item.id} className={`h-1.5 rounded-full transition-all ${index === activeIndex % Math.min(12, deck.length) ? 'w-6 bg-[#2f7d32]' : 'w-1.5 bg-slate-300'}`}></span>)}
       </div>
     </div>
   );
@@ -2464,6 +2954,10 @@ function DailyPicksPanel({ picks }) {
             <div className="p-3">
               <p className="truncate text-sm font-medium text-slate-950">{pick.title}</p>
               <p className="mt-1 text-xs text-slate-500">{pick.location} · {pick.price}</p>
+              <div className="mt-2 flex flex-wrap gap-1">
+                <span className="rounded-full bg-[#edf8ee] px-2 py-0.5 text-[0.65rem] text-[#215d27]">{pick.recommendationScore || pick.matchScore}% fit</span>
+                {(pick.recommendationReasons || pick.badges || []).slice(0, 1).map((reason) => <span key={reason} className="rounded-full bg-white px-2 py-0.5 text-[0.65rem] text-slate-500">{reason}</span>)}
+              </div>
             </div>
           </div>
         ))}
@@ -2599,6 +3093,578 @@ function SocialStoryRail({ posts, groups, onSelectTab }) {
         ))}
       </div>
     </div>
+  );
+}
+
+function DailyReturnPanel({ profile, lifecycleTasks, reputationProfile, onCompleteTask }) {
+  const role = profile.role || 'General';
+  const reasons = roleReturnReasons[role] || roleReturnReasons.General;
+  const relevantTasks = lifecycleTasks
+    .filter((task) => task.roleType === 'General' || task.roleType === role)
+    .sort((a, b) => {
+      const cadenceOrder = { today: 0, week: 1, long: 2 };
+      return (cadenceOrder[a.cadence] ?? 3) - (cadenceOrder[b.cadence] ?? 3);
+    })
+    .slice(0, 5);
+  const completedCount = relevantTasks.filter((task) => task.status === 'completed').length;
+  const openCount = Math.max(0, relevantTasks.length - completedCount);
+
+  return (
+    <section className="overflow-hidden rounded-[1.75rem] border border-white bg-white/92 shadow-[0_18px_44px_-34px_rgba(15,23,42,0.45),inset_0_1px_0_white]">
+      <div className="bg-[#092243] p-5 text-white">
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <p className="font-['JetBrains_Mono',monospace] text-xs text-[#8fd0ff]">WHY OPEN TODAY</p>
+            <h2 className="mt-2 text-3xl font-semibold tracking-tight">Your rental world moved.</h2>
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-white/68">RentEazy gives every role a reason to check in without forcing a long form or fake urgency.</p>
+          </div>
+          <div className="shrink-0 rounded-2xl bg-white/12 px-4 py-3 text-center ring-1 ring-white/12">
+            <p className="text-2xl font-semibold">{openCount}</p>
+            <p className="text-[0.68rem] text-white/58">open loops</p>
+          </div>
+        </div>
+        <div className="mt-5 grid gap-2 sm:grid-cols-3">
+          {reasons.map((reason) => (
+            <div key={reason} className="rounded-2xl bg-white/10 px-3 py-3 text-sm leading-5 ring-1 ring-white/10">{reason}</div>
+          ))}
+        </div>
+      </div>
+      <div className="grid gap-3 p-4 lg:grid-cols-[1fr_15rem]">
+        <div className="grid gap-3">
+          {relevantTasks.map((task) => {
+            const complete = task.status === 'completed';
+            return (
+              <article key={task.id} className={`rounded-3xl border p-4 ${complete ? 'border-[#d5ecd7] bg-[#edf8ee]' : 'border-slate-200 bg-white'}`}>
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <p className="text-xs text-[#2670a8]">{task.cadence === 'today' ? 'Today' : task.cadence === 'week' ? 'This week' : 'Long game'} · {task.reward}</p>
+                    <h3 className="mt-1 text-base font-semibold text-slate-950">{task.title}</h3>
+                  </div>
+                  <span className={`shrink-0 rounded-full px-3 py-1 text-xs ${complete ? 'bg-white text-[#215d27]' : 'bg-slate-50 text-slate-500'}`}>{complete ? 'Done' : 'Open'}</span>
+                </div>
+                <p className="mt-2 text-sm leading-6 text-slate-600">{task.body}</p>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  <a href={task.targetPath} className="rounded-full bg-[#092243] px-4 py-2 text-sm text-white">{task.actionLabel}</a>
+                  {!complete && (
+                    <button type="button" onClick={() => onCompleteTask(task.id)} className="rounded-full bg-[#2f7d32] px-4 py-2 text-sm text-white">Mark useful</button>
+                  )}
+                </div>
+              </article>
+            );
+          })}
+        </div>
+        <div className="rounded-3xl border border-[#d5ecd7] bg-[#edf8ee] p-4 text-[#215d27]">
+          <p className="font-['JetBrains_Mono',monospace] text-xs">REPUTATION ASSET</p>
+          <p className="mt-3 text-4xl font-semibold tracking-tight text-slate-950">{reputationProfile?.score || 0}</p>
+          <p className="mt-1 text-sm">{reputationProfile?.tier || 'Starter'} tier</p>
+          <p className="mt-4 text-sm leading-6">Helpful activity, mutual matches, viewings, and double-sided feedback improve the asset users do not want to lose.</p>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function RecommendationLoopPanel({ insights, onOpenOffer }) {
+  const learned = insights?.learnedSignals || {};
+  const feedMix = insights?.feedMix || {};
+  const swipeDeck = insights?.swipeDeck || {};
+  const nextActions = insights?.nextActions || [];
+  const perkRecommendations = insights?.perkRecommendations || [];
+
+  return (
+    <section className="rounded-[1.75rem] border border-white bg-white/92 p-5 shadow-[0_18px_44px_-34px_rgba(15,23,42,0.42),inset_0_1px_0_white]">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <p className="font-['JetBrains_Mono',monospace] text-xs text-[#2670a8]">RECOMMENDATION LOOP</p>
+          <h2 className="mt-2 text-2xl font-normal tracking-tight text-slate-950">What RentEazy learned</h2>
+          <p className="mt-1 text-sm leading-6 text-slate-500">Your actions change Feed rank, swipe priority, and relevant perks. No fake scarcity, no hidden trust boosts.</p>
+        </div>
+        <Sparkles className="mt-1 h-5 w-5 text-[#2f7d32]" />
+      </div>
+      <div className="mt-4 grid grid-cols-3 gap-2 text-center text-xs">
+        {[
+          [learned.answeredQuestions || 0, 'Answers'],
+          [learned.likedSwipes || 0, 'Liked swipes'],
+          [learned.feedInteractions || 0, 'Feed signals'],
+        ].map(([value, label]) => (
+          <div key={label} className="rounded-2xl bg-slate-50 p-3">
+            <p className="text-xl text-slate-950">{value}</p>
+            <p className="text-slate-500">{label}</p>
+          </div>
+        ))}
+      </div>
+      <div className="mt-4 rounded-3xl bg-[#092243] p-4 text-white">
+        <p className="text-xs text-[#8fd0ff]">Feed mix</p>
+        <div className="mt-3 grid grid-cols-3 gap-2 text-center text-xs">
+          <div className="rounded-2xl bg-white/10 p-3"><p className="text-lg font-semibold">{feedMix.discovery || 0}</p><p className="text-white/58">Discovery</p></div>
+          <div className="rounded-2xl bg-white/10 p-3"><p className="text-lg font-semibold">{feedMix.progress || 0}</p><p className="text-white/58">Progress</p></div>
+          <div className="rounded-2xl bg-white/10 p-3"><p className="text-lg font-semibold">{feedMix.socialProof || 0}</p><p className="text-white/58">Proof</p></div>
+        </div>
+        {feedMix.topReasons?.length > 0 && (
+          <div className="mt-3 flex flex-wrap gap-2">
+            {feedMix.topReasons.map((reason) => <span key={reason} className="rounded-full bg-white/12 px-3 py-1 text-xs text-white/72">{reason}</span>)}
+          </div>
+        )}
+      </div>
+      <div className="mt-4 grid gap-3 lg:grid-cols-2">
+        <div className="rounded-3xl border border-[#d5ecd7] bg-[#edf8ee] p-4 text-[#215d27]">
+          <p className="text-sm font-medium">Swipe deck adjustment</p>
+          <div className="mt-2 space-y-2">
+            {[...(swipeDeck.prioritySignals || []), ...(swipeDeck.suppressedSignals || [])].slice(0, 3).map((signal) => (
+              <p key={signal} className="rounded-2xl bg-white px-3 py-2 text-xs">{signal}</p>
+            ))}
+          </div>
+        </div>
+        <div className="rounded-3xl border border-slate-200 bg-white p-4">
+          <p className="text-sm font-medium text-slate-950">Next best actions</p>
+          <div className="mt-2 space-y-2">
+            {nextActions.length ? nextActions.map((action) => (
+              <a key={action.id} href={action.targetPath} className="block rounded-2xl bg-slate-50 px-3 py-2 text-xs text-slate-600">
+                <span className="font-medium text-slate-950">{action.label}</span>
+                <span className="mt-1 block">{action.reason}</span>
+              </a>
+            )) : <p className="rounded-2xl bg-slate-50 px-3 py-2 text-xs text-slate-500">Keep using Feed, Swipe, and Groups to improve recommendations.</p>}
+          </div>
+        </div>
+      </div>
+      {perkRecommendations.length > 0 && (
+        <div className="mt-4 rounded-3xl bg-slate-50 p-4">
+          <p className="text-sm font-medium text-slate-950">Perks now prioritised</p>
+          <div className="mt-2 flex gap-2 overflow-x-auto pb-1">
+            {perkRecommendations.map((offer) => (
+              <button key={offer.offerId} type="button" onClick={() => onOpenOffer?.(offer.offerId)} className="min-w-56 rounded-2xl bg-white p-3 text-left text-xs text-slate-600">
+                <span className="block font-medium text-slate-950">{offer.title}</span>
+                <span className="mt-1 block">{offer.reason}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+    </section>
+  );
+}
+
+function ReferralLoopPanel({ profile, referrals, onCreateReferral }) {
+  const [inviteType, setInviteType] = useState(profile.role === 'Investor' ? 'Sourcer' : profile.role === 'Landlord' ? 'Agent' : 'House Buddy');
+  const [target, setTarget] = useState('');
+  const templates = ['House Buddy', 'Landlord', 'Agent', 'Operator', 'Sourcer', 'Investor'];
+  const recentReferral = referrals[0];
+
+  const submit = (event) => {
+    event.preventDefault();
+    onCreateReferral({ inviteType, target });
+    setTarget('');
+  };
+
+  const copyReferral = async (url) => {
+    if (!url || !navigator.clipboard) return;
+    await navigator.clipboard.writeText(url);
+  };
+
+  return (
+    <section className="rounded-[1.75rem] border border-white bg-white/92 p-5 shadow-[0_18px_44px_-34px_rgba(15,23,42,0.45),inset_0_1px_0_white]">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <p className="font-['JetBrains_Mono',monospace] text-xs text-[#2670a8]">INVITE LOOP</p>
+          <h2 className="mt-2 text-2xl font-normal tracking-tight text-slate-950">Bring the right side of the market in</h2>
+          <p className="mt-1 text-sm leading-6 text-slate-500">Useful invites improve liquidity: buddies bring buddies, landlords bring supply, sourcers bring deals, investors bring criteria.</p>
+        </div>
+        <UserPlus className="mt-1 h-5 w-5 text-[#2f7d32]" />
+      </div>
+      <form onSubmit={submit} className="mt-4 grid gap-3">
+        <div className="flex gap-2 overflow-x-auto pb-1">
+          {templates.map((type) => (
+            <button key={type} type="button" onClick={() => setInviteType(type)} className={`shrink-0 rounded-full px-4 py-2 text-sm ${inviteType === type ? 'bg-[#092243] text-white' : 'border border-slate-200 bg-white text-slate-600'}`}>{type}</button>
+          ))}
+        </div>
+        <div className="flex gap-2">
+          <input value={target} onChange={(event) => setTarget(event.target.value)} placeholder="Who should join? Optional" className="min-w-0 flex-1 rounded-full border border-slate-200 bg-white px-4 py-3 text-sm outline-hidden focus:border-[#2f7d32]" />
+          <button className="rounded-full bg-[#2f7d32] px-5 py-3 text-sm text-white">Create link</button>
+        </div>
+      </form>
+      {recentReferral && (
+        <div className="mt-4 rounded-3xl bg-slate-50 p-4">
+          <p className="text-sm font-medium text-slate-950">{recentReferral.inviteType} invite ready</p>
+          <p className="mt-1 truncate text-xs text-slate-500">{recentReferral.trackingUrl}</p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <button type="button" onClick={() => copyReferral(recentReferral.trackingUrl)} className="rounded-full bg-white px-4 py-2 text-sm text-slate-700">Copy link</button>
+            <a href={`mailto:?subject=Join me on RentEazy&body=${encodeURIComponent(recentReferral.trackingUrl)}`} className="rounded-full bg-[#092243] px-4 py-2 text-sm text-white">Send invite</a>
+          </div>
+          <p className="mt-3 text-xs leading-5 text-slate-500">{recentReferral.reward}</p>
+        </div>
+      )}
+    </section>
+  );
+}
+
+function ResidentModePanel({ residentProfiles, maintenanceRequests, rentRecords, onLogMaintenance, onLogRent }) {
+  const [maintenanceDraft, setMaintenanceDraft] = useState({ title: '', category: 'Repair', priority: 'Normal', notes: '' });
+  const [rentDraft, setRentDraft] = useState({ month: new Date().toISOString().slice(0, 7), amount: '' });
+  const resident = residentProfiles[0];
+  const leaseDays = resident?.leaseEndsAt ? Math.max(0, Math.ceil((new Date(resident.leaseEndsAt).getTime() - Date.now()) / (24 * 60 * 60 * 1000))) : null;
+
+  const submitMaintenance = (event) => {
+    event.preventDefault();
+    if (!maintenanceDraft.title.trim()) return;
+    onLogMaintenance(maintenanceDraft);
+    setMaintenanceDraft({ title: '', category: 'Repair', priority: 'Normal', notes: '' });
+  };
+
+  const submitRent = (event) => {
+    event.preventDefault();
+    if (!Number(rentDraft.amount)) return;
+    onLogRent(rentDraft);
+    setRentDraft({ month: new Date().toISOString().slice(0, 7), amount: '' });
+  };
+
+  return (
+    <section className="rounded-[1.75rem] border border-white bg-white/92 p-5 shadow-[0_18px_44px_-34px_rgba(15,23,42,0.45),inset_0_1px_0_white]">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <p className="font-['JetBrains_Mono',monospace] text-xs text-[#2670a8]">RESIDENT MODE</p>
+          <h2 className="mt-2 text-2xl font-normal tracking-tight text-slate-950">Stay useful after move-in</h2>
+          <p className="mt-1 text-sm leading-6 text-slate-500">Maintenance, rent history, lease reminders, and local records keep reputation growing between searches.</p>
+        </div>
+        <ShieldCheck className="mt-1 h-5 w-5 text-[#2f7d32]" />
+      </div>
+      <div className="mt-4 grid gap-3 lg:grid-cols-3">
+        <div className="rounded-3xl bg-[#092243] p-4 text-white">
+          <p className="text-xs text-white/58">{resident?.area || 'RentEazy network'}</p>
+          <h3 className="mt-2 text-lg font-semibold">{resident?.homeLabel || 'Resident record ready'}</h3>
+          <p className="mt-3 text-sm leading-6 text-white/68">{leaseDays !== null ? `${leaseDays} days until renewal window pressure starts.` : 'Add a lease date to unlock renewal reminders.'}</p>
+        </div>
+        <div className="rounded-3xl bg-slate-50 p-4">
+          <p className="text-xs text-[#2670a8]">Records</p>
+          <p className="mt-2 text-3xl font-semibold text-slate-950">{maintenanceRequests.length + rentRecords.length}</p>
+          <p className="mt-1 text-sm text-slate-500">timestamped resident signals</p>
+        </div>
+        <div className="rounded-3xl bg-[#edf8ee] p-4 text-[#215d27]">
+          <p className="text-xs">Reputation</p>
+          <p className="mt-2 text-sm leading-6">{resident?.reputationImpact || 'Resident history can become a portable trust asset.'}</p>
+        </div>
+      </div>
+      <div className="mt-4 grid gap-3 lg:grid-cols-2">
+        <form onSubmit={submitMaintenance} className="rounded-3xl border border-slate-200 bg-white p-4">
+          <p className="text-sm font-medium text-slate-950">Log maintenance</p>
+          <input value={maintenanceDraft.title} onChange={(event) => setMaintenanceDraft((current) => ({ ...current, title: event.target.value }))} placeholder="What needs attention?" className="mt-3 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-hidden focus:border-[#2f7d32]" />
+          <div className="mt-2 grid grid-cols-2 gap-2">
+            <select value={maintenanceDraft.category} onChange={(event) => setMaintenanceDraft((current) => ({ ...current, category: event.target.value }))} className="rounded-2xl border border-slate-200 px-3 py-2 text-sm">
+              {['Repair', 'Safety', 'Cleaning', 'Noise', 'Other'].map((item) => <option key={item}>{item}</option>)}
+            </select>
+            <select value={maintenanceDraft.priority} onChange={(event) => setMaintenanceDraft((current) => ({ ...current, priority: event.target.value }))} className="rounded-2xl border border-slate-200 px-3 py-2 text-sm">
+              {['Low', 'Normal', 'Urgent'].map((item) => <option key={item}>{item}</option>)}
+            </select>
+          </div>
+          <textarea value={maintenanceDraft.notes} onChange={(event) => setMaintenanceDraft((current) => ({ ...current, notes: event.target.value }))} rows={2} placeholder="Notes" className="mt-2 w-full resize-none rounded-2xl border border-slate-200 px-4 py-3 text-sm" />
+          <button className="mt-3 w-full rounded-full bg-[#2f7d32] px-4 py-3 text-sm text-white">Save record</button>
+        </form>
+        <form onSubmit={submitRent} className="rounded-3xl border border-[#d5ecd7] bg-[#edf8ee] p-4">
+          <p className="text-sm font-medium text-[#215d27]">Record rent history</p>
+          <div className="mt-3 grid grid-cols-2 gap-2">
+            <input type="month" value={rentDraft.month} onChange={(event) => setRentDraft((current) => ({ ...current, month: event.target.value }))} className="rounded-2xl border border-[#c6e5c9] bg-white px-3 py-2 text-sm" />
+            <input inputMode="numeric" value={rentDraft.amount} onChange={(event) => setRentDraft((current) => ({ ...current, amount: event.target.value }))} placeholder="£ amount" className="rounded-2xl border border-[#c6e5c9] bg-white px-3 py-2 text-sm" />
+          </div>
+          <p className="mt-3 text-xs leading-5 text-[#215d27]">Self-recorded now; verification can be added later. Do not upload bank details here.</p>
+          <button className="mt-3 w-full rounded-full bg-[#092243] px-4 py-3 text-sm text-white">Save rent record</button>
+        </form>
+      </div>
+    </section>
+  );
+}
+
+function LandlordModePanel({ properties, posts, onAddProperty }) {
+  const [draft, setDraft] = useState({ title: '', area: '', propertyType: 'Room', expectedRent: '' });
+  const tenantDemandPosts = posts.filter((post) => ['Looking', 'House Buddy', 'Question'].includes(post.postType)).length;
+  const totalDemand = properties.reduce((sum, property) => sum + Number(property.tenantDemandCount || 0), tenantDemandPosts);
+  const totalOperatorInterest = properties.reduce((sum, property) => sum + Number(property.operatorInterestCount || 0), 0);
+
+  const submit = (event) => {
+    event.preventDefault();
+    if (!draft.title.trim() || !draft.area.trim()) return;
+    onAddProperty(draft);
+    setDraft({ title: '', area: '', propertyType: 'Room', expectedRent: '' });
+  };
+
+  return (
+    <section className="rounded-[1.75rem] border border-white bg-white/92 p-5 shadow-[0_18px_44px_-34px_rgba(15,23,42,0.45),inset_0_1px_0_white]">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <p className="font-['JetBrains_Mono',monospace] text-xs text-[#2670a8]">LANDLORD MODE</p>
+          <h2 className="mt-2 text-2xl font-normal tracking-tight text-slate-950">Demand before vacancy</h2>
+          <p className="mt-1 text-sm leading-6 text-slate-500">Properties connect to tenant demand, agent routes, operator offers, and investor interest.</p>
+        </div>
+        <Home className="mt-1 h-5 w-5 text-[#2f7d32]" />
+      </div>
+      <div className="mt-4 grid grid-cols-3 gap-2 text-center text-xs">
+        <div className="rounded-2xl bg-slate-50 p-3"><p className="text-xl text-slate-950">{properties.length}</p><p className="text-slate-500">Properties</p></div>
+        <div className="rounded-2xl bg-[#edf8ee] p-3"><p className="text-xl text-[#215d27]">{totalDemand}</p><p className="text-[#215d27]">Demand</p></div>
+        <div className="rounded-2xl bg-[#edf7ff] p-3"><p className="text-xl text-[#154f79]">{totalOperatorInterest}</p><p className="text-[#154f79]">Operators</p></div>
+      </div>
+      <div className="mt-4 grid gap-3">
+        {properties.slice(0, 3).map((property) => (
+          <article key={property.id} className="rounded-3xl border border-slate-200 bg-white p-4">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p className="text-xs text-[#2670a8]">{property.area} · {property.propertyType}</p>
+                <h3 className="mt-1 text-base font-semibold text-slate-950">{property.title}</h3>
+              </div>
+              <span className="rounded-full bg-[#edf8ee] px-3 py-1 text-xs text-[#215d27]">{property.vacancyRisk} risk</span>
+            </div>
+            <p className="mt-2 text-sm leading-6 text-slate-600">{property.benchmarkNote}</p>
+            <p className="mt-2 text-xs text-slate-500">{property.tenantDemandCount} tenant signals · {property.agentInterestCount} agent routes · {property.operatorInterestCount} operator signals</p>
+          </article>
+        ))}
+      </div>
+      <form onSubmit={submit} className="mt-4 grid gap-2 rounded-3xl bg-slate-50 p-3">
+        <p className="text-sm font-medium text-slate-950">Add property pipeline</p>
+        <input value={draft.title} onChange={(event) => setDraft((current) => ({ ...current, title: event.target.value }))} placeholder="Property or room name" className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm" />
+        <div className="grid grid-cols-3 gap-2">
+          <input value={draft.area} onChange={(event) => setDraft((current) => ({ ...current, area: event.target.value }))} placeholder="Area" className="rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm" />
+          <select value={draft.propertyType} onChange={(event) => setDraft((current) => ({ ...current, propertyType: event.target.value }))} className="rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm">
+            {['Room', 'Flat', 'House', 'Short stay'].map((item) => <option key={item}>{item}</option>)}
+          </select>
+          <input value={draft.expectedRent} onChange={(event) => setDraft((current) => ({ ...current, expectedRent: event.target.value }))} placeholder="Rent" className="rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm" />
+        </div>
+        <button className="rounded-full bg-[#092243] px-4 py-3 text-sm text-white">Create pipeline</button>
+      </form>
+    </section>
+  );
+}
+
+function ProfessionalModePanel({ profile, professionalProfiles, posts, groups }) {
+  const role = profile.role || 'General';
+  const activeProfile = professionalProfiles.find((item) => item.roleType === role) || professionalProfiles[0];
+  const professionalPosts = posts.filter((post) => ['Agent Update', 'Sourcer Deal', 'Investor Brief', 'Operator Offer', 'Landlord Opportunity'].includes(post.postType));
+  const professionalGroups = groups.filter((group) => ['Role network', 'Professional circle', 'Deal community'].includes(group.groupType));
+
+  return (
+    <section className="rounded-[1.75rem] border border-white bg-white/92 p-5 shadow-[0_18px_44px_-34px_rgba(15,23,42,0.45),inset_0_1px_0_white]">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <p className="font-['JetBrains_Mono',monospace] text-xs text-[#2670a8]">PROFESSIONAL MODE</p>
+          <h2 className="mt-2 text-2xl font-normal tracking-tight text-slate-950">Pipeline, status, and market signal</h2>
+          <p className="mt-1 text-sm leading-6 text-slate-500">Agents, sourcers, investors, and operators get reputation, followership, deal flow, and response metrics.</p>
+        </div>
+        <BadgeCheck className="mt-1 h-5 w-5 text-[#2f7d32]" />
+      </div>
+      <div className="mt-4 grid grid-cols-4 gap-2 text-center text-xs">
+        {[
+          [activeProfile?.responseRate || 0, 'Response %'],
+          [activeProfile?.verifiedDeals || 0, 'Verified'],
+          [activeProfile?.followerCount || 0, 'Followers'],
+          [activeProfile?.pipelineCount || 0, 'Pipeline'],
+        ].map(([value, label]) => (
+          <div key={label} className="rounded-2xl bg-slate-50 p-3">
+            <p className="text-xl text-slate-950">{value}</p>
+            <p className="text-slate-500">{label}</p>
+          </div>
+        ))}
+      </div>
+      <div className="mt-4 grid gap-3 lg:grid-cols-2">
+        <div className="rounded-3xl bg-[#092243] p-4 text-white">
+          <p className="text-xs text-[#8fd0ff]">{activeProfile?.roleType || role} · #{activeProfile?.leaderboardRank || '—'} in active area</p>
+          <h3 className="mt-2 text-lg font-semibold">{activeProfile?.displayName || 'Professional profile ready'}</h3>
+          <p className="mt-3 text-sm leading-6 text-white/68">{activeProfile?.areas?.join(', ') || 'Add areas to start ranking professional demand.'}</p>
+        </div>
+        <div className="rounded-3xl bg-[#edf8ee] p-4 text-[#215d27]">
+          <p className="text-sm font-medium">Market signal</p>
+          <p className="mt-2 text-sm leading-6">{professionalPosts.length} professional posts and {professionalGroups.length} role groups are feeding the network right now.</p>
+          <a href="/app/post" className="mt-4 inline-flex rounded-full bg-[#2f7d32] px-4 py-2 text-sm text-white">Post update</a>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function TenantDemandPipelinePanel({ signals, properties, introductions, onShortlist }) {
+  const shortlistedIds = new Set(introductions.map((item) => item.sourceId));
+  const strongSignals = signals.filter((signal) => Number(signal.strength || 0) >= 75).length;
+  const totalMatchedProperties = signals.reduce((sum, signal) => sum + (signal.matchedPropertyIds?.length || 0), 0);
+
+  return (
+    <section className="rounded-[1.75rem] border border-white bg-white/92 p-5 shadow-[0_18px_44px_-34px_rgba(15,23,42,0.45),inset_0_1px_0_white]">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <p className="font-['JetBrains_Mono',monospace] text-xs text-[#2670a8]">TENANT DEMAND PIPELINE</p>
+          <h2 className="mt-2 text-2xl font-normal tracking-tight text-slate-950">Demand landlords can act on</h2>
+          <p className="mt-1 text-sm leading-6 text-slate-500">Looking posts, buddy-up posts, and market signals become shortlists for landlord, agent, and operator workflows.</p>
+        </div>
+        <Users className="mt-1 h-5 w-5 text-[#2f7d32]" />
+      </div>
+      <div className="mt-4 grid grid-cols-3 gap-2 text-center text-xs">
+        <div className="rounded-2xl bg-slate-50 p-3"><p className="text-xl text-slate-950">{signals.length}</p><p className="text-slate-500">Signals</p></div>
+        <div className="rounded-2xl bg-[#edf8ee] p-3"><p className="text-xl text-[#215d27]">{strongSignals}</p><p className="text-[#215d27]">Strong</p></div>
+        <div className="rounded-2xl bg-[#edf7ff] p-3"><p className="text-xl text-[#154f79]">{totalMatchedProperties}</p><p className="text-[#154f79]">Property fits</p></div>
+      </div>
+      <div className="mt-4 space-y-3">
+        {signals.slice(0, 4).map((signal) => {
+          const shortlisted = shortlistedIds.has(signal.id) || signal.status === 'shortlisted';
+          const targetProperty = properties.find((property) => signal.matchedPropertyIds?.includes(property.id));
+          return (
+            <article key={signal.id} className="rounded-3xl border border-slate-200 bg-white p-4">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="text-xs text-[#2670a8]">{signal.roleType} · {signal.area}</p>
+                  <h3 className="mt-1 text-base font-semibold text-slate-950">{signal.displayName}</h3>
+                  <p className="mt-1 text-xs text-slate-500">{signal.budget} · {signal.moveDate}</p>
+                </div>
+                <span className="shrink-0 rounded-full bg-[#edf8ee] px-3 py-1 text-xs text-[#215d27]">{signal.strength}% fit</span>
+              </div>
+              <p className="mt-2 text-sm leading-6 text-slate-600">{signal.propertyInterest}</p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {signal.reasonBadges?.map((badge) => <span key={badge} className="rounded-full bg-slate-100 px-3 py-1 text-xs text-slate-600">{badge}</span>)}
+              </div>
+              <div className="mt-3 flex items-center justify-between gap-3">
+                <p className="text-xs text-slate-500">{targetProperty ? `Best fit: ${targetProperty.title}` : 'No property fit yet; keep as market signal.'}</p>
+                <button type="button" onClick={() => onShortlist(signal)} className={`shrink-0 rounded-full px-4 py-2 text-xs ${shortlisted ? 'bg-[#edf8ee] text-[#215d27]' : 'bg-[#092243] text-white'}`}>
+                  {shortlisted ? 'Shortlisted' : 'Shortlist'}
+                </button>
+              </div>
+            </article>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
+function DealTrackingPanel({ posts, watchlist, onWatchDeal, onUpdateDealStatus }) {
+  const dealPosts = posts.filter((post) => ['Sourcer Deal', 'Investor Brief', 'Landlord Opportunity', 'Operator Offer'].includes(post.postType));
+  const watchedIds = new Set(watchlist.map((item) => item.dealPostId));
+  const activeWatchCount = watchlist.filter((item) => item.status !== 'passed').length;
+
+  return (
+    <section className="rounded-[1.75rem] border border-white bg-white/92 p-5 shadow-[0_18px_44px_-34px_rgba(15,23,42,0.45),inset_0_1px_0_white]">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <p className="font-['JetBrains_Mono',monospace] text-xs text-[#2670a8]">DEAL WATCHLIST</p>
+          <h2 className="mt-2 text-2xl font-normal tracking-tight text-slate-950">Follow the money signals</h2>
+          <p className="mt-1 text-sm leading-6 text-slate-500">Investors, sourcers, and operators can watch briefs, deals, landlord opportunities, and operator offers.</p>
+        </div>
+        <Bookmark className="mt-1 h-5 w-5 text-[#2f7d32]" />
+      </div>
+      <div className="mt-4 grid grid-cols-3 gap-2 text-center text-xs">
+        <div className="rounded-2xl bg-slate-50 p-3"><p className="text-xl text-slate-950">{dealPosts.length}</p><p className="text-slate-500">Deal posts</p></div>
+        <div className="rounded-2xl bg-[#edf8ee] p-3"><p className="text-xl text-[#215d27]">{activeWatchCount}</p><p className="text-[#215d27]">Watching</p></div>
+        <div className="rounded-2xl bg-[#edf7ff] p-3"><p className="text-xl text-[#154f79]">{Math.round((watchlist[0]?.score || 0))}</p><p className="text-[#154f79]">Top score</p></div>
+      </div>
+      <div className="mt-4 space-y-3">
+        {dealPosts.slice(0, 4).map((post) => {
+          const watched = watchedIds.has(post.id);
+          const watchItem = watchlist.find((item) => item.dealPostId === post.id);
+          return (
+            <article key={post.id} className="rounded-3xl border border-slate-200 bg-white p-4">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="text-xs text-[#2670a8]">{post.postType} · {post.area}</p>
+                  <h3 className="mt-1 text-base font-semibold text-slate-950">{post.title}</h3>
+                </div>
+                <span className="rounded-full bg-slate-100 px-3 py-1 text-xs text-slate-600">{post.budget}</span>
+              </div>
+              <p className="mt-2 line-clamp-2 text-sm leading-6 text-slate-600">{post.body}</p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {(watchItem?.reasonBadges || post.tags || []).slice(0, 3).map((badge) => <span key={badge} className="rounded-full bg-[#edf7ff] px-3 py-1 text-xs text-[#154f79]">{badge}</span>)}
+              </div>
+              <div className="mt-3 flex flex-wrap items-center gap-2">
+                <button type="button" onClick={() => onWatchDeal(post)} className={`rounded-full px-4 py-2 text-xs ${watched ? 'bg-[#edf8ee] text-[#215d27]' : 'bg-[#092243] text-white'}`}>
+                  {watched ? 'Watching' : 'Watch deal'}
+                </button>
+                {watched && ['reviewing', 'contacted', 'passed'].map((status) => (
+                  <button key={status} type="button" onClick={() => onUpdateDealStatus(watchItem.id, status)} className={`rounded-full px-3 py-2 text-xs ${watchItem.status === status ? 'bg-[#2f7d32] text-white' : 'bg-slate-100 text-slate-600'}`}>{status}</button>
+                ))}
+              </div>
+            </article>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
+function OperatorSignalsPanel({ signals, onAddSignal }) {
+  const [draft, setDraft] = useState({ area: '', propertyType: '', model: 'Management', unitsTracked: '', occupancySignal: '' });
+  const totalUnits = signals.reduce((sum, signal) => sum + Number(signal.unitsTracked || 0), 0);
+  const landlordDemand = signals.reduce((sum, signal) => sum + Number(signal.landlordDemandCount || 0), 0);
+  const investorBriefs = signals.reduce((sum, signal) => sum + Number(signal.investorBriefCount || 0), 0);
+
+  const submit = (event) => {
+    event.preventDefault();
+    if (!draft.area.trim()) return;
+    onAddSignal(draft);
+    setDraft({ area: '', propertyType: '', model: 'Management', unitsTracked: '', occupancySignal: '' });
+  };
+
+  return (
+    <section className="rounded-[1.75rem] border border-white bg-white/92 p-5 shadow-[0_18px_44px_-34px_rgba(15,23,42,0.45),inset_0_1px_0_white]">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <p className="font-['JetBrains_Mono',monospace] text-xs text-[#2670a8]">OPERATOR SIGNALS</p>
+          <h2 className="mt-2 text-2xl font-normal tracking-tight text-slate-950">Portfolio demand map</h2>
+          <p className="mt-1 text-sm leading-6 text-slate-500">Operators can publish areas, property needs, and model signals without turning the app into a dashboard.</p>
+        </div>
+        <Compass className="mt-1 h-5 w-5 text-[#2f7d32]" />
+      </div>
+      <div className="mt-4 grid grid-cols-3 gap-2 text-center text-xs">
+        <div className="rounded-2xl bg-slate-50 p-3"><p className="text-xl text-slate-950">{totalUnits}</p><p className="text-slate-500">Units</p></div>
+        <div className="rounded-2xl bg-[#edf8ee] p-3"><p className="text-xl text-[#215d27]">{landlordDemand}</p><p className="text-[#215d27]">Landlord fit</p></div>
+        <div className="rounded-2xl bg-[#edf7ff] p-3"><p className="text-xl text-[#154f79]">{investorBriefs}</p><p className="text-[#154f79]">Investor briefs</p></div>
+      </div>
+      <div className="mt-4 space-y-3">
+        {signals.slice(0, 3).map((signal) => (
+          <article key={signal.id} className="rounded-3xl border border-slate-200 bg-white p-4">
+            <p className="text-xs text-[#2670a8]">{signal.area} · {signal.model}</p>
+            <h3 className="mt-1 text-base font-semibold text-slate-950">{signal.propertyType}</h3>
+            <p className="mt-2 text-sm leading-6 text-slate-600">{signal.occupancySignal}</p>
+            <p className="mt-2 text-xs text-slate-500">{signal.unitsTracked} units tracked · {signal.complianceStatus}</p>
+            <p className="mt-2 text-xs text-[#215d27]">{signal.nextAction}</p>
+          </article>
+        ))}
+      </div>
+      <form onSubmit={submit} className="mt-4 grid gap-2 rounded-3xl bg-slate-50 p-3">
+        <p className="text-sm font-medium text-slate-950">Add operator signal</p>
+        <div className="grid gap-2 sm:grid-cols-2">
+          <input value={draft.area} onChange={(event) => setDraft((current) => ({ ...current, area: event.target.value }))} placeholder="Area" className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm" />
+          <select value={draft.model} onChange={(event) => setDraft((current) => ({ ...current, model: event.target.value }))} className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm">
+            {['Management', 'Co-hosting', 'Serviced accommodation', 'Rent-to-rent'].map((item) => <option key={item}>{item}</option>)}
+          </select>
+        </div>
+        <div className="grid gap-2 sm:grid-cols-[1fr_7rem]">
+          <input value={draft.propertyType} onChange={(event) => setDraft((current) => ({ ...current, propertyType: event.target.value }))} placeholder="Property type wanted" className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm" />
+          <input value={draft.unitsTracked} onChange={(event) => setDraft((current) => ({ ...current, unitsTracked: event.target.value }))} placeholder="Units" className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm" />
+        </div>
+        <input value={draft.occupancySignal} onChange={(event) => setDraft((current) => ({ ...current, occupancySignal: event.target.value }))} placeholder="Occupancy or demand signal" className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm" />
+        <button className="rounded-full bg-[#092243] px-4 py-3 text-sm text-white">Save signal</button>
+      </form>
+    </section>
+  );
+}
+
+function UsefulNotificationsPanel({ notifications, onMarkRead }) {
+  const unreadCount = notifications.filter((item) => !item.read).length;
+
+  return (
+    <section className="rounded-[1.75rem] border border-white bg-white/92 p-5 shadow-[0_18px_44px_-34px_rgba(15,23,42,0.45),inset_0_1px_0_white]">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <p className="font-['JetBrains_Mono',monospace] text-xs text-[#2670a8]">USEFUL NOTIFICATIONS</p>
+          <h2 className="mt-2 text-2xl font-normal tracking-tight text-slate-950">Only when it reduces uncertainty</h2>
+        </div>
+        <span className="rounded-full bg-[#edf8ee] px-3 py-1 text-xs text-[#215d27]">{unreadCount} unread</span>
+      </div>
+      <div className="mt-4 space-y-2">
+        {notifications.slice(0, 4).map((notification) => (
+          <article key={notification.id} className={`rounded-2xl p-3 ${notification.read ? 'bg-slate-50' : 'bg-[#edf7ff]'}`}>
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p className="text-sm font-medium text-slate-950">{notification.title}</p>
+                <p className="mt-1 text-xs leading-5 text-slate-500">{notification.body}</p>
+              </div>
+              {!notification.read && <button type="button" onClick={() => onMarkRead(notification.id)} className="shrink-0 rounded-full bg-white px-3 py-1 text-xs text-[#154f79]">Read</button>}
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
   );
 }
 
@@ -3187,7 +4253,7 @@ function BillingPanel({ onSelectProduct, purchases, boosts, wallet }) {
       <section className="overflow-hidden rounded-[2rem] bg-[#092243] p-6 text-white shadow-[0_28px_70px_-46px_rgba(9,34,67,0.95)]">
         <p className="font-['JetBrains_Mono',monospace] text-xs text-[#8fd0ff]">BILLING</p>
         <h1 className="mt-3 text-4xl font-semibold leading-[0.96] tracking-tight">Plans, boosts, credits, and Protect.</h1>
-        <p className="mt-4 max-w-2xl text-sm leading-7 text-white/68">Free users create liquidity. Paid users remove friction. Businesses pay for labelled reach. Paid visibility never replaces suitability or trust.</p>
+        <p className="mt-4 max-w-2xl text-sm leading-7 text-white/68">Start free, keep useful activity flowing, and upgrade only when you want less friction or labelled business reach. Paid visibility never replaces suitability or trust.</p>
         <div className="mt-5 grid gap-2 sm:grid-cols-3">
           {[
             [`${wallet.balance}`, 'Credits'],
@@ -3281,48 +4347,104 @@ function ModerationQueueCard({ reports }) {
   );
 }
 
-function FeedPostCard({ post, liked, saved, followed, commentCount, onLike, onSave, onFollow, onShare, onComment, onBoost, onHide, onReport }) {
-  const image = post.media?.[0];
+function FeedPostCard({ post, ranking, card, streamId, liked, saved, followed, commentCount, onLike, onSave, onFollow, onShare, onComment, onBoost, onHide, onReport, onExplain, onPass, onMatch, onSignal }) {
+  const schema = card || createFeedCardSchema(post, ranking, 0);
+  const image = schema.heroImage;
+  const [showWhy, setShowWhy] = useState(false);
+  const rank = ranking || { score: 50, objective: 'Discovery', reasons: ['Fresh'], negativeSignals: [] };
+  const rootRef = useRef(null);
+  const visibleSinceRef = useRef(0);
+  const mountedAtRef = useRef(Date.now());
+
+  useEffect(() => {
+    const node = rootRef.current;
+    if (!node || typeof IntersectionObserver === 'undefined') return undefined;
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting && entry.intersectionRatio >= 0.55) {
+        visibleSinceRef.current = Date.now();
+        onSignal?.('impression', post, { streamId, sequence: rank.sequence, ratio: entry.intersectionRatio });
+      } else if (visibleSinceRef.current) {
+        const dwellMs = Date.now() - visibleSinceRef.current;
+        visibleSinceRef.current = 0;
+        if (dwellMs > 250) onSignal?.('dwell', post, { streamId, dwellMs });
+      }
+    }, { threshold: [0, 0.55, 0.9] });
+    observer.observe(node);
+    return () => {
+      if (visibleSinceRef.current) {
+        const dwellMs = Date.now() - visibleSinceRef.current;
+        if (dwellMs > 250) onSignal?.('dwell', post, { streamId, dwellMs });
+      }
+      observer.disconnect();
+    };
+  }, [onSignal, post, rank.sequence, streamId]);
+
+  const actionSpeedMs = () => Date.now() - mountedAtRef.current;
 
   return (
-    <article className="overflow-hidden rounded-[1.75rem] border border-white bg-white/88 shadow-[0_18px_44px_-34px_rgba(15,23,42,0.45),inset_0_1px_0_white]">
-      {image && <img src={image} alt="" className="h-56 w-full object-cover" loading="lazy" />}
-      <div className="p-5">
-        <div className="flex items-start justify-between gap-3">
-          <div className="min-w-0">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="rounded-full bg-[#edf7ff] px-3 py-1 text-xs text-[#154f79]">{post.postType}</span>
-              {post.sponsoredStatus && <span className="rounded-full bg-[#fff7ed] px-3 py-1 text-xs text-[#9a3412]">{post.sponsoredStatus}</span>}
-              <span className="text-xs text-slate-400">{new Date(post.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}</span>
-            </div>
-            <h2 className="mt-3 text-2xl font-normal tracking-tight text-slate-950">{post.title}</h2>
-            <p className="mt-2 text-sm text-slate-500">{post.authorName} · {post.authorType}</p>
+    <article ref={rootRef} data-feed-card={post.id} className="overflow-hidden rounded-[1.75rem] border border-white bg-white/92 shadow-[0_18px_44px_-34px_rgba(15,23,42,0.45),inset_0_1px_0_white]">
+      <div className="relative h-[27rem] overflow-hidden bg-slate-200">
+        {image && <img src={image} alt="" className="absolute inset-0 h-full w-full object-cover" loading="lazy" />}
+        <div className="absolute inset-0 bg-linear-to-t from-[#06172f]/92 via-[#06172f]/24 to-transparent" />
+        <div className="absolute left-4 right-4 top-4 flex items-start justify-between gap-3">
+          <div className="flex flex-wrap gap-2">
+            <span className="rounded-full bg-white px-3 py-1.5 text-xs font-semibold text-[#092243] shadow-[0_8px_18px_-12px_rgba(15,23,42,0.45)]">{schema.matchPercent}% match</span>
+            <span className="rounded-full bg-[#edf8ee] px-3 py-1.5 text-xs text-[#215d27]">{schema.trustSignal}</span>
+            {schema.explorationLabel && <span className="rounded-full bg-[#fff7ed] px-3 py-1.5 text-xs text-[#9a3412]">{schema.explorationLabel}</span>}
           </div>
-          <button type="button" onClick={() => onFollow(post.authorId)} className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-3 py-2 text-xs ${followed ? 'bg-[#edf8ee] text-[#215d27]' : 'border border-slate-200 bg-white text-slate-600'}`}>
+          <button type="button" onClick={() => onFollow(post.authorId)} className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-3 py-2 text-xs backdrop-blur ${followed ? 'bg-[#8bdc65] text-[#092243]' : 'bg-white/88 text-[#092243]'}`}>
             <UserPlus className="h-3.5 w-3.5" />
             {followed ? 'Following' : 'Follow'}
           </button>
         </div>
-        <p className="mt-4 text-sm leading-7 text-slate-700">{post.body}</p>
-        <div className="mt-4 grid grid-cols-2 gap-2 text-sm text-slate-600">
-          {post.area && <span className="rounded-2xl bg-slate-50 px-3 py-2"><MapPin className="mr-1 inline h-4 w-4 text-[#2670a8]" />{post.area}</span>}
-          {post.budget && <span className="rounded-2xl bg-slate-50 px-3 py-2">{post.budget}</span>}
+        <div className="absolute inset-x-0 bottom-0 p-5 text-white">
+          <div className="mb-3 flex flex-wrap items-center gap-2 text-sm text-white/86">
+            <span>{schema.price}</span>
+            <span>•</span>
+            <span>{schema.area}</span>
+            <span>•</span>
+            <span>{schema.bedsBaths}</span>
+          </div>
+          <h2 className="text-3xl font-normal tracking-tight">{post.title}</h2>
+          <p className="mt-2 text-sm text-white/78">{schema.standout}</p>
+          <div className="mt-4 grid grid-cols-[1fr_1fr] gap-3">
+            <button type="button" onClick={() => onPass?.(post, actionSpeedMs())} className="rounded-full border border-white/20 bg-white/12 px-5 py-3 text-sm font-semibold text-white backdrop-blur active:scale-[0.98]">Pass</button>
+            <button type="button" onClick={() => onMatch?.(post, actionSpeedMs())} className="rounded-full bg-[#8bdc65] px-5 py-3 text-sm font-semibold text-[#092243] shadow-[0_16px_30px_-20px_rgba(139,220,101,0.8)] active:scale-[0.98]">Match</button>
+          </div>
         </div>
-        <div className="mt-4 flex flex-wrap gap-2">
-          {post.tags.map((tag) => <span key={tag} className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs text-slate-500">{tag}</span>)}
+      </div>
+      <div className="p-4">
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <p className="text-xs text-[#2670a8]">{post.postType} · {post.authorName}</p>
+            <p className="mt-1 line-clamp-2 text-sm leading-6 text-slate-600">{post.body}</p>
+          </div>
+          <button type="button" onClick={() => {
+            const next = !showWhy;
+            setShowWhy(next);
+            if (next) {
+              onSignal?.('expand', post, { streamId, objective: rank.objective, score: rank.score });
+              onExplain?.(post, rank);
+            }
+          }} className="shrink-0 rounded-full bg-slate-100 px-3 py-2 text-xs text-slate-600">{showWhy ? 'Hide why' : 'Why'}</button>
         </div>
-        <div className="mt-5 grid grid-cols-6 gap-1 rounded-2xl bg-slate-50 p-1.5">
-          <button type="button" onClick={() => onLike(post.id)} className={`rounded-xl px-2 py-2 text-xs ${liked ? 'bg-[#edf8ee] text-[#215d27]' : 'text-slate-600'}`}><Heart className={`mx-auto h-4 w-4 ${liked ? 'fill-current' : ''}`} />{post.likeCount + (liked ? 1 : 0)}</button>
+        {showWhy && (
+          <div className="mt-3 flex flex-wrap gap-2">
+            {(rank.reasons?.length ? rank.reasons : ['Relevant rental signal']).map((reason) => <span key={reason} className="rounded-full bg-[#edf8ee] px-3 py-1 text-xs text-[#215d27]">{reason}</span>)}
+            {(rank.negativeSignals || []).map((signal) => <span key={signal} className="rounded-full bg-[#fff7ed] px-3 py-1 text-xs text-[#9a3412]">{signal}</span>)}
+          </div>
+        )}
+        <div className="mt-4 grid grid-cols-5 gap-1 rounded-2xl bg-slate-50 p-1.5">
+          <button type="button" onClick={() => onSave(post.id, post)} className={`rounded-xl px-2 py-2 text-xs ${saved ? 'bg-[#edf7ff] text-[#154f79]' : 'text-slate-600'}`}><Bookmark className={`mx-auto h-4 w-4 ${saved ? 'fill-current' : ''}`} />Save</button>
+          <button type="button" onClick={() => onShare(post)} className="rounded-xl px-2 py-2 text-xs text-slate-600"><Share2 className="mx-auto h-4 w-4" />Share</button>
           <button type="button" onClick={() => onComment(post)} className="rounded-xl px-2 py-2 text-xs text-slate-600"><MessageCircle className="mx-auto h-4 w-4" />{commentCount}</button>
-          <button type="button" onClick={() => onSave(post.id)} className={`rounded-xl px-2 py-2 text-xs ${saved ? 'bg-[#edf7ff] text-[#154f79]' : 'text-slate-600'}`}><Bookmark className={`mx-auto h-4 w-4 ${saved ? 'fill-current' : ''}`} />{post.saveCount + (saved ? 1 : 0)}</button>
-          <button type="button" onClick={() => onShare(post)} className="rounded-xl px-2 py-2 text-xs text-slate-600"><Share2 className="mx-auto h-4 w-4" />{post.shareCount}</button>
-          <button type="button" onClick={() => onBoost(post)} className="rounded-xl px-2 py-2 text-xs text-slate-600"><ArrowUp className="mx-auto h-4 w-4" />Boost</button>
+          <button type="button" onClick={() => onHide(post.id, post)} className="rounded-xl px-2 py-2 text-xs text-slate-600"><RotateCcw className="mx-auto h-4 w-4" />Not for me</button>
           <button type="button" onClick={() => onReport(post)} className="rounded-xl px-2 py-2 text-xs text-slate-600"><Flag className="mx-auto h-4 w-4" />Report</button>
         </div>
         {post.sponsoredStatus && (
           <div className="mt-3 flex items-center justify-between gap-3 rounded-2xl border border-[#fed7aa] bg-[#fff7ed] px-3 py-2 text-xs text-[#9a3412]">
             <span>{post.sponsoredStatus} content is labelled and reportable.</span>
-            <button type="button" onClick={() => onHide(post.id)} className="rounded-full bg-white px-3 py-1">Hide ad</button>
+            <button type="button" onClick={() => onHide(post.id, post)} className="rounded-full bg-white px-3 py-1">Hide</button>
           </div>
         )}
       </div>
@@ -3354,13 +4476,28 @@ function RentEazyAppShell() {
   const [groupMemberships, setGroupMemberships] = useStoredState('renteazy-group-memberships', [{ id: 'membership-demo-east-london', groupId: 'group-east-london-renters', userId: currentUser.id, role: 'member', createdAt: new Date().toISOString() }]);
   const [partnerOffers, setPartnerOffers] = useStoredState('renteazy-partner-offers', seededPartnerOffers);
   const [feedAds, setFeedAds] = useStoredState('renteazy-feed-ads', seededFeedAds);
+  const [feedRankings, setFeedRankings] = useStoredState('renteazy-feed-rankings', []);
+  const [recommendationInsights, setRecommendationInsights] = useStoredState('renteazy-recommendation-insights', null);
   const [behavioralEvents, setBehavioralEvents] = useStoredState('renteazy-behavioral-events', []);
+  const [feedSignals, setFeedSignals] = useStoredState('renteazy-feed-signals', []);
   const [hiddenAdIds, setHiddenAdIds] = useStoredState('renteazy-hidden-ads', []);
   const [matches, setMatches] = useStoredState('renteazy-matches', seededMatches);
   const [matchMessages, setMatchMessages] = useStoredState('renteazy-match-messages', seededMatchMessages);
   const [viewings, setViewings] = useStoredState('renteazy-viewings', seededViewings);
   const [reviews, setReviews] = useStoredState('renteazy-reviews', []);
   const [reputationProfile, setReputationProfile] = useStoredState('renteazy-reputation-profile', defaultReputationProfile);
+  const [lifecycleTasks, setLifecycleTasks] = useStoredState('renteazy-lifecycle-tasks', seededLifecycleTasks);
+  const [referrals, setReferrals] = useStoredState('renteazy-referrals', seededReferrals);
+  const [residentProfiles, setResidentProfiles] = useStoredState('renteazy-resident-profiles', seededResidentProfiles);
+  const [maintenanceRequests, setMaintenanceRequests] = useStoredState('renteazy-maintenance-requests', seededMaintenanceRequests);
+  const [rentRecords, setRentRecords] = useStoredState('renteazy-rent-records', seededRentRecords);
+  const [landlordProperties, setLandlordProperties] = useStoredState('renteazy-landlord-properties', seededLandlordProperties);
+  const [professionalProfiles, setProfessionalProfiles] = useStoredState('renteazy-professional-profiles', seededProfessionalProfiles);
+  const [tenantDemandSignals, setTenantDemandSignals] = useStoredState('renteazy-tenant-demand-signals', seededTenantDemandSignals);
+  const [dealWatchlist, setDealWatchlist] = useStoredState('renteazy-deal-watchlist', seededDealWatchlist);
+  const [operatorPortfolioSignals, setOperatorPortfolioSignals] = useStoredState('renteazy-operator-portfolio-signals', seededOperatorPortfolioSignals);
+  const [marketIntroductions, setMarketIntroductions] = useStoredState('renteazy-market-introductions', seededMarketIntroductions);
+  const [notifications, setNotifications] = useStoredState('renteazy-notifications', seededNotifications);
   const [openedOfferId, setOpenedOfferId] = useState('');
   const [sharePost, setSharePost] = useState(null);
   const [reportPost, setReportPost] = useState(null);
@@ -3371,9 +4508,18 @@ function RentEazyAppShell() {
   const [backendStatus, setBackendStatus] = useState('checking');
   const profileSyncRef = useRef('');
   const answersSyncRef = useRef('');
+  const lastFeedActionRef = useRef(null);
+  const scrollSignalRef = useRef(0);
   const remainingSwipes = Math.max(0, usageLimit.allowance - usageLimit.used);
   const activeUpsellProduct = microProducts.find((product) => product.id === upsellProductId);
-  const dailyPicks = heroSwipeCards.slice(0, 3);
+  const rankedSwipeCards = useMemo(() => heroSwipeCards
+    .map((card) => scoreSwipeCard(card, { profile, answers, recommendationInsights, behavioralEvents }))
+    .sort((a, b) => (b.recommendationScore || 0) - (a.recommendationScore || 0)), [answers, behavioralEvents, profile, recommendationInsights]);
+  const localRecommendationInsights = useMemo(() => buildLocalRecommendationInsights({ profile, answers, feedRankings, behavioralEvents, partnerOffers }), [answers, behavioralEvents, feedRankings, partnerOffers, profile]);
+  const activeRecommendationInsights = recommendationInsights || localRecommendationInsights;
+  const recommendedOfferIds = new Set((activeRecommendationInsights?.perkRecommendations || []).map((offer) => offer.offerId));
+  const sortedPartnerOffers = useMemo(() => [...partnerOffers].sort((a, b) => Number(recommendedOfferIds.has(b.id)) - Number(recommendedOfferIds.has(a.id))), [partnerOffers, activeRecommendationInsights]);
+  const dailyPicks = rankedSwipeCards.slice(0, 3);
 
   const applyApiState = (state) => {
     if (!state) return;
@@ -3397,12 +4543,26 @@ function RentEazyAppShell() {
     if (state.groupMemberships) setGroupMemberships(state.groupMemberships);
     if (state.partnerOffers) setPartnerOffers(state.partnerOffers);
     if (state.feedAds) setFeedAds(state.feedAds);
+    if (state.feedRankings) setFeedRankings(state.feedRankings);
+    if (state.recommendationInsights) setRecommendationInsights(state.recommendationInsights);
     if (state.behavioralEvents) setBehavioralEvents(state.behavioralEvents);
     if (state.matches) setMatches(state.matches);
     if (state.matchMessages) setMatchMessages(state.matchMessages);
     if (state.viewings) setViewings(state.viewings);
     if (state.reviews) setReviews(state.reviews);
     if (state.reputationProfile) setReputationProfile(state.reputationProfile);
+    if (state.lifecycleTasks) setLifecycleTasks(state.lifecycleTasks);
+    if (state.referrals) setReferrals(state.referrals);
+    if (state.residentProfiles) setResidentProfiles(state.residentProfiles);
+    if (state.maintenanceRequests) setMaintenanceRequests(state.maintenanceRequests);
+    if (state.rentRecords) setRentRecords(state.rentRecords);
+    if (state.landlordProperties) setLandlordProperties(state.landlordProperties);
+    if (state.professionalProfiles) setProfessionalProfiles(state.professionalProfiles);
+    if (state.tenantDemandSignals) setTenantDemandSignals(state.tenantDemandSignals);
+    if (state.dealWatchlist) setDealWatchlist(state.dealWatchlist);
+    if (state.operatorPortfolioSignals) setOperatorPortfolioSignals(state.operatorPortfolioSignals);
+    if (state.marketIntroductions) setMarketIntroductions(state.marketIntroductions);
+    if (state.notifications) setNotifications(state.notifications);
   };
 
   const syncApiState = async (promise) => {
@@ -3474,6 +4634,46 @@ function RentEazyAppShell() {
     }
   }, [appStreak.lastActivityAt, setAppStreak]);
 
+  useEffect(() => {
+    if (routeTab !== 'Feed') return undefined;
+    const onScroll = () => {
+      const now = Date.now();
+      if (now - scrollSignalRef.current < 250) return;
+      scrollSignalRef.current = now;
+      const scrollDepth = Math.round(window.scrollY + window.innerHeight);
+      const signal = {
+        id: createPostId(),
+        type: 'scroll',
+        eventType: 'feed_scroll',
+        targetType: 'feed',
+        targetId: activeFeedTab,
+        postId: '',
+        metadata: { scrollY: Math.round(window.scrollY), scrollDepth, activeFeedTab },
+        createdAt: new Date().toISOString(),
+      };
+      setFeedSignals((current) => [signal, ...current].slice(0, 240));
+      syncApiState(apiRequest('/api/events', { method: 'POST', body: signal }));
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, [activeFeedTab, routeTab, setFeedSignals]);
+
+  useEffect(() => {
+    if (routeTab !== 'Feed') return undefined;
+    const recordExit = () => {
+      const lastAction = lastFeedActionRef.current;
+      if (!lastAction || Date.now() - lastAction.createdAt > 2200) return;
+      const post = posts.find((item) => item.id === lastAction.postId);
+      if (post) recordFeedSignal('immediate_exit', post, { previousAction: lastAction.type });
+    };
+    window.addEventListener('beforeunload', recordExit);
+    document.addEventListener('visibilitychange', recordExit);
+    return () => {
+      window.removeEventListener('beforeunload', recordExit);
+      document.removeEventListener('visibilitychange', recordExit);
+    };
+  }, [posts, routeTab]);
+
   const addPost = async (post) => {
     setPosts((current) => [post, ...current]);
     setNewPost(post);
@@ -3514,6 +4714,23 @@ function RentEazyAppShell() {
     return event;
   };
 
+  const recordFeedSignal = (type, post, metadata = {}) => {
+    const signal = createFeedSignal({ type, post, metadata });
+    lastFeedActionRef.current = { postId: post?.id || '', createdAt: Date.now(), type };
+    setFeedSignals((current) => [signal, ...current].slice(0, 240));
+    trackBehaviorEvent(signal.eventType, signal.targetType, signal.targetId, signal.metadata);
+    return signal;
+  };
+
+  const explainFeedItem = (post, ranking) => {
+    trackBehaviorEvent('feed_explanation_opened', 'post', post.id, {
+      postType: post.postType,
+      objective: ranking?.objective,
+      score: ranking?.score,
+      reasons: ranking?.reasons || [],
+    });
+  };
+
   const joinGroup = (groupId) => {
     const existing = groupMemberships.find((item) => item.groupId === groupId);
     if (existing) {
@@ -3548,6 +4765,162 @@ function RentEazyAppShell() {
   const openPartnerOffer = (offer) => {
     setOpenedOfferId(offer.id);
     trackBehaviorEvent('partner_offer_opened', 'partner_offer', offer.id, { category: offer.category, lifecycleTrigger: offer.lifecycleTrigger });
+  };
+
+  const openRecommendedOffer = (offerId) => {
+    const offer = partnerOffers.find((item) => item.id === offerId);
+    if (offer) openPartnerOffer(offer);
+  };
+
+  const completeLifecycleTask = (taskId) => {
+    setLifecycleTasks((current) => current.map((task) => task.id === taskId ? { ...task, status: 'completed', completedAt: new Date().toISOString(), updatedAt: new Date().toISOString() } : task));
+    syncApiState(apiRequest(`/api/lifecycle-tasks/${taskId}/complete`, { method: 'POST' }));
+  };
+
+  const createReferral = (draft) => {
+    const inviteType = draft.inviteType || 'Rental connection';
+    const referral = {
+      id: createPostId(),
+      userId: profile.id || currentUser.id,
+      inviteType,
+      target: draft.target?.trim() || `A ${inviteType.toLowerCase()} contact`,
+      status: 'ready_to_share',
+      reward: '5 extra swipes after first accepted invite',
+      trackingUrl: `https://renteazy.co.uk/join?ref=${encodeURIComponent(profile.id || currentUser.id)}&invite=${encodeURIComponent(inviteType.toLowerCase().replace(/\s+/g, '-'))}`,
+      createdAt: new Date().toISOString(),
+      acceptedAt: null,
+    };
+    setReferrals((current) => [referral, ...current]);
+    syncApiState(apiRequest('/api/referrals', { method: 'POST', body: referral }));
+  };
+
+  const logMaintenanceRequest = (draft) => {
+    const request = {
+      id: createPostId(),
+      userId: profile.id || currentUser.id,
+      residentProfileId: residentProfiles[0]?.id || '',
+      title: draft.title.trim(),
+      category: draft.category,
+      priority: draft.priority,
+      status: 'logged',
+      notes: draft.notes?.trim() || '',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+    setMaintenanceRequests((current) => [request, ...current]);
+    syncApiState(apiRequest('/api/resident/maintenance', { method: 'POST', body: request }));
+  };
+
+  const logRentRecord = (draft) => {
+    const record = {
+      id: createPostId(),
+      userId: profile.id || currentUser.id,
+      residentProfileId: residentProfiles[0]?.id || '',
+      month: draft.month,
+      amount: Number(draft.amount),
+      currency: 'GBP',
+      status: 'recorded_on_time',
+      verificationStatus: 'self_recorded',
+      reputationPoints: 5,
+      createdAt: new Date().toISOString(),
+    };
+    setRentRecords((current) => [record, ...current]);
+    syncApiState(apiRequest('/api/resident/rent-records', { method: 'POST', body: record }));
+  };
+
+  const addLandlordProperty = (draft) => {
+    const property = {
+      id: createPostId(),
+      ownerId: profile.id || currentUser.id,
+      title: draft.title.trim(),
+      area: draft.area.trim(),
+      propertyType: draft.propertyType,
+      status: 'pipeline',
+      expectedRent: Number(draft.expectedRent || 0),
+      currency: 'GBP',
+      vacancyRisk: 'Unknown',
+      benchmarkNote: 'Benchmark will improve as more local RentEazy signals arrive.',
+      tenantDemandCount: 0,
+      operatorInterestCount: 0,
+      agentInterestCount: 0,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+    setLandlordProperties((current) => [property, ...current]);
+    syncApiState(apiRequest('/api/landlord/properties', { method: 'POST', body: property }));
+  };
+
+  const shortlistTenantDemand = (signal) => {
+    const targetId = signal.matchedPropertyIds?.[0] || landlordProperties[0]?.id || '';
+    const introduction = {
+      id: createPostId(),
+      userId: profile.id || currentUser.id,
+      sourceType: 'tenant_demand',
+      sourceId: signal.id,
+      targetType: targetId ? 'landlord_property' : 'demand_pipeline',
+      targetId,
+      status: 'shortlisted',
+      reason: `${signal.displayName} fits ${signal.area} demand and timing.`,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+    setTenantDemandSignals((current) => current.map((item) => item.id === signal.id ? { ...item, status: 'shortlisted', updatedAt: new Date().toISOString() } : item));
+    setMarketIntroductions((current) => [introduction, ...current.filter((item) => !(item.sourceId === signal.id && item.targetId === targetId))]);
+    syncApiState(apiRequest(`/api/landlord/demand/${signal.id}/shortlist`, { method: 'POST', body: introduction }));
+  };
+
+  const watchDeal = (post) => {
+    const existing = dealWatchlist.find((item) => item.dealPostId === post.id);
+    if (existing) {
+      setDealWatchlist((current) => current.map((item) => item.id === existing.id ? { ...item, status: 'watching', updatedAt: new Date().toISOString() } : item));
+    } else {
+      const watchItem = {
+        id: createPostId(),
+        userId: profile.id || currentUser.id,
+        dealPostId: post.id,
+        dealType: post.postType,
+        area: post.area,
+        strategy: post.tags?.join(', ') || 'Rental-market opportunity',
+        status: 'watching',
+        score: post.sponsoredStatus ? 76 : 70,
+        reasonBadges: (post.tags || ['Fresh signal']).slice(0, 3),
+        notes: `Watch ${post.title} and track next steps.`,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+      setDealWatchlist((current) => [watchItem, ...current]);
+    }
+    syncApiState(apiRequest('/api/deals/watchlist', { method: 'POST', body: { dealPostId: post.id, reasonBadges: (post.tags || []).slice(0, 3) } }));
+  };
+
+  const updateDealStatus = (watchId, status) => {
+    setDealWatchlist((current) => current.map((item) => item.id === watchId ? { ...item, status, updatedAt: new Date().toISOString() } : item));
+    syncApiState(apiRequest(`/api/deals/watchlist/${watchId}/status`, { method: 'PATCH', body: { status } }));
+  };
+
+  const addOperatorSignal = (draft) => {
+    const signal = {
+      id: createPostId(),
+      operatorId: profile.id || currentUser.id,
+      area: draft.area.trim(),
+      propertyType: draft.propertyType.trim() || 'Mixed property types',
+      model: draft.model,
+      unitsTracked: Number(draft.unitsTracked || 0),
+      occupancySignal: draft.occupancySignal.trim() || 'New operator signal',
+      landlordDemandCount: 0,
+      investorBriefCount: 0,
+      complianceStatus: 'Ready to verify',
+      nextAction: 'Connect suitable landlords, investors, and sourcers.',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+    setOperatorPortfolioSignals((current) => [signal, ...current]);
+    syncApiState(apiRequest('/api/operator/signals', { method: 'POST', body: signal }));
+  };
+
+  const markNotificationRead = (notificationId) => {
+    setNotifications((current) => current.map((notification) => notification.id === notificationId ? { ...notification, read: true, readAt: new Date().toISOString() } : notification));
+    syncApiState(apiRequest(`/api/notifications/${notificationId}/read`, { method: 'POST' }));
   };
 
   const openNativeAd = (ad) => {
@@ -3613,8 +4986,8 @@ function RentEazyAppShell() {
         targetType: 'swipe_card',
         targetId: card.id,
         subjectTitle: card.title,
-        score: card.matchScore,
-        reasonBadges: card.badges,
+        score: card.recommendationScore || card.matchScore,
+        reasonBadges: [...new Set([...(card.badges || []), ...(card.recommendationReasons || [])])].slice(0, 6),
         missingInfo: ['Confirm viewing availability'],
         counterpartId: `source-${card.id || 'card'}`,
         counterpartName: card.type === 'room' || card.type === 'flat' || card.type === 'studio' ? 'Listing source' : 'RentEazy member',
@@ -3729,7 +5102,8 @@ function RentEazyAppShell() {
     syncApiState(apiRequest(`/api/posts/${postId}/like`, { method: 'POST' }));
   };
 
-  const toggleSave = (postId) => {
+  const toggleSave = (postId, post = posts.find((item) => item.id === postId)) => {
+    if (post) recordFeedSignal('save', post, { saved: !savedIds.includes(postId) });
     toggleId(setSavedIds, postId);
     syncApiState(apiRequest(`/api/posts/${postId}/save`, { method: 'POST' }));
   };
@@ -3739,9 +5113,19 @@ function RentEazyAppShell() {
     syncApiState(apiRequest('/api/follows', { method: 'POST', body: { followingId } }));
   };
 
-  const hidePost = (postId) => {
+  const hidePost = (postId, post = posts.find((item) => item.id === postId)) => {
+    if (post) recordFeedSignal('not_interested', post, { suppressionDays: 30 });
     setHiddenPostIds((current) => [...new Set([...current, postId])]);
     syncApiState(apiRequest(`/api/posts/${postId}/hide`, { method: 'POST' }));
+  };
+
+  const passFeedCard = (post, speedMs) => {
+    recordFeedSignal('swipe', post, { direction: 'left', speedMs, suppressionDays: speedMs <= 900 ? 14 : 0 });
+  };
+
+  const matchFeedCard = (post, speedMs) => {
+    recordFeedSignal('match', post, { direction: 'right', speedMs });
+    if (!likedIds.includes(post.id)) toggleLike(post.id);
   };
 
   const boostPost = (postId, productId = 'post-bump-small') => {
@@ -3754,6 +5138,11 @@ function RentEazyAppShell() {
     syncApiState(apiRequest(`/api/posts/${report.targetId}/report`, { method: 'POST', body: report }));
   };
 
+  const rankingById = new Map(posts.map((post) => {
+    const backendRank = feedRankings.find((ranking) => ranking.postId === post.id);
+    return [post.id, backendRank || calculateFeedRanking(post, { profile, answers, followedIds, likedIds, savedIds, comments })];
+  }));
+
   const filteredPosts = posts.filter((post) => {
     if (hiddenPostIds.includes(post.id)) return false;
     if (activeFeedTab === 'Groups' || activeFeedTab === 'Perks') return false;
@@ -3764,7 +5153,13 @@ function RentEazyAppShell() {
     if (activeFeedTab === 'House Buddies') return post.postType === 'House Buddy';
     if (activeFeedTab === 'Advice') return ['Advice', 'Question', 'Area Insight', 'Success Story'].includes(post.postType);
     return post.postType.toLowerCase().includes(activeFeedTab.toLowerCase().replace(/s$/, '')) || post.authorType.toLowerCase().includes(activeFeedTab.toLowerCase().replace(/s$/, ''));
-  });
+  }).sort((a, b) => (rankingById.get(b.id)?.score || 0) - (rankingById.get(a.id)?.score || 0));
+
+  const feedSummary = filteredPosts.reduce((acc, post) => {
+    const objective = rankingById.get(post.id)?.objective || 'Discovery';
+    acc[objective] = (acc[objective] || 0) + 1;
+    return acc;
+  }, {});
 
   const navItems = [
     ['Feed', '/app/feed', Home],
@@ -3813,6 +5208,15 @@ function RentEazyAppShell() {
               <div className="mb-4">
                 <SocialStoryRail posts={posts} groups={groups} onSelectTab={setActiveFeedTab} />
               </div>
+              <div className="mb-4">
+                <DailyReturnPanel profile={profile} lifecycleTasks={lifecycleTasks} reputationProfile={reputationProfile} onCompleteTask={completeLifecycleTask} />
+              </div>
+              <div className="mb-4">
+                <RecommendationLoopPanel insights={activeRecommendationInsights} onOpenOffer={openRecommendedOffer} />
+              </div>
+              <div className="mb-4">
+                <UsefulNotificationsPanel notifications={notifications} onMarkRead={markNotificationRead} />
+              </div>
               <div className="mb-4 overflow-x-auto pb-1">
                 <div className="flex min-w-max gap-2">
                   {feedTabs.map((tab) => (
@@ -3820,6 +5224,23 @@ function RentEazyAppShell() {
                   ))}
                 </div>
               </div>
+              {activeFeedTab !== 'Groups' && activeFeedTab !== 'Perks' && (
+                <div className="mb-4 rounded-[1.75rem] border border-white bg-white/92 p-4 shadow-[0_18px_44px_-34px_rgba(15,23,42,0.35),inset_0_1px_0_white]">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <p className="font-['JetBrains_Mono',monospace] text-xs text-[#2670a8]">EXPLAINABLE FEED</p>
+                      <h2 className="mt-2 text-xl font-normal tracking-tight text-slate-950">Ranked for fit, not noise</h2>
+                      <p className="mt-1 text-sm leading-6 text-slate-500">Every card is tagged as discovery, progress, or social proof, with the reasons visible.</p>
+                    </div>
+                    <span className="shrink-0 rounded-full bg-[#edf8ee] px-3 py-1 text-xs text-[#215d27]">{filteredPosts.length} ranked</span>
+                  </div>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {['Discovery', 'Progress', 'Social proof'].map((objective) => (
+                      <span key={objective} className="rounded-full bg-slate-50 px-3 py-1.5 text-xs text-slate-600">{feedSummary[objective] || 0} {objective}</span>
+                    ))}
+                  </div>
+                </div>
+              )}
               {activeFeedTab !== 'Groups' && activeFeedTab !== 'Perks' && <ComposerPanel onCreatePost={addPost} compact profile={profile} />}
               {newPost && (
                 <div className="mt-4 rounded-3xl border border-[#d5ecd7] bg-[#edf8ee] p-4">
@@ -3839,12 +5260,13 @@ function RentEazyAppShell() {
                 {activeFeedTab === 'Groups' ? (
                   <GroupsPanel groups={groups} memberships={groupMemberships} onJoinGroup={joinGroup} onCreateGroup={createGroup} />
                 ) : activeFeedTab === 'Perks' ? (
-                  <PerksRail partnerOffers={partnerOffers} profile={profile} onOpenOffer={openPartnerOffer} />
+                  <PerksRail partnerOffers={sortedPartnerOffers} profile={profile} onOpenOffer={openPartnerOffer} />
                 ) : (
                   filteredPosts.map((post, index) => (
                     <React.Fragment key={post.id}>
                       <FeedPostCard
                         post={post}
+                        ranking={rankingById.get(post.id)}
                         liked={likedIds.includes(post.id)}
                         saved={savedIds.includes(post.id)}
                         followed={followedIds.includes(post.authorId)}
@@ -3857,6 +5279,7 @@ function RentEazyAppShell() {
                         onBoost={(post) => boostPost(post.id)}
                         onHide={hidePost}
                         onReport={setReportPost}
+                        onExplain={explainFeedItem}
                       />
                       {index === 0 && (
                         <GroupsPanel groups={groups} memberships={groupMemberships} onJoinGroup={joinGroup} onCreateGroup={createGroup} compact />
@@ -3872,12 +5295,23 @@ function RentEazyAppShell() {
                         <NativeAdCard ad={feedAds.filter((ad) => !hiddenAdIds.includes(ad.id))[0]} onOpen={openNativeAd} onHide={hideNativeAd} onReport={reportNativeAd} />
                       )}
                       {index === 3 && (
-                        <PerksRail partnerOffers={partnerOffers} profile={profile} onOpenOffer={openPartnerOffer} compact />
+                        <PerksRail partnerOffers={sortedPartnerOffers} profile={profile} onOpenOffer={openPartnerOffer} compact />
                       )}
                       {index === 4 && (
                         <div className="space-y-4">
                           <RoleLanesPanel profile={profile} onSelectTab={setActiveFeedTab} />
+                          <ProfessionalModePanel profile={profile} professionalProfiles={professionalProfiles} posts={posts} groups={groups} />
+                          <DealTrackingPanel posts={posts} watchlist={dealWatchlist} onWatchDeal={watchDeal} onUpdateDealStatus={updateDealStatus} />
+                          <ReferralLoopPanel profile={profile} referrals={referrals} onCreateReferral={createReferral} />
                           <TractionPanel posts={posts} likedIds={likedIds} savedIds={savedIds} shares={shares} comments={comments} onBoost={openUpsell} />
+                        </div>
+                      )}
+                      {index === 5 && (
+                        <div className="space-y-4">
+                          <ResidentModePanel residentProfiles={residentProfiles} maintenanceRequests={maintenanceRequests} rentRecords={rentRecords} onLogMaintenance={logMaintenanceRequest} onLogRent={logRentRecord} />
+                          <LandlordModePanel properties={landlordProperties} posts={posts} onAddProperty={addLandlordProperty} />
+                          <TenantDemandPipelinePanel signals={tenantDemandSignals} properties={landlordProperties} introductions={marketIntroductions} onShortlist={shortlistTenantDemand} />
+                          <OperatorSignalsPanel signals={operatorPortfolioSignals} onAddSignal={addOperatorSignal} />
                         </div>
                       )}
                     </React.Fragment>
@@ -3926,7 +5360,7 @@ function RentEazyAppShell() {
               <p className="mt-3 text-slate-600">Swipe through suitable homes, rooms, stays, and people one card at a time.</p>
               <div className="mt-5"><MatchSummaryStrip profile={profile} answers={answers} /></div>
               <div className="mt-5"><DailySwipePanel usageLimit={usageLimit} onBuyMore={openUpsell} /></div>
-              <div className="mt-5"><InteractiveMatchCard canSwipe={remainingSwipes > 0} onSwipeAction={handleSwipeAction} onBlocked={() => openUpsell('extra-swipes-10')} /></div>
+              <div className="mt-5"><InteractiveMatchCard cards={rankedSwipeCards} canSwipe={remainingSwipes > 0} onSwipeAction={handleSwipeAction} onBlocked={() => openUpsell('extra-swipes-10')} /></div>
               <div className="mt-5">
                 <MatchPipelinePanel matches={matches} messages={matchMessages} viewings={viewings} reviews={reviews} onSendMessage={sendMatchMessage} onRequestViewing={requestViewing} onSubmitReview={submitMatchReview} />
               </div>
@@ -3958,6 +5392,7 @@ function RentEazyAppShell() {
                   <FeedPostCard
                     key={post.id}
                     post={post}
+                    ranking={rankingById.get(post.id)}
                     liked={likedIds.includes(post.id)}
                     saved={savedIds.includes(post.id)}
                     followed={followedIds.includes(post.authorId)}
@@ -3970,6 +5405,7 @@ function RentEazyAppShell() {
                     onBoost={(post) => boostPost(post.id)}
                     onHide={hidePost}
                     onReport={setReportPost}
+                    onExplain={explainFeedItem}
                   />
                 ))}
                 {posts.filter((post) => likedIds.includes(post.id) || savedIds.includes(post.id)).length === 0 && <p className="rounded-[1.75rem] border border-white bg-white/86 p-6 text-sm text-slate-600">Like or save posts from the Feed and they will appear here.</p>}
@@ -3990,7 +5426,17 @@ function RentEazyAppShell() {
                 </div>
               </div>
               <ProfileEditor profile={profile} setProfile={setProfile} answers={answers} setAnswers={setAnswers} />
+              <DailyReturnPanel profile={profile} lifecycleTasks={lifecycleTasks} reputationProfile={reputationProfile} onCompleteTask={completeLifecycleTask} />
+              <RecommendationLoopPanel insights={activeRecommendationInsights} onOpenOffer={openRecommendedOffer} />
               <ReputationScoreCard reputationProfile={reputationProfile} />
+              <UsefulNotificationsPanel notifications={notifications} onMarkRead={markNotificationRead} />
+              <ResidentModePanel residentProfiles={residentProfiles} maintenanceRequests={maintenanceRequests} rentRecords={rentRecords} onLogMaintenance={logMaintenanceRequest} onLogRent={logRentRecord} />
+              <LandlordModePanel properties={landlordProperties} posts={posts} onAddProperty={addLandlordProperty} />
+              <TenantDemandPipelinePanel signals={tenantDemandSignals} properties={landlordProperties} introductions={marketIntroductions} onShortlist={shortlistTenantDemand} />
+              <ProfessionalModePanel profile={profile} professionalProfiles={professionalProfiles} posts={posts} groups={groups} />
+              <DealTrackingPanel posts={posts} watchlist={dealWatchlist} onWatchDeal={watchDeal} onUpdateDealStatus={updateDealStatus} />
+              <OperatorSignalsPanel signals={operatorPortfolioSignals} onAddSignal={addOperatorSignal} />
+              <ReferralLoopPanel profile={profile} referrals={referrals} onCreateReferral={createReferral} />
               <MatchPipelinePanel matches={matches} messages={matchMessages} viewings={viewings} reviews={reviews} onSendMessage={sendMatchMessage} onRequestViewing={requestViewing} onSubmitReview={submitMatchReview} />
               <TrustReputationPanel reports={reports} comments={comments} profile={profile} />
               <ActivityInbox usageLimit={usageLimit} posts={posts} shares={shares} reports={reports} boosts={boosts} profile={profile} />
@@ -4017,7 +5463,16 @@ function RentEazyAppShell() {
           <div className="rounded-[1.75rem] border border-[#d5ecd7] bg-[#edf8ee] p-5 text-sm leading-7 text-[#215d27]">
             Share Everywhere creates a caption, tracking link, copy actions, share sheet, and reward record.
           </div>
+          <UsefulNotificationsPanel notifications={notifications} onMarkRead={markNotificationRead} />
           <ProfileStrengthCard profile={profile} answers={answers} />
+          <RecommendationLoopPanel insights={activeRecommendationInsights} onOpenOffer={openRecommendedOffer} />
+          <ReferralLoopPanel profile={profile} referrals={referrals} onCreateReferral={createReferral} />
+          <ResidentModePanel residentProfiles={residentProfiles} maintenanceRequests={maintenanceRequests} rentRecords={rentRecords} onLogMaintenance={logMaintenanceRequest} onLogRent={logRentRecord} />
+          <LandlordModePanel properties={landlordProperties} posts={posts} onAddProperty={addLandlordProperty} />
+          <TenantDemandPipelinePanel signals={tenantDemandSignals} properties={landlordProperties} introductions={marketIntroductions} onShortlist={shortlistTenantDemand} />
+          <ProfessionalModePanel profile={profile} professionalProfiles={professionalProfiles} posts={posts} groups={groups} />
+          <DealTrackingPanel posts={posts} watchlist={dealWatchlist} onWatchDeal={watchDeal} onUpdateDealStatus={updateDealStatus} />
+          <OperatorSignalsPanel signals={operatorPortfolioSignals} onAddSignal={addOperatorSignal} />
           <ActivityInbox usageLimit={usageLimit} posts={posts} shares={shares} reports={reports} boosts={boosts} profile={profile} />
           <RoleLanesPanel profile={profile} onSelectTab={setActiveFeedTab} />
           <TractionPanel posts={posts} likedIds={likedIds} savedIds={savedIds} shares={shares} comments={comments} onBoost={openUpsell} />
@@ -4113,7 +5568,7 @@ function LegalPage({ kind }) {
 }
 
 export default function App() {
-  const rotatingHeroWords = useMemo(() => defaultRotatingHeroWords, []);
+  const { profile, setProfile } = useProfile();
   const pathname = typeof window === 'undefined' ? '/' : window.location.pathname;
 
   if (pathname.startsWith('/app')) {
@@ -4131,6 +5586,13 @@ export default function App() {
   if (pathname.startsWith('/privacy')) {
     return <LegalPage kind="privacy" />;
   }
+
+  // Land → pick who you are → get a profile-specific landing (not a generic one).
+  if (!profile) {
+    return <ProfileChooser onSelect={setProfile} />;
+  }
+  const pc = getProfile(profile);
+  const rotatingHeroWords = pc.hero.rotating;
 
   return (
     <div className="bg-[#f5f8fb] text-slate-900 font-['Inter',sans-serif] min-h-screen relative overflow-x-hidden antialiased selection:bg-[#dff4e2] selection:text-[#092243]">
@@ -4364,7 +5826,7 @@ export default function App() {
               />
             }
           >
-            <VSLPlayer />
+            <VSLPlayer userType={pc.vslUserType} />
           </React.Suspense>
 
           {/* Close them here — capture intent the moment the video lands */}
