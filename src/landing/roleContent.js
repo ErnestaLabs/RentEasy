@@ -15,7 +15,7 @@ export const ROLE_CONTENT = {
     },
     problem: {
       heading: 'You’re not bad at this. The system is broken.',
-      lines: ['You message 20 places. Three reply. One ghosts you after the viewing.', 'You refresh the portals every morning — same listings, already gone.', 'No way to know if you’re even a strong applicant before you waste the trip.'],
+      lines: ['You send 20 messages. They echo in a black hole — not even a “no”.', 'You refresh the portals every morning — same listings, already gone.', 'No way to know if you’re even a strong applicant before you waste the trip.'],
     },
     dream: {
       heading: 'Imagine opening an app to three places that actually fit.',
@@ -37,7 +37,7 @@ export const ROLE_CONTENT = {
     },
     problem: {
       heading: 'List on a portal. Get 47 enquiries. Fill it anyway, eventually.',
-      lines: ['You speak to a handful. Some ghost after the viewing. One fails referencing.', 'Every empty week is real money out of your pocket — more than a year of platform fees.', 'And the wrong tenant, post-Section-21, costs far more than the void ever did.'],
+      lines: ['You speak to a handful. Some ghost after the viewing. One fails referencing.', 'Every empty week is real money out of your pocket — more than a year of platform fees.', 'And with Section 21 gone, the wrong tenant is a 12–18 month problem you can’t undo.'],
     },
     dream: {
       heading: 'See the tenant before you ever pick up the phone.',
