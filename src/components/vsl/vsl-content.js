@@ -22,7 +22,7 @@ export const CONTENT = {
       { title: '6 viewings booked', sub: 'Landlord ghosted 4. No-show for the other 2.' },
       { title: '"Still looking"', sub: 'You\'ve said it so many times you hate the words.' },
     ],
-    identityLine: 'The flat you want doesn\'t wait.',
+    identityLine: 'The place you want doesn\'t wait.',
     identityAccent: 'doesn\'t wait',
 
     // Act 3 — AGITATE: visceral cost lines
