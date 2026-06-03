@@ -21,6 +21,14 @@ export const ROLE_CONTENT = {
       heading: 'Imagine opening an app to three places that actually fit.',
       sub: 'The landlord already knows you’re serious. You already know the place suits you. One viewing. You like it, they like you, you take it. That’s matching — direct, with no chasing someone who never calls back.',
     },
+    enemy: {
+      heading: 'The problem was never you. It’s a one-sided system.',
+      line: 'Agents and portals reward whoever shouts first and ghost everyone else. Here, nobody reaches you unless they’ve already chosen you — so a reply means someone actually wants you.',
+    },
+    objection: {
+      q: '“Great. Another rental site.”',
+      a: 'Not quite. A landlord or agent only reaches you once they’ve liked your profile — both sides match before anyone messages. Free to post, free to swipe, no premium wall. And your profile travels with you, so you never start from zero again.',
+    },
     mechanism: ['Create your free profile — no premium wall, and your reputation travels with you', 'Swipe scored homes that fit your brief', 'Match when both sides like → viewing flow begins'],
     proof: 'stats',
     cta: 'Start matching — it’s free',
@@ -43,6 +51,14 @@ export const ROLE_CONTENT = {
       heading: 'See the tenant before you ever pick up the phone.',
       sub: 'Budget set. Move date set. Genuinely interested in your property. You match with people you’d actually want — and you choose who gets the keys, not whoever shouted loudest first.',
     },
+    enemy: {
+      heading: 'Your agent is paid to fill it — not to fill it right.',
+      line: '“They don’t care who they put into your property.” Agents earn on placement, not on whether the tenant lasts. And the portals charge you the Rightmove tax whether the enquiries are real or not.',
+    },
+    objection: {
+      q: '“Another platform deciding for me?”',
+      a: 'No. You set the standards. You see budgets and move dates up front. You choose who gets the keys — RentEazy just brings you people who already match. Free to list, no per-let placement fee.',
+    },
     mechanism: ['List your property — free', 'Receive matched tenants with budgets & move dates set', 'Match → meet the right person → fill faster'],
     proof: 'stats',
     cta: 'List your property — free',
@@ -64,6 +80,14 @@ export const ROLE_CONTENT = {
     dream: {
       heading: 'Deal flow that finds you — by strategy, with the numbers attached.',
       sub: 'BTL, HMO, SA — matched to your criteria, with sourcers and operators whose track record and reputation are visible before you ever message. See who actually delivers — before you’re the one who got burned.',
+    },
+    enemy: {
+      heading: 'If it was blasted to a WhatsApp group, it isn’t a deal.',
+      line: 'Anyone can call themselves a sourcer — there’s no barrier to entry. The numbers are inflated until you’ve transacted, and you can’t tell a real operator from a course graduate until it’s too late.',
+    },
+    objection: {
+      q: '“How is this not another guru platform?”',
+      a: 'No course, no hype. Sourcers and operators earn reputation by adding proof — completed deals, track record, Companies House, redress registration on their own profile — visible before you message. You see who delivers. You still run your own diligence.',
     },
     mechanism: ['Set your criteria & strategy — free', 'Discover matched deals and credible sourcers', 'Build relationships with people who deliver'],
     proof: 'stats',

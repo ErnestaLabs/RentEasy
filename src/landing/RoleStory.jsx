@@ -2,11 +2,10 @@ import React from 'react';
 import { getRoleContent } from './roleContent.js';
 
 // Per-role narrative injected INTO the existing landing (Gen UI on the real
-// page — not a separate landing). Renders the chosen role's emotional arc:
-// problem (their exact pain) → dream (the experience) → mechanism (how).
-// This is what makes a landlord's page genuinely different from a tenant's,
-// without touching the beloved rotating-word hero. Honest: real pain, no
-// fabricated metrics.
+// page — NOT touching the rotating-word hero or the demo). Sequence follows the
+// VoC brief: pain (their words) → enemy (their distrust, named) → relief/mechanic
+// → objection handling → CTA. One audience, one promise per render.
+// Honest: real pain language; no fabricated metrics; no unbacked compliance claims.
 
 const display = "font-['Bricolage_Grotesque_Variable',Inter,sans-serif]";
 
@@ -15,8 +14,8 @@ export default function RoleStory({ profile = 'tenant' }) {
 
   return (
     <div data-role-story={profile}>
-      {/* ── PROBLEM — name their exact pain ─────────────────────────────── */}
-      <section className="max-w-3xl mx-auto px-6 py-16">
+      {/* ── 1 · PAIN — mirror it in their own words ─────────────────────── */}
+      <section className="max-w-3xl mx-auto px-6 pt-16 pb-10">
         <p
           className="font-['JetBrains_Mono',monospace] text-[11px] tracking-[0.16em] mb-3"
           style={{ color: rc.accent }}
@@ -38,8 +37,23 @@ export default function RoleStory({ profile = 'tenant' }) {
         </div>
       </section>
 
-      {/* ── DREAM — the experience on the other side ────────────────────── */}
-      <section className="max-w-5xl mx-auto px-6 pb-16">
+      {/* ── 2 · ENEMY — name what they already distrust ─────────────────── */}
+      {rc.enemy && (
+        <section className="max-w-3xl mx-auto px-6 pb-12">
+          <div className="rounded-3xl border border-[#f3d2d2] bg-[#fdf4f4] p-7 md:p-9">
+            <p className="font-['JetBrains_Mono',monospace] text-[10px] tracking-[0.18em] text-[#b91c1c]">
+              THE PART NO ONE FIXES
+            </p>
+            <h3 className={`${display} mt-2 text-2xl md:text-[1.7rem] font-normal leading-[1.15] tracking-tight text-slate-950`}>
+              {rc.enemy.heading}
+            </h3>
+            <p className="mt-3 text-base leading-7 font-light text-slate-600">{rc.enemy.line}</p>
+          </div>
+        </section>
+      )}
+
+      {/* ── 3 · RELIEF / MECHANIC — the dream, in plain words ───────────── */}
+      <section className="max-w-5xl mx-auto px-6 pb-12">
         <div className="relative overflow-hidden rounded-[2.5rem] bg-linear-to-br from-[#0d2e57] to-[#06182f] px-8 py-14 md:px-14 text-center shadow-[0_30px_70px_-45px_rgba(9,34,67,0.65)]">
           <div
             className="pointer-events-none absolute -top-24 left-1/2 h-64 w-64 -translate-x-1/2 rounded-full blur-[6rem] opacity-40"
@@ -54,8 +68,8 @@ export default function RoleStory({ profile = 'tenant' }) {
         </div>
       </section>
 
-      {/* ── MECHANISM — how it actually works for them ──────────────────── */}
-      <section className="max-w-7xl mx-auto px-6 pb-4">
+      {/* ── 4 · HOW IT WORKS — the match mechanic, stepwise ─────────────── */}
+      <section className="max-w-7xl mx-auto px-6 pb-12">
         <div className="grid gap-4 md:grid-cols-3">
           {rc.mechanism.map((step, i) => (
             <div
@@ -72,6 +86,31 @@ export default function RoleStory({ profile = 'tenant' }) {
             </div>
           ))}
         </div>
+      </section>
+
+      {/* ── 5 · OBJECTION — handle the reflex doubt ─────────────────────── */}
+      {rc.objection && (
+        <section className="max-w-3xl mx-auto px-6 pb-12">
+          <div className="rounded-3xl border border-white bg-white/82 p-7 md:p-9 shadow-[0_14px_34px_-26px_rgba(15,23,42,0.32)]">
+            <p className={`${display} text-xl md:text-2xl font-normal tracking-tight text-slate-900`}>
+              {rc.objection.q}
+            </p>
+            <p className="mt-3 text-base leading-7 font-light text-slate-600">{rc.objection.a}</p>
+          </div>
+        </section>
+      )}
+
+      {/* ── 6 · CTA — single action, their promise ──────────────────────── */}
+      <section className="max-w-3xl mx-auto px-6 pb-16 text-center">
+        <a
+          href={rc.ctaHref}
+          className="inline-flex items-center gap-2 rounded-full border border-[#25672a] bg-linear-to-b from-[#52a832] to-[#2f7d32] px-8 py-4 text-base font-medium text-white shadow-[0_12px_28px_rgba(47,125,50,0.3)]"
+        >
+          {rc.cta}
+        </a>
+        <p className="mt-3 font-['JetBrains_Mono',monospace] text-[10px] tracking-[0.14em] text-slate-400">
+          FREE TO START · NO CARD REQUIRED
+        </p>
       </section>
     </div>
   );
