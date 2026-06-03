@@ -9,8 +9,10 @@
 export const CONTENT = {
   tenant: {
     // Act 1 — INTERRUPT: word-by-word hook on pure black
-    // Target inner monologue: "it's 1am, I'm still on Rightmove, this place was gone before I even saw it"
-    hookWords: ['Still', 'refreshing', 'Rightmove', 'at', '1am?'],
+    // Target inner monologue: "it's 1am, I'm still on SpareRoom, that room was gone before I even messaged"
+    // SpareRoom is the UK's #1 rooms/flatshare platform — far more resonant for
+    // renters than Rightmove (which is agent/whole-property led).
+    hookWords: ['Still', 'refreshing', 'SpareRoom', 'at', '1am?'],
     hookSubline: 'You already know the answer isn\'t on there.',
 
     // Act 2 — IDENTIFY: pain cards that name the exact feeling
@@ -29,8 +31,8 @@ export const CONTENT = {
       'Every viewing you rush to is already gone.',
       'The market moves. You\'re always one day late.',
     ],
-    anguishLine: 'Rightmove wasn\'t built for you. It was built for volume.',
-    anguishAccent: 'volume',
+    anguishLine: 'SpareRoom rewards whoever messages first — not whoever fits.',
+    anguishAccent: 'not whoever fits',
 
     // Act 4 — BRIDGE: the pivot moment
     bridgeLine: 'What if the right place found you?',
@@ -48,7 +50,7 @@ export const CONTENT = {
     identityFrame: 'Stop searching. Start matching.',
     identityAccentWord: 'matching',
     ctaLabel: 'Find your match — it\'s free',
-    consequenceLine: 'Rightmove isn\'t going anywhere. Neither is the queue behind you.',
+    consequenceLine: 'SpareRoom isn\'t going anywhere. Neither is the queue behind you.',
   },
 
   landlord: {
