@@ -1204,7 +1204,7 @@ function Act7Close({ content }) {
         zIndex: 1,
       }}>
         <Img
-          src={staticFile('/images/renteazy-main-logo-transparent.png')}
+          src={staticFile('/images/renteazy-logo-2026-t.png')}
           style={{ width: 230, height: 'auto', display: 'block' }}
         />
       </div>

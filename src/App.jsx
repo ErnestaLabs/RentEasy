@@ -1,4 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import '@fontsource/poppins/400.css';
+import '@fontsource/poppins/700.css';
 import "iconify-icon";
 import { motion } from 'framer-motion';
 import { PricingTable, SignIn, SignInButton, SignUp, SignUpButton, UserButton, useAuth, useUser } from '@clerk/react';
@@ -114,71 +116,131 @@ const demoVisuals = [
   ['#12364f', '#82d57a', 'solar:garage-bold'],
 ];
 
-const demoImageSources = [
-  '/images/match-flat.jpg',
-  '/images/match-room.jpg',
-  '/images/match-flat-2.jpg',
-  '/images/match-room-2.jpg',
-  '/images/match-demo-01.jpg',
-  '/images/match-flat-3.jpg',
-  '/images/match-demo-02.jpg',
-  '/images/match-flat-4.jpg',
-  '/images/match-demo-03.jpg',
-  '/images/match-demo-04.jpg',
-  '/images/match-demo-05.jpg',
-  '/images/canary-wharf-studio-kitchen.jpg',
-  '/images/match-demo-06.jpg',
-  '/images/match-demo-07.jpg',
-  '/images/match-demo-08.jpg',
-  '/images/match-demo-09.jpg',
-  '/images/match-demo-10.jpg',
-  '/images/match-demo-11.jpg',
-  '/images/match-demo-12.jpg',
-  '/images/match-demo-13.jpg',
-  '/images/match-tenant.jpg',
-  '/images/match-agent.jpg',
-  '/images/match-demo-14.jpg',
-  '/images/match-demo-15.jpg',
-  '/images/match-demo-16.jpg',
-  '/images/match-demo-17.jpg',
-  '/images/match-demo-18.jpg',
-  '/images/match-demo-19.jpg',
-  '/images/match-demo-20.jpg',
-  '/images/match-demo-21.jpg',
-];
+const galleryImages = {
+  living: [
+    '/pexels/galleries/apartment-living-01.jpg',
+    '/pexels/galleries/apartment-living-02.jpg',
+    '/pexels/galleries/apartment-living-03.jpg',
+    '/pexels/galleries/apartment-living-04.jpg',
+    '/pexels/galleries/apartment-living-05.jpg',
+    '/pexels/galleries/apartment-living-06.jpg',
+    '/pexels/galleries/apartment-living-07.jpg',
+    '/pexels/galleries/apartment-living-08.jpg',
+  ],
+  bedroom: [
+    '/pexels/galleries/apartment-bedroom-01.jpg',
+    '/pexels/galleries/apartment-bedroom-02.jpg',
+    '/pexels/galleries/apartment-bedroom-03.jpg',
+    '/pexels/galleries/apartment-bedroom-04.jpg',
+    '/pexels/galleries/apartment-bedroom-05.jpg',
+    '/pexels/galleries/apartment-bedroom-06.jpg',
+    '/pexels/galleries/apartment-bedroom-07.jpg',
+    '/pexels/galleries/apartment-bedroom-08.jpg',
+  ],
+  kitchen: [
+    '/pexels/galleries/apartment-kitchen-01.jpg',
+    '/pexels/galleries/apartment-kitchen-02.jpg',
+    '/pexels/galleries/apartment-kitchen-03.jpg',
+    '/pexels/galleries/apartment-kitchen-04.jpg',
+    '/pexels/galleries/apartment-kitchen-05.jpg',
+    '/pexels/galleries/apartment-kitchen-06.jpg',
+    '/pexels/galleries/apartment-kitchen-07.jpg',
+    '/pexels/galleries/apartment-kitchen-08.jpg',
+  ],
+  bathroom: [
+    '/pexels/galleries/flat-bathroom-01.jpg',
+    '/pexels/galleries/flat-bathroom-02.jpg',
+    '/pexels/galleries/flat-bathroom-03.jpg',
+    '/pexels/galleries/flat-bathroom-04.jpg',
+    '/pexels/galleries/flat-bathroom-05.jpg',
+    '/pexels/galleries/flat-bathroom-06.jpg',
+  ],
+  studio: [
+    '/pexels/galleries/studio-flat-01.jpg',
+    '/pexels/galleries/studio-flat-02.jpg',
+    '/pexels/galleries/studio-flat-03.jpg',
+    '/pexels/galleries/studio-flat-04.jpg',
+    '/pexels/galleries/studio-flat-05.jpg',
+    '/pexels/galleries/studio-flat-06.jpg',
+    '/pexels/galleries/studio-flat-07.jpg',
+    '/pexels/galleries/studio-flat-08.jpg',
+  ],
+  exterior: [
+    '/pexels/galleries/house-exterior-01.jpg',
+    '/pexels/galleries/house-exterior-02.jpg',
+    '/pexels/galleries/house-exterior-03.jpg',
+    '/pexels/galleries/house-exterior-04.jpg',
+    '/pexels/galleries/house-exterior-05.jpg',
+    '/pexels/galleries/house-exterior-06.jpg',
+  ],
+  shared: [
+    '/pexels/galleries/shared-house-01.jpg',
+    '/pexels/galleries/shared-house-02.jpg',
+    '/pexels/galleries/shared-house-03.jpg',
+    '/pexels/galleries/shared-house-04.jpg',
+    '/pexels/galleries/shared-house-05.jpg',
+    '/pexels/galleries/shared-house-06.jpg',
+  ],
+  tenant: [
+    '/pexels/people/tenant-profile-01.jpg',
+    '/pexels/people/tenant-profile-02.jpg',
+    '/pexels/people/tenant-profile-03.jpg',
+    '/pexels/people/tenant-profile-04.jpg',
+    '/pexels/people/tenant-profile-05.jpg',
+    '/pexels/people/tenant-profile-06.jpg',
+  ],
+  buddyPeople: [
+    '/pexels/people/house-buddy-01.jpg',
+    '/pexels/people/house-buddy-02.jpg',
+    '/pexels/people/house-buddy-03.jpg',
+    '/pexels/people/house-buddy-04.jpg',
+    '/pexels/people/house-buddy-05.jpg',
+    '/pexels/people/house-buddy-06.jpg',
+  ],
+  agentPeople: [
+    '/pexels/people/agent-profile-01.jpg',
+    '/pexels/people/agent-profile-02.jpg',
+    '/pexels/people/agent-profile-03.jpg',
+    '/pexels/people/agent-profile-04.jpg',
+    '/pexels/people/agent-profile-05.jpg',
+  ],
+  landlordPeople: [
+    '/pexels/people/landlord-profile-01.jpg',
+    '/pexels/people/landlord-profile-02.jpg',
+    '/pexels/people/landlord-profile-03.jpg',
+    '/pexels/people/landlord-profile-04.jpg',
+    '/pexels/people/landlord-profile-05.jpg',
+  ],
+  investorPeople: [
+    '/pexels/people/investor-profile-01.jpg',
+    '/pexels/people/investor-profile-02.jpg',
+    '/pexels/people/investor-profile-03.jpg',
+    '/pexels/people/investor-profile-04.jpg',
+  ],
+};
 
-const demoImagePositions = [
-  '74% center',
-  'center',
-  '48% center',
-  'center',
-  '58% center',
-  'center',
-  '42% center',
-  '62% center',
-  '55% center',
-  '48% center',
-  '56% center',
-  'center',
-  '45% center',
-  '60% center',
-  '50% center',
-  '54% center',
-  '58% center',
-  '46% center',
-  '52% center',
-  '56% center',
-  'center top',
-  'center top',
-  'center top',
-  'center top',
-  'center top',
-  '52% center',
-  '56% center',
-  '48% center',
-  '50% center',
-  '55% center',
-];
+const swipeGalleryBlueprints = {
+  flat: ['living', 'kitchen', 'bedroom', 'bathroom'],
+  room: ['bedroom', 'shared', 'kitchen', 'bathroom'],
+  studio: ['studio', 'kitchen', 'bathroom', 'living'],
+  house: ['exterior', 'living', 'bedroom', 'kitchen'],
+  tenant: ['tenant', 'tenant', 'living', 'bedroom'],
+  landlord: ['landlordPeople', 'exterior', 'living', 'kitchen'],
+  agent: ['agentPeople', 'living', 'kitchen', 'bedroom'],
+  operator: ['agentPeople', 'living', 'studio', 'kitchen'],
+  investor: ['investorPeople', 'exterior', 'living', 'kitchen'],
+  buddy: ['buddyPeople', 'buddyPeople', 'bedroom', 'shared'],
+  'short stay': ['studio', 'living', 'kitchen', 'bathroom'],
+};
+
+function buildConsistentGallery(type, index, length = 4) {
+  const blueprint = swipeGalleryBlueprints[type] || swipeGalleryBlueprints.flat;
+  return Array.from({ length }, (_, offset) => {
+    const bucket = blueprint[offset % blueprint.length];
+    const images = galleryImages[bucket] || galleryImages.living;
+    return images[(index + offset * 2) % images.length];
+  });
+}
 
 const demoCardData = [
   ['stratford-1-bed', 'flat', 'Stratford 1-bed', 'Stratford', '£1,650 pcm', 88, 'Available 12 June', '8 min walk to station', ['Budget fit', 'No red flags', 'Viewing slots']],
@@ -199,6 +261,8 @@ const demoCardData = [
   ['croydon-2-bed', 'house', 'Croydon 2-bed', 'Croydon', '£1,550 pcm', 86, 'Family fit', 'Garden and parking', ['Garden', 'Parking', 'Good value']],
   ['deptford-house-share', 'house', 'Deptford house share', 'Deptford', '£820 pcm', 90, 'Room open', 'Four-bed house, social kitchen', ['House share', 'Budget win', 'Social']],
   ['finsbury-park-flat', 'flat', 'Finsbury Park flat', 'Finsbury Park', '£1,690 pcm', 87, 'Verified source', 'Piccadilly line, furnished', ['Verified', 'Furnished', 'Commute fit']],
+  ['viewing-ready-tenant', 'tenant', 'Viewing-ready tenant', 'East London', '£1,450 budget', 90, 'Move in 3 weeks', 'References, viewing windows and affordability ready', ['Tenant profile', 'Ready to view', 'Budget clear']],
+  ['self-employed-renter', 'tenant', 'Self-employed renter', 'Hackney / Islington', '£1,550 budget', 86, 'Profile complete', 'Contracts, accounts and references prepared', ['Tenant profile', 'Human review', 'Documents ready']],
   ['bow-landlord-opportunity', 'landlord', 'Bow landlord opportunity', 'East London', 'Tenant or operator wanted', 85, 'Flexible instruction', 'Owner open to direct or agent route', ['Landlord card', 'Operator possible', 'Agent option']],
   ['shepherds-bush-studio', 'studio', "Shepherd's Bush studio", "Shepherd's Bush", '£1,470 pcm', 83, 'Available soon', 'Westfield nearby, furnished', ['Studio', 'West London', 'Furnished']],
   ['find-house-buddy', 'buddy', 'Find a house buddy', 'East London', '£950 budget', 92, 'Buddy ready', 'Clean, quiet, move in July', ['Buddy match', 'Quiet home', 'July move']],
@@ -215,6 +279,7 @@ const demoCardData = [
 
 const heroSwipeCards = demoCardData.map(([id, type, title, location, price, matchScore, availability, detailLine, badges], index) => {
   const [from, to, icon] = demoVisuals[index % demoVisuals.length];
+  const gallery = buildConsistentGallery(type, index);
   return {
     id,
     type,
@@ -225,9 +290,10 @@ const heroSwipeCards = demoCardData.map(([id, type, title, location, price, matc
     availability,
     detailLine,
     badges,
-    imageSrc: demoImageSources[index],
+    gallery,
+    imageSrc: gallery[0],
     imageAlt: `${title} demo card`,
-    imagePosition: demoImagePositions[index] || (type === 'buddy' ? 'center top' : 'center'),
+    imagePosition: 'center',
     visual: { from, to, icon, index },
   };
 });
@@ -315,6 +381,138 @@ const matchRoleIcon = {
   Investor: ['solar:graph-up-bold', '#9bd383'],
   Opportunity: ['solar:buildings-2-bold', '#5bc4ff'],
 };
+
+const openPeepsBustAvatars = Array.from({ length: 105 }, (_, index) => `/open-peeps/bust/peep-${index + 1}.png`);
+const openPeepsStandingAvatars = Array.from({ length: 30 }, (_, index) => `/open-peeps/standing/peep-standing-${index + 1}.png`);
+const openPeepsSittingAvatars = [1, 2, 4, 5, 6, 7, 9, 10, 11, 12, 14, 15, 17, 18].map((index) => `/open-peeps/sitting/peep-sitting-${index}.png`);
+
+function getPeepAvatarSrc(seed = '', variant = 'bust', avatarIndex = null) {
+  const pool = variant === 'standing'
+    ? openPeepsStandingAvatars
+    : variant === 'sitting'
+      ? openPeepsSittingAvatars
+      : openPeepsBustAvatars;
+  const index = Number.isFinite(Number(avatarIndex)) ? Number(avatarIndex) : Math.abs(stableHash(seed));
+  return pool[Math.abs(index) % pool.length] || openPeepsBustAvatars[0];
+}
+
+const avatarBackgrounds = {
+  mist: 'bg-[#edf7ff]',
+  green: 'bg-[#edf8ee]',
+  navy: 'bg-[#092243]',
+  sun: 'bg-[#fff7ed]',
+  blush: 'bg-[#fff1f2]',
+};
+
+const avatarBackgroundOptions = [
+  ['mist', 'Mist', 'bg-[#edf7ff]'],
+  ['green', 'Green', 'bg-[#edf8ee]'],
+  ['navy', 'Navy', 'bg-[#092243]'],
+  ['sun', 'Sun', 'bg-[#fff7ed]'],
+  ['blush', 'Blush', 'bg-[#fff1f2]'],
+];
+
+const avatarVariantOptions = [
+  ['bust', 'Bust'],
+  ['standing', 'Standing'],
+  ['sitting', 'Sitting'],
+];
+
+function PeepAvatar({ seed, variant = 'bust', avatarIndex = null, avatarBg = 'mist', className = 'h-11 w-11', imageClassName = '', ring = 'ring-1 ring-[#cfe9fb]' }) {
+  return (
+    <span className={`relative grid shrink-0 place-items-center overflow-hidden rounded-full ${avatarBackgrounds[avatarBg] || avatarBackgrounds.mist} ${ring} ${className}`}>
+      <img src={getPeepAvatarSrc(seed, variant, avatarIndex)} alt="" className={`h-full w-full object-cover object-top ${imageClassName}`} loading="lazy" />
+    </span>
+  );
+}
+
+function getAvatarPool(variant = 'bust') {
+  if (variant === 'standing') return openPeepsStandingAvatars;
+  if (variant === 'sitting') return openPeepsSittingAvatars;
+  return openPeepsBustAvatars;
+}
+
+function AvatarCustomizer({ profile, setProfile }) {
+  const variant = profile.avatarVariant || 'standing';
+  const avatarBg = profile.avatarBg || 'mist';
+  const selectedIndex = Number.isFinite(Number(profile.avatarIndex)) ? Number(profile.avatarIndex) : 0;
+  const pool = getAvatarPool(variant);
+  const visibleAvatars = pool.slice(0, variant === 'bust' ? 24 : 18);
+  const isFullBody = variant !== 'bust';
+
+  const updateAvatar = (patch) => {
+    setProfile((current) => ({
+      ...current,
+      ...patch,
+    }));
+  };
+
+  return (
+    <div className="rounded-[1.75rem] border border-white bg-white/90 p-5 shadow-[0_18px_44px_-34px_rgba(15,23,42,0.45),inset_0_1px_0_white]">
+      <div className="flex items-center justify-between gap-3">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#2670a8]">Avatar</p>
+          <h2 className="mt-1 text-2xl font-semibold tracking-tight text-slate-950">Choose your look</h2>
+        </div>
+        <PeepAvatar
+          seed={`${profile.id}-${profile.name}-${profile.role}`}
+          variant={variant}
+          avatarIndex={selectedIndex}
+          avatarBg={avatarBg}
+          className="h-16 w-16 rounded-[1.2rem]"
+          ring="ring-1 ring-slate-200"
+          imageClassName={isFullBody ? 'object-contain p-1' : ''}
+        />
+      </div>
+
+      <div className="mt-4 grid grid-cols-3 gap-1 rounded-full bg-[#edf3f7] p-1">
+        {avatarVariantOptions.map(([value, label]) => (
+          <button
+            key={value}
+            type="button"
+            onClick={() => updateAvatar({ avatarVariant: value, avatarIndex: 0 })}
+            className={`rounded-full px-3 py-2 text-xs font-semibold transition ${variant === value ? 'bg-[#092243] text-white shadow-[0_10px_24px_-18px_rgba(9,34,67,0.8)]' : 'text-slate-500 hover:text-slate-900'}`}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
+      <div className="mt-4 grid grid-cols-6 gap-2">
+        {visibleAvatars.map((src, index) => {
+          const selected = selectedIndex === index;
+          return (
+            <button
+              key={src}
+              type="button"
+              onClick={() => updateAvatar({ avatarIndex: index })}
+              className={`relative aspect-square overflow-hidden rounded-2xl transition ${avatarBackgrounds[avatarBg] || avatarBackgrounds.mist} ${selected ? 'ring-2 ring-[#2f7d32] ring-offset-2 ring-offset-white' : 'ring-1 ring-slate-200 hover:ring-[#8bdc65]'}`}
+              aria-label={`Choose avatar ${index + 1}`}
+            >
+              <img src={src} alt="" className={`h-full w-full ${isFullBody ? 'object-contain p-1' : 'object-cover object-top'}`} loading="lazy" />
+              {selected && <span className="absolute right-1 top-1 h-2.5 w-2.5 rounded-full bg-[#2f7d32] ring-2 ring-white" />}
+            </button>
+          );
+        })}
+      </div>
+
+      <div className="mt-4 flex items-center justify-between gap-3">
+        <span className="text-sm font-medium text-slate-600">Background</span>
+        <div className="flex gap-2">
+          {avatarBackgroundOptions.map(([value, label, className]) => (
+            <button
+              key={value}
+              type="button"
+              onClick={() => updateAvatar({ avatarBg: value })}
+              className={`h-8 w-8 rounded-full ${className} ${avatarBg === value ? 'ring-2 ring-[#092243] ring-offset-2 ring-offset-white' : 'ring-1 ring-slate-200'}`}
+              aria-label={`Use ${label} avatar background`}
+            />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 const paidMechanics = [
   {
@@ -600,6 +798,9 @@ const defaultAppProfile = {
   budget: '',
   moveDate: '',
   lookingFor: '',
+  avatarVariant: 'standing',
+  avatarIndex: 0,
+  avatarBg: 'mist',
 };
 
 const matchingQuestions = {
@@ -644,7 +845,7 @@ const seededFeedPosts = [
     postType: 'Room',
     title: 'Double room near Stratford station',
     body: 'Bright furnished room in a clean flatshare. Best for someone moving within the next few weeks and wanting a quick viewing slot.',
-    media: ['/images/match-room.jpg'],
+    media: ['/pexels/images/stratford-room.jpg'],
     area: 'Stratford',
     budget: '£925 pcm',
     tags: ['Bills included', 'Zone 2/3', 'Viewing slots'],
@@ -665,7 +866,7 @@ const seededFeedPosts = [
     postType: 'Looking',
     title: 'Looking for a calm room in Hackney or Bow',
     body: 'Budget up to £1,050. Hybrid worker, tidy, ready to view this week. Open to buddying up for the right two-bed.',
-    media: [],
+    media: ['/pexels/images/hackney-tenant.jpg'],
     area: 'Hackney / Bow',
     budget: 'Up to £1,050 pcm',
     tags: ['Ready to view', 'Buddy-up possible', 'Hybrid worker'],
@@ -686,7 +887,7 @@ const seededFeedPosts = [
     postType: 'House Buddy',
     title: 'Buddy-up for a two-bed in Clapham',
     body: 'Looking for one person to team up with for a tidy two-bed. I can move from mid-July and prefer somewhere close to Northern line.',
-    media: ['/images/match-tenant.jpg'],
+    media: ['/pexels/images/clapham-buddy.jpg'],
     area: 'Clapham',
     budget: '£1,100 each',
     tags: ['Mid-July', 'Two-bed search', 'Northern line'],
@@ -707,7 +908,7 @@ const seededFeedPosts = [
     postType: 'Short-Term Stay',
     title: 'Flexible Shoreditch stay for relocations',
     body: 'Furnished studio available for short stays while you search properly. Weekly pricing, fast Wi-Fi, and flexible checkout.',
-    media: ['/images/match-demo-16.jpg'],
+    media: ['/pexels/videos/city-apartment.mp4'],
     area: 'Shoreditch',
     budget: 'From £89/night',
     tags: ['Flexible stay', 'Relocation', 'Furnished'],
@@ -728,7 +929,7 @@ const seededFeedPosts = [
     postType: 'Landlord Opportunity',
     title: 'Bow landlord open to tenant or agent route',
     body: 'One-bed flat coming up. I am open to a direct tenant match or speaking with a local agent who already has a suitable renter.',
-    media: ['/images/match-demo-06.jpg'],
+    media: ['/pexels/images/bow-landlord-flat.jpg'],
     area: 'Bow',
     budget: '£1,650 pcm guide',
     tags: ['Direct possible', 'Agent intro', 'Available soon'],
@@ -749,7 +950,7 @@ const seededFeedPosts = [
     postType: 'Investor Brief',
     title: 'Investor looking for Manchester/Liverpool options',
     body: 'Budget £250k-£450k. Interested in buy-to-let and serviced options with clean numbers and clear area reasoning.',
-    media: [],
+    media: ['/pexels/images/northwest-investor.jpg'],
     area: 'Manchester / Liverpool',
     budget: '£250k-£450k',
     tags: ['Investor brief', 'Sourcer wanted', 'Numbers first'],
@@ -770,7 +971,7 @@ const seededFeedPosts = [
     postType: 'Area Insight',
     title: 'Canary Wharf rooms are moving fastest under £1,000',
     body: 'If you are looking around Canary Wharf, rooms with bills included under £1,000 are moving quickly. Have your move date and viewing times ready.',
-    media: [],
+    media: ['/pexels/images/canary-area-insight.jpg'],
     area: 'Canary Wharf',
     budget: 'Under £1,000 rooms',
     tags: ['Area insight', 'Room search', 'Viewing tip'],
@@ -791,7 +992,7 @@ const seededFeedPosts = [
     postType: 'Agent Update',
     title: 'Saturday viewing slots open in Greenwich',
     body: 'Three rooms and one studio have Saturday viewings available. Best for renters with documents ready and flexible move timing.',
-    media: ['/images/match-demo-04.jpg'],
+    media: ['/pexels/videos/agent-walkthrough.mp4'],
     area: 'Greenwich',
     budget: 'Rooms from £890 pcm',
     tags: ['Viewing slots', 'Documents ready', 'Greenwich'],
@@ -812,7 +1013,7 @@ const seededFeedPosts = [
     postType: 'Operator Offer',
     title: 'West London operator looking for compliant stock',
     body: 'Management and co-hosting routes available for landlords with furnished homes near transport. Clear handover process and monthly reporting.',
-    media: ['/images/match-demo-18.jpg'],
+    media: ['/pexels/images/operator-west-london.jpg'],
     area: 'West London',
     budget: 'Management / co-hosting',
     tags: ['Operator', 'Co-hosting', 'Monthly reporting'],
@@ -833,7 +1034,7 @@ const seededFeedPosts = [
     postType: 'Sourcer Deal',
     title: 'Leeds student-house brief for active investors',
     body: 'Looking for investors interested in student lets around Headingley and Hyde Park. Numbers-first summaries only, no return guarantees.',
-    media: ['/images/match-demo-20.jpg'],
+    media: ['/pexels/images/leeds-student-house.jpg'],
     area: 'Leeds',
     budget: 'Investor brief',
     tags: ['Sourcer', 'Student lets', 'Numbers first'],
@@ -854,7 +1055,7 @@ const seededFeedPosts = [
     postType: 'Question',
     title: 'What should I prepare before a same-day viewing?',
     body: 'I have a viewing this evening and want to be ready without oversharing. What documents or questions usually help?',
-    media: [],
+    media: ['/pexels/images/referencing-question.jpg'],
     area: 'London',
     budget: 'Advice needed',
     tags: ['Question', 'Viewing', 'Referencing'],
@@ -875,7 +1076,7 @@ const seededFeedPosts = [
     postType: 'Availability',
     title: 'Relocation stay open from Monday',
     body: 'Furnished one-bed available weekly for relocations while you search longer-term. Bills included and flexible extension possible.',
-    media: ['/images/match-demo-16.jpg'],
+    media: ['/pexels/videos/rental-feed-scroll.mp4'],
     area: 'Manchester',
     budget: '£620/week',
     tags: ['Availability', 'Relocation', 'Bills included'],
@@ -889,6 +1090,943 @@ const seededFeedPosts = [
     shareCount: 0,
   },
 ];
+
+const vocSeededFeedPosts = [
+  {
+    id: 'voc-tenant-ghosted-viewing',
+    authorId: 'tenant-jules',
+    authorType: 'Tenant',
+    authorName: 'Jules M.',
+    postType: 'Question',
+    title: 'Is it normal to get no reply after a viewing?',
+    body: 'Viewed a room, sent my availability and documents, then nothing. I would rather get a clear no than sit refreshing messages for days.',
+    media: ['/pexels/images/referencing-question.jpg'],
+    area: 'London',
+    budget: 'Advice needed',
+    tags: ['Ghosting', 'Viewing follow-up', 'Clear replies'],
+    visibility: 'public',
+    sponsoredStatus: null,
+    createdAt: '2026-06-04T11:40:00.000Z',
+    updatedAt: '2026-06-04T11:40:00.000Z',
+    likeCount: 18,
+    commentCount: 7,
+    saveCount: 11,
+    shareCount: 2,
+  },
+  {
+    id: 'voc-agent-callback-window',
+    authorId: 'agent-dockside',
+    authorType: 'Agent',
+    authorName: 'Dockside Lettings',
+    postType: 'Agent Update',
+    title: 'Canary Wharf rooms: reply window today',
+    body: 'If you matched on a bills-included room under £1,000, send move date and viewing windows today. We are closing the shortlist tonight.',
+    media: ['/pexels/images/canary-area-insight.jpg'],
+    area: 'Canary Wharf',
+    budget: 'Under £1,000 rooms',
+    tags: ['Reply window', 'Bills included', 'Shortlist'],
+    visibility: 'public',
+    sponsoredStatus: null,
+    createdAt: '2026-06-04T11:20:00.000Z',
+    updatedAt: '2026-06-04T11:20:00.000Z',
+    likeCount: 24,
+    commentCount: 5,
+    saveCount: 19,
+    shareCount: 4,
+  },
+  {
+    id: 'voc-renter-referencing-self-employed',
+    authorId: 'tenant-omar',
+    authorType: 'Tenant',
+    authorName: 'Omar H.',
+    postType: 'Looking',
+    title: 'Self-employed renter with clean records',
+    body: 'I can show contracts, accounts, references and deposit. Looking for a landlord who will read the full profile instead of auto-rejecting me.',
+    media: ['/pexels/images/hackney-tenant.jpg'],
+    area: 'Hackney / Islington',
+    budget: 'Up to £1,450 pcm',
+    tags: ['Self-employed', 'Referencing', 'Human review'],
+    visibility: 'public',
+    sponsoredStatus: null,
+    createdAt: '2026-06-04T10:50:00.000Z',
+    updatedAt: '2026-06-04T10:50:00.000Z',
+    likeCount: 31,
+    commentCount: 12,
+    saveCount: 16,
+    shareCount: 3,
+  },
+  {
+    id: 'voc-single-renter-zone2',
+    authorId: 'tenant-sarah',
+    authorType: 'Tenant',
+    authorName: 'Sarah L.',
+    postType: 'Looking',
+    title: 'Single professional looking without a bidding war',
+    body: 'Stable income, strong references, no pets. I am trying to avoid another best-and-final race where couples or upfront rent always win.',
+    media: ['/pexels/images/feed-moving.jpg'],
+    area: 'Zone 2 London',
+    budget: 'Up to £1,600 pcm',
+    tags: ['Single renter', 'No bidding war', 'References ready'],
+    visibility: 'public',
+    sponsoredStatus: null,
+    createdAt: '2026-06-04T10:25:00.000Z',
+    updatedAt: '2026-06-04T10:25:00.000Z',
+    likeCount: 27,
+    commentCount: 9,
+    saveCount: 14,
+    shareCount: 4,
+  },
+  {
+    id: 'voc-scam-warning-bank-transfer',
+    authorId: 'tenant-nina',
+    authorType: 'Tenant',
+    authorName: 'Nina P.',
+    postType: 'Advice',
+    title: 'Red flag: asked to pay outside the platform',
+    body: 'A listing looked cheap, then the contact wanted money sent directly before viewing. I reported it. Do not pay deposits before verifying the source.',
+    media: ['/pexels/images/referencing-question.jpg'],
+    area: 'UK',
+    budget: 'Safety warning',
+    tags: ['Scam/fraud', 'Deposit safety', 'Report'],
+    visibility: 'public',
+    sponsoredStatus: null,
+    createdAt: '2026-06-04T09:55:00.000Z',
+    updatedAt: '2026-06-04T09:55:00.000Z',
+    likeCount: 46,
+    commentCount: 15,
+    saveCount: 39,
+    shareCount: 11,
+  },
+  {
+    id: 'voc-room-bills-clarity',
+    authorId: 'agent-eastline',
+    authorType: 'Agent',
+    authorName: 'Eastline Rooms',
+    postType: 'Room',
+    title: 'Bills-included double room in Bow',
+    body: 'Clean double room with council tax, broadband and utilities included. We will only message matched renters who have a move date and budget filled in.',
+    media: ['/pexels/images/feed-room-1.jpg'],
+    area: 'Bow',
+    budget: '£975 pcm',
+    tags: ['Bills included', 'Matched renters only', 'Move date needed'],
+    visibility: 'public',
+    sponsoredStatus: 'Boosted',
+    createdAt: '2026-06-04T09:35:00.000Z',
+    updatedAt: '2026-06-04T09:35:00.000Z',
+    likeCount: 35,
+    commentCount: 6,
+    saveCount: 29,
+    shareCount: 5,
+  },
+  {
+    id: 'voc-flatshare-adults',
+    authorId: 'buddy-ellie',
+    authorType: 'House Buddy',
+    authorName: 'Ellie C.',
+    postType: 'House Buddy',
+    title: 'Adult flatshare without chaos',
+    body: 'Looking for one person for a calm home, not a party house. Clean shared spaces, predictable bills, and direct communication matter most.',
+    media: ['/pexels/images/clapham-buddy.jpg'],
+    area: 'Brixton / Clapham',
+    budget: '£950-£1,150 each',
+    tags: ['Calm home', 'Shared responsibilities', 'Bills clarity'],
+    visibility: 'public',
+    sponsoredStatus: null,
+    createdAt: '2026-06-04T09:10:00.000Z',
+    updatedAt: '2026-06-04T09:10:00.000Z',
+    likeCount: 22,
+    commentCount: 10,
+    saveCount: 17,
+    shareCount: 3,
+  },
+  {
+    id: 'voc-landlord-prescreen-form',
+    authorId: 'landlord-dan',
+    authorType: 'Landlord',
+    authorName: 'Dan W.',
+    postType: 'Landlord Update',
+    title: 'Pre-screen before I offer viewings',
+    body: 'Last listing had huge enquiry volume and too many no-shows. I am only booking people with budget, move date, household details and viewing times completed.',
+    media: ['/pexels/images/feed-landlord.jpg'],
+    area: 'Croydon',
+    budget: 'Rooms from £850 pcm',
+    tags: ['Pre-screening', 'No-shows', 'Viewing slots'],
+    visibility: 'public',
+    sponsoredStatus: null,
+    createdAt: '2026-06-04T08:45:00.000Z',
+    updatedAt: '2026-06-04T08:45:00.000Z',
+    likeCount: 40,
+    commentCount: 18,
+    saveCount: 20,
+    shareCount: 6,
+  },
+  {
+    id: 'voc-landlord-void-period',
+    authorId: 'landlord-maria',
+    authorType: 'Landlord',
+    authorName: 'Maria G.',
+    postType: 'Landlord Opportunity',
+    title: 'Small flat, need fewer viewings and better fit',
+    body: 'The flat is ready. I would rather speak to five suitable renters than handle another week of open enquiries that go nowhere.',
+    media: ['/pexels/images/bow-landlord-flat.jpg'],
+    area: 'Walthamstow',
+    budget: '£1,575 pcm',
+    tags: ['Void period', 'Suitable renters', 'Direct let'],
+    visibility: 'public',
+    sponsoredStatus: null,
+    createdAt: '2026-06-04T08:25:00.000Z',
+    updatedAt: '2026-06-04T08:25:00.000Z',
+    likeCount: 29,
+    commentCount: 8,
+    saveCount: 21,
+    shareCount: 2,
+  },
+  {
+    id: 'voc-landlord-agent-fee',
+    authorId: 'landlord-colin',
+    authorType: 'Landlord',
+    authorName: 'Colin B.',
+    postType: 'Question',
+    title: 'When is an agent worth the management fee?',
+    body: 'I do not mind paying for useful work. I do mind paying percentages and then doing the chasing, statements and tenant checks myself.',
+    media: ['/pexels/images/feed-office-agent.jpg'],
+    area: 'Birmingham',
+    budget: 'Landlord question',
+    tags: ['Agent fees', 'Management', 'Vetting control'],
+    visibility: 'public',
+    sponsoredStatus: null,
+    createdAt: '2026-06-04T08:05:00.000Z',
+    updatedAt: '2026-06-04T08:05:00.000Z',
+    likeCount: 33,
+    commentCount: 16,
+    saveCount: 15,
+    shareCount: 4,
+  },
+  {
+    id: 'voc-agent-quality-viewings',
+    authorId: 'agent-harbour',
+    authorType: 'Agent',
+    authorName: 'Harbour & Co',
+    postType: 'Agent Update',
+    title: 'Greenwich viewings: confirmed renters only',
+    body: 'We are trialling confirmation checks before Saturday slots. It protects renters from wasted trips and landlords from empty appointments.',
+    media: ['/pexels/videos/agent-walkthrough.mp4'],
+    area: 'Greenwich',
+    budget: 'Rooms £890-£1,100',
+    tags: ['Confirmed viewing', 'No-show reduction', 'Documents ready'],
+    visibility: 'public',
+    sponsoredStatus: null,
+    createdAt: '2026-06-04T07:45:00.000Z',
+    updatedAt: '2026-06-04T07:45:00.000Z',
+    likeCount: 26,
+    commentCount: 7,
+    saveCount: 18,
+    shareCount: 3,
+  },
+  {
+    id: 'voc-tenant-deposit-return',
+    authorId: 'tenant-reece',
+    authorType: 'Tenant',
+    authorName: 'Reece J.',
+    postType: 'Advice',
+    title: 'How do you protect your deposit trail?',
+    body: 'I am moving soon and want a clean record: photos, inventory, messages and checkout notes. What should be logged before keys are handed over?',
+    media: ['/pexels/images/feed-moving.jpg'],
+    area: 'Manchester',
+    budget: 'Move-out checklist',
+    tags: ['Deposit', 'Protect', 'Move-out record'],
+    visibility: 'public',
+    sponsoredStatus: null,
+    createdAt: '2026-06-03T18:30:00.000Z',
+    updatedAt: '2026-06-03T18:30:00.000Z',
+    likeCount: 38,
+    commentCount: 14,
+    saveCount: 34,
+    shareCount: 7,
+  },
+  {
+    id: 'voc-short-stay-between-homes',
+    authorId: 'host-bridge',
+    authorType: 'Short-Term Host',
+    authorName: 'BridgeStay',
+    postType: 'Short-Term Stay',
+    title: 'Weekly stay for renters between homes',
+    body: 'Furnished studio for people stuck between viewings, referencing and move-in dates. Weekly extension possible, bills included.',
+    media: ['/pexels/videos/city-apartment.mp4'],
+    area: 'Shoreditch',
+    budget: '£615/week',
+    tags: ['Between homes', 'Bills included', 'Flexible extension'],
+    visibility: 'public',
+    sponsoredStatus: 'Promoted',
+    createdAt: '2026-06-03T17:50:00.000Z',
+    updatedAt: '2026-06-03T17:50:00.000Z',
+    likeCount: 21,
+    commentCount: 4,
+    saveCount: 25,
+    shareCount: 5,
+  },
+  {
+    id: 'voc-operator-compliant-stock',
+    authorId: 'operator-keysafe',
+    authorType: 'Operator',
+    authorName: 'KeySafe Stays',
+    postType: 'Operator Offer',
+    title: 'Operator seeking compliant furnished homes',
+    body: 'Looking for landlords who want management or co-hosting with clear reporting. Not interested in unclear lease positions or poor handover records.',
+    media: ['/pexels/images/operator-west-london.jpg'],
+    area: 'West London',
+    budget: 'Management / co-hosting',
+    tags: ['Operator fit', 'Compliance', 'Monthly reporting'],
+    visibility: 'public',
+    sponsoredStatus: 'Sponsored',
+    createdAt: '2026-06-03T17:20:00.000Z',
+    updatedAt: '2026-06-03T17:20:00.000Z',
+    likeCount: 19,
+    commentCount: 6,
+    saveCount: 18,
+    shareCount: 4,
+  },
+  {
+    id: 'voc-investor-deals-stack-up',
+    authorId: 'investor-raj',
+    authorType: 'Investor',
+    authorName: 'Raj V.',
+    postType: 'Investor Brief',
+    title: 'Send numbers that survive due diligence',
+    body: 'Open to North West BTL and HMO leads, but I need rent comparables, refurb assumptions, financing notes and source transparency before a call.',
+    media: ['/pexels/images/northwest-investor.jpg'],
+    area: 'Manchester / Liverpool',
+    budget: '£180k-£420k',
+    tags: ['Due diligence', 'BTL', 'HMO', 'Numbers first'],
+    visibility: 'public',
+    sponsoredStatus: null,
+    createdAt: '2026-06-03T16:40:00.000Z',
+    updatedAt: '2026-06-03T16:40:00.000Z',
+    likeCount: 44,
+    commentCount: 20,
+    saveCount: 32,
+    shareCount: 8,
+  },
+  {
+    id: 'voc-sourcer-compliance-visible',
+    authorId: 'sourcer-mersey',
+    authorType: 'Sourcer',
+    authorName: 'Mersey Property Desk',
+    postType: 'Sourcer Deal',
+    title: 'Liverpool deal pack with compliance notes',
+    body: 'Two-bed refurb lead with source notes, rent evidence, fees shown plainly and compliance checklist attached. Investors can ask for missing assumptions.',
+    media: ['/pexels/images/leeds-student-house.jpg'],
+    area: 'Liverpool',
+    budget: '£145k guide',
+    tags: ['Compliance visible', 'Rent evidence', 'Fees shown'],
+    visibility: 'public',
+    sponsoredStatus: null,
+    createdAt: '2026-06-03T16:05:00.000Z',
+    updatedAt: '2026-06-03T16:05:00.000Z',
+    likeCount: 28,
+    commentCount: 11,
+    saveCount: 27,
+    shareCount: 5,
+  },
+  {
+    id: 'voc-investor-no-broadcast',
+    authorId: 'investor-sasha',
+    authorType: 'Investor',
+    authorName: 'Sasha D.',
+    postType: 'Question',
+    title: 'How are people vetting sourcers before paying fees?',
+    body: 'I ignore broadcast deal blasts now. I want track record, compliance visibility and referrals from people who have actually completed.',
+    media: ['/pexels/images/feed-office-agent.jpg'],
+    area: 'UK',
+    budget: 'Investor question',
+    tags: ['Sourcer vetting', 'Track record', 'No broadcast deals'],
+    visibility: 'public',
+    sponsoredStatus: null,
+    createdAt: '2026-06-03T15:35:00.000Z',
+    updatedAt: '2026-06-03T15:35:00.000Z',
+    likeCount: 55,
+    commentCount: 24,
+    saveCount: 41,
+    shareCount: 9,
+  },
+  {
+    id: 'voc-btl-section24-check',
+    authorId: 'landlord-investor-lee',
+    authorType: 'Investor',
+    authorName: 'Lee F.',
+    postType: 'Advice',
+    title: 'Before buying: model tax, voids and maintenance',
+    body: 'A deal can look fine before Section 24, repairs, voids and management time. I am saving posts that show the full downside as well as headline rent.',
+    media: ['/pexels/images/northwest-investor.jpg'],
+    area: 'UK',
+    budget: 'Deal analysis',
+    tags: ['Section 24', 'Void risk', 'Maintenance'],
+    visibility: 'public',
+    sponsoredStatus: null,
+    createdAt: '2026-06-03T15:05:00.000Z',
+    updatedAt: '2026-06-03T15:05:00.000Z',
+    likeCount: 48,
+    commentCount: 17,
+    saveCount: 46,
+    shareCount: 10,
+  },
+  {
+    id: 'voc-agent-transparent-process',
+    authorId: 'agent-northstar',
+    authorType: 'Agent',
+    authorName: 'Northstar Homes',
+    postType: 'Agent Update',
+    title: 'Our rental process in five steps',
+    body: 'Match, profile check, viewing slot, landlord decision, clear response. No duplicate forms after every message. Ask questions below.',
+    media: ['/pexels/images/feed-office-agent.jpg'],
+    area: 'Leeds',
+    budget: 'Process update',
+    tags: ['Transparent process', 'No duplicate forms', 'Clear response'],
+    visibility: 'public',
+    sponsoredStatus: null,
+    createdAt: '2026-06-03T14:30:00.000Z',
+    updatedAt: '2026-06-03T14:30:00.000Z',
+    likeCount: 37,
+    commentCount: 13,
+    saveCount: 30,
+    shareCount: 6,
+  },
+  {
+    id: 'voc-area-insight-zone2-rooms',
+    authorId: 'renteazy-market',
+    authorType: 'RentEazy',
+    authorName: 'RentEazy Market',
+    postType: 'Area Insight',
+    title: 'Zone 2 rooms: what gets replies first',
+    body: 'Posts with move date, budget, viewing windows and bills preference get clearer responses. Missing details are the main reason conversations stall.',
+    media: ['/pexels/images/feed-balcony-1.jpg'],
+    area: 'London Zone 2',
+    budget: 'Market signal',
+    tags: ['Area insight', 'Profile strength', 'Reply quality'],
+    visibility: 'public',
+    sponsoredStatus: null,
+    createdAt: '2026-06-03T14:00:00.000Z',
+    updatedAt: '2026-06-03T14:00:00.000Z',
+    likeCount: 62,
+    commentCount: 16,
+    saveCount: 53,
+    shareCount: 12,
+  },
+  {
+    id: 'voc-property-stratford-studio',
+    authorId: 'landlord-ana',
+    authorType: 'Landlord',
+    authorName: 'Ana V.',
+    postType: 'Property',
+    title: 'Stratford studio, first-come viewing list',
+    body: 'Furnished studio near station. I will review matched profiles in order and reply either way so nobody waits in silence.',
+    media: ['/pexels/images/feed-kitchen-1.jpg'],
+    area: 'Stratford',
+    budget: '£1,395 pcm',
+    tags: ['Studio', 'Clear replies', 'Matched profiles'],
+    visibility: 'public',
+    sponsoredStatus: null,
+    createdAt: '2026-06-03T13:35:00.000Z',
+    updatedAt: '2026-06-03T13:35:00.000Z',
+    likeCount: 42,
+    commentCount: 9,
+    saveCount: 38,
+    shareCount: 5,
+  },
+  {
+    id: 'voc-property-hackney-flat',
+    authorId: 'agent-canal',
+    authorType: 'Agent',
+    authorName: 'Canal Homes',
+    postType: 'Property',
+    title: 'Hackney one-bed with clear bills breakdown',
+    body: 'One-bed flat with estimated council tax, broadband and energy shown separately. Best for renters who want the real monthly cost before viewing.',
+    media: ['/pexels/images/feed-flat-1.jpg'],
+    area: 'Hackney',
+    budget: '£1,725 pcm',
+    tags: ['Bills breakdown', 'One-bed', 'Monthly cost'],
+    visibility: 'public',
+    sponsoredStatus: 'Promoted',
+    createdAt: '2026-06-03T13:05:00.000Z',
+    updatedAt: '2026-06-03T13:05:00.000Z',
+    likeCount: 39,
+    commentCount: 8,
+    saveCount: 35,
+    shareCount: 4,
+  },
+  {
+    id: 'voc-room-manchester-flatshare',
+    authorId: 'agent-mcrrooms',
+    authorType: 'Agent',
+    authorName: 'MCR Rooms',
+    postType: 'Room',
+    title: 'Manchester room with response deadline',
+    body: 'Double room in a quiet flatshare. Shortlist closes tomorrow afternoon and every matched profile will receive a yes/no update.',
+    media: ['/pexels/images/feed-room-1.jpg'],
+    area: 'Manchester',
+    budget: '£690 pcm',
+    tags: ['Quiet flatshare', 'Response deadline', 'Bills estimate'],
+    visibility: 'public',
+    sponsoredStatus: null,
+    createdAt: '2026-06-03T12:40:00.000Z',
+    updatedAt: '2026-06-03T12:40:00.000Z',
+    likeCount: 34,
+    commentCount: 7,
+    saveCount: 28,
+    shareCount: 5,
+  },
+  {
+    id: 'voc-landlord-pet-question',
+    authorId: 'landlord-hannah',
+    authorType: 'Landlord',
+    authorName: 'Hannah R.',
+    postType: 'Question',
+    title: 'How are landlords handling pets fairly?',
+    body: 'I am open to pets if the profile is clear on routine, references and property fit. Looking for practical policy ideas, not blanket assumptions.',
+    media: ['/pexels/images/feed-house-1.jpg'],
+    area: 'Brighton',
+    budget: 'Landlord question',
+    tags: ['Pets', 'Policy', 'Fair screening'],
+    visibility: 'public',
+    sponsoredStatus: null,
+    createdAt: '2026-06-03T12:05:00.000Z',
+    updatedAt: '2026-06-03T12:05:00.000Z',
+    likeCount: 30,
+    commentCount: 19,
+    saveCount: 18,
+    shareCount: 4,
+  },
+  {
+    id: 'voc-resident-maintenance-record',
+    authorId: 'tenant-leah',
+    authorType: 'Tenant',
+    authorName: 'Leah S.',
+    postType: 'Success Story',
+    title: 'Keeping maintenance notes helped',
+    body: 'Logged the repair, photos and messages in one place. It made the follow-up calmer and gave both sides a clean record.',
+    media: ['/pexels/images/perk-cleaning.jpg'],
+    area: 'Bristol',
+    budget: 'Resident mode',
+    tags: ['Maintenance record', 'Protect', 'Resident mode'],
+    visibility: 'public',
+    sponsoredStatus: null,
+    createdAt: '2026-06-03T11:40:00.000Z',
+    updatedAt: '2026-06-03T11:40:00.000Z',
+    likeCount: 23,
+    commentCount: 6,
+    saveCount: 21,
+    shareCount: 3,
+  },
+  {
+    id: 'voc-perk-cleaning-move',
+    authorId: 'partner-moveclean',
+    authorType: 'Business',
+    authorName: 'Move-clean Partner',
+    postType: 'Operator Offer',
+    title: 'Move-in and end-of-tenancy cleaning slots',
+    body: 'Useful when you have a confirmed move date or listing handover. Sponsored partner card, labelled and reportable.',
+    media: ['/pexels/videos/cleaning-service.mp4'],
+    area: 'London',
+    budget: 'From £49',
+    tags: ['Cleaning', 'Move date', 'Partner offer'],
+    visibility: 'public',
+    sponsoredStatus: 'Sponsored',
+    createdAt: '2026-06-03T11:20:00.000Z',
+    updatedAt: '2026-06-03T11:20:00.000Z',
+    likeCount: 12,
+    commentCount: 2,
+    saveCount: 19,
+    shareCount: 3,
+  },
+  {
+    id: 'voc-perk-storage-window',
+    authorId: 'partner-storage',
+    authorType: 'Business',
+    authorName: 'Move Window Storage',
+    postType: 'Availability',
+    title: 'Short-term storage for awkward move gaps',
+    body: 'For renters between homes, rooms or short stays. Shown around move-window signals, not random display advertising.',
+    media: ['/pexels/images/perk-storage.jpg'],
+    area: 'UK',
+    budget: 'Partner offer',
+    tags: ['Storage', 'Move gap', 'Partner offer'],
+    visibility: 'public',
+    sponsoredStatus: 'Sponsored',
+    createdAt: '2026-06-03T11:00:00.000Z',
+    updatedAt: '2026-06-03T11:00:00.000Z',
+    likeCount: 9,
+    commentCount: 1,
+    saveCount: 17,
+    shareCount: 2,
+  },
+  {
+    id: 'voc-broadband-move-in',
+    authorId: 'partner-broadband',
+    authorType: 'Business',
+    authorName: 'Move-ready Broadband',
+    postType: 'Availability',
+    title: 'Broadband setup before move-in',
+    body: 'Compare setup windows once a tenancy or short stay becomes likely. Labelled partner post with frequency caps.',
+    media: ['/pexels/images/perk-broadband.jpg'],
+    area: 'UK',
+    budget: 'Partner offer',
+    tags: ['Broadband', 'Move-in', 'Partner offer'],
+    visibility: 'public',
+    sponsoredStatus: 'Promoted',
+    createdAt: '2026-06-03T10:40:00.000Z',
+    updatedAt: '2026-06-03T10:40:00.000Z',
+    likeCount: 11,
+    commentCount: 1,
+    saveCount: 15,
+    shareCount: 2,
+  },
+  {
+    id: 'voc-renter-fair-process',
+    authorId: 'tenant-ade',
+    authorType: 'Tenant',
+    authorName: 'Ade F.',
+    postType: 'Advice',
+    title: 'Fair process beats bidding pressure',
+    body: 'I am more likely to trust a listing that explains order, criteria and response timing than one that says act ASAP with no process.',
+    media: ['/pexels/images/feed-balcony-1.jpg'],
+    area: 'London',
+    budget: 'Rental process',
+    tags: ['Fair process', 'No bidding pressure', 'Transparency'],
+    visibility: 'public',
+    sponsoredStatus: null,
+    createdAt: '2026-06-03T10:10:00.000Z',
+    updatedAt: '2026-06-03T10:10:00.000Z',
+    likeCount: 58,
+    commentCount: 21,
+    saveCount: 44,
+    shareCount: 13,
+  },
+  {
+    id: 'voc-agent-no-middleman-balance',
+    authorId: 'agent-clearroute',
+    authorType: 'Agent',
+    authorName: 'ClearRoute Agency',
+    postType: 'Agent Update',
+    title: 'Where agents still add value',
+    body: 'Fast replies, clean process, honest shortlists and useful landlord context. If an agent cannot provide that, renters and landlords should know.',
+    media: ['/pexels/images/feed-office-agent.jpg'],
+    area: 'London',
+    budget: 'Agent standard',
+    tags: ['Agent accountability', 'Clear process', 'Shortlist quality'],
+    visibility: 'public',
+    sponsoredStatus: null,
+    createdAt: '2026-06-03T09:40:00.000Z',
+    updatedAt: '2026-06-03T09:40:00.000Z',
+    likeCount: 25,
+    commentCount: 14,
+    saveCount: 18,
+    shareCount: 4,
+  },
+  {
+    id: 'voc-investor-referral-network',
+    authorId: 'investor-maya',
+    authorType: 'Investor',
+    authorName: 'Maya K.',
+    postType: 'Investor Brief',
+    title: 'Looking for sourcers with investor references',
+    body: 'Interested in Midlands and North West leads. I want to see completed introductions and investor feedback before discussing fees.',
+    media: ['/pexels/images/northwest-investor.jpg'],
+    area: 'Midlands / North West',
+    budget: '£120k-£300k',
+    tags: ['Investor references', 'Track record', 'Deal flow'],
+    visibility: 'public',
+    sponsoredStatus: null,
+    createdAt: '2026-06-03T09:15:00.000Z',
+    updatedAt: '2026-06-03T09:15:00.000Z',
+    likeCount: 32,
+    commentCount: 10,
+    saveCount: 29,
+    shareCount: 6,
+  },
+  {
+    id: 'voc-sourcer-fees-plain',
+    authorId: 'sourcer-clearpack',
+    authorType: 'Sourcer',
+    authorName: 'ClearPack Sourcing',
+    postType: 'Sourcer Deal',
+    title: 'Sourcing fee shown before the call',
+    body: 'Deal pack includes fee, source route, comparable rents, refurb range and red flags. If the numbers do not stack, say so in comments.',
+    media: ['/pexels/images/leeds-student-house.jpg'],
+    area: 'Birmingham',
+    budget: '£165k guide',
+    tags: ['Fee visible', 'Red flags', 'Comparable rents'],
+    visibility: 'public',
+    sponsoredStatus: null,
+    createdAt: '2026-06-03T08:50:00.000Z',
+    updatedAt: '2026-06-03T08:50:00.000Z',
+    likeCount: 28,
+    commentCount: 13,
+    saveCount: 26,
+    shareCount: 5,
+  },
+  {
+    id: 'voc-availability-leeds-room',
+    authorId: 'agent-leedsrooms',
+    authorType: 'Agent',
+    authorName: 'Leeds Rooms',
+    postType: 'Availability',
+    title: 'Headingley room available after fall-through',
+    body: 'One room came back after a failed reference. Preference for renters with move date, affordability and viewing slots already completed.',
+    media: ['/pexels/images/leeds-student-house.jpg'],
+    area: 'Leeds',
+    budget: '£625 pcm',
+    tags: ['Availability', 'Reference ready', 'Room'],
+    visibility: 'public',
+    sponsoredStatus: null,
+    createdAt: '2026-06-03T08:25:00.000Z',
+    updatedAt: '2026-06-03T08:25:00.000Z',
+    likeCount: 19,
+    commentCount: 5,
+    saveCount: 24,
+    shareCount: 3,
+  },
+  {
+    id: 'voc-corporate-stay-relocation',
+    authorId: 'operator-citybridge',
+    authorType: 'Operator',
+    authorName: 'CityBridge Stays',
+    postType: 'Serviced Accommodation',
+    title: 'Corporate relocation stay with monthly reporting',
+    body: 'Furnished stay for relocation teams and guests waiting on long-term rentals. Bills, Wi-Fi and extension terms visible upfront.',
+    media: ['/pexels/videos/rental-feed-scroll.mp4'],
+    area: 'Manchester',
+    budget: 'From £720/week',
+    tags: ['Corporate stay', 'Relocation', 'Bills visible'],
+    visibility: 'public',
+    sponsoredStatus: 'Boosted',
+    createdAt: '2026-06-03T08:05:00.000Z',
+    updatedAt: '2026-06-03T08:05:00.000Z',
+    likeCount: 18,
+    commentCount: 3,
+    saveCount: 22,
+    shareCount: 4,
+  },
+  {
+    id: 'voc-landlord-renters-rights',
+    authorId: 'landlord-owen',
+    authorType: 'Landlord',
+    authorName: 'Owen T.',
+    postType: 'Question',
+    title: 'How careful is too careful after legal changes?',
+    body: 'The risk of the wrong tenant feels bigger now. I want to stay fair, but I also need confidence before handing over keys.',
+    media: ['/pexels/images/feed-landlord.jpg'],
+    area: 'Kent',
+    budget: 'Landlord question',
+    tags: ['Vetting', 'Fair process', 'Key handover'],
+    visibility: 'public',
+    sponsoredStatus: null,
+    createdAt: '2026-06-02T17:50:00.000Z',
+    updatedAt: '2026-06-02T17:50:00.000Z',
+    likeCount: 36,
+    commentCount: 22,
+    saveCount: 20,
+    shareCount: 5,
+  },
+  {
+    id: 'voc-tenant-direct-landlord',
+    authorId: 'tenant-monica',
+    authorType: 'Tenant',
+    authorName: 'Monica A.',
+    postType: 'Looking',
+    title: 'Looking for direct landlord conversation',
+    body: 'I am not trying to bypass checks. I just want a chance to explain my situation to the person actually deciding.',
+    media: ['/pexels/images/hackney-tenant.jpg'],
+    area: 'South London',
+    budget: 'Up to £1,350 pcm',
+    tags: ['Direct landlord', 'Human explanation', 'References ready'],
+    visibility: 'public',
+    sponsoredStatus: null,
+    createdAt: '2026-06-02T17:10:00.000Z',
+    updatedAt: '2026-06-02T17:10:00.000Z',
+    likeCount: 41,
+    commentCount: 15,
+    saveCount: 25,
+    shareCount: 6,
+  },
+  {
+    id: 'voc-room-female-safe-flatshare',
+    authorId: 'buddy-zara',
+    authorType: 'House Buddy',
+    authorName: 'Zara N.',
+    postType: 'House Buddy',
+    title: 'Buddy-up for a safe, quiet flatshare',
+    body: 'Seeking another woman for a calm two-bed search. Priority is responsive landlord, clear deposit protection and no surprise visits.',
+    media: ['/pexels/images/clapham-buddy.jpg'],
+    area: 'Islington / Finsbury Park',
+    budget: '£1,150 each',
+    tags: ['Buddy-up', 'Deposit protection', 'Quiet home'],
+    visibility: 'public',
+    sponsoredStatus: null,
+    createdAt: '2026-06-02T16:35:00.000Z',
+    updatedAt: '2026-06-02T16:35:00.000Z',
+    likeCount: 49,
+    commentCount: 18,
+    saveCount: 34,
+    shareCount: 9,
+  },
+  {
+    id: 'voc-property-btr-transparent',
+    authorId: 'operator-buildstay',
+    authorType: 'Operator',
+    authorName: 'BuildStay Living',
+    postType: 'Property',
+    title: 'Managed rental with first-come process',
+    body: 'Two flats available with published criteria and response timing. No bidding, no hidden process, no duplicate paperwork after matching.',
+    media: ['/pexels/images/greenwich-viewings.jpg'],
+    area: 'Wembley',
+    budget: 'From £1,580 pcm',
+    tags: ['Managed rental', 'First-come process', 'No bidding'],
+    visibility: 'public',
+    sponsoredStatus: 'Promoted',
+    createdAt: '2026-06-02T16:05:00.000Z',
+    updatedAt: '2026-06-02T16:05:00.000Z',
+    likeCount: 52,
+    commentCount: 11,
+    saveCount: 48,
+    shareCount: 10,
+  },
+  {
+    id: 'voc-advice-zero-deposit',
+    authorId: 'renteazy-safety',
+    authorType: 'RentEazy',
+    authorName: 'RentEazy Safety',
+    postType: 'Advice',
+    title: 'Before accepting any deposit alternative',
+    body: 'Check what protection you keep, what you lose, and who gets paid if there is a dispute. Save the terms before signing.',
+    media: ['/pexels/images/perk-insurance.jpg'],
+    area: 'UK',
+    budget: 'Safety note',
+    tags: ['Deposit alternatives', 'Terms', 'Safety'],
+    visibility: 'public',
+    sponsoredStatus: null,
+    createdAt: '2026-06-02T15:30:00.000Z',
+    updatedAt: '2026-06-02T15:30:00.000Z',
+    likeCount: 63,
+    commentCount: 20,
+    saveCount: 71,
+    shareCount: 18,
+  },
+  {
+    id: 'voc-area-insight-no-shows',
+    authorId: 'renteazy-market',
+    authorType: 'RentEazy',
+    authorName: 'RentEazy Market',
+    postType: 'Area Insight',
+    title: 'Viewing no-shows hurt both sides',
+    body: 'Same-day confirmation and profile completeness are strong signals. Renters avoid wasted journeys; landlords avoid empty appointments.',
+    media: ['/pexels/videos/moving-boxes.mp4'],
+    area: 'UK',
+    budget: 'Market signal',
+    tags: ['Viewing reliability', 'Profile strength', 'Confirmation'],
+    visibility: 'public',
+    sponsoredStatus: null,
+    createdAt: '2026-06-02T15:00:00.000Z',
+    updatedAt: '2026-06-02T15:00:00.000Z',
+    likeCount: 57,
+    commentCount: 14,
+    saveCount: 50,
+    shareCount: 12,
+  },
+];
+
+const feedImagePool = [
+  '/pexels/images/stratford-room.jpg',
+  '/pexels/images/feed-flat-1.jpg',
+  '/pexels/images/feed-room-1.jpg',
+  '/pexels/images/greenwich-viewings.jpg',
+  '/pexels/images/bow-landlord-flat.jpg',
+  '/pexels/images/northwest-investor.jpg',
+  '/pexels/images/operator-west-london.jpg',
+  '/pexels/images/leeds-student-house.jpg',
+  '/pexels/images/canary-area-insight.jpg',
+  '/pexels/images/feed-moving.jpg',
+  '/pexels/images/feed-balcony-1.jpg',
+  '/pexels/images/feed-kitchen-1.jpg',
+  '/pexels/images/feed-house-1.jpg',
+  '/pexels/images/feed-landlord.jpg',
+  '/pexels/images/feed-office-agent.jpg',
+  '/pexels/images/hackney-tenant.jpg',
+  '/pexels/images/clapham-buddy.jpg',
+  '/pexels/images/manchester-relocation.jpg',
+  '/pexels/images/referencing-question.jpg',
+  '/pexels/images/shoreditch-short-stay.jpg',
+  '/pexels/images/perk-cleaning.jpg',
+  '/pexels/images/perk-storage.jpg',
+  '/pexels/images/perk-broadband.jpg',
+  '/pexels/images/perk-insurance.jpg',
+];
+
+const feedVideoPool = [
+  '/pexels/videos/agent-walkthrough.mp4',
+  '/pexels/videos/city-apartment.mp4',
+  '/pexels/videos/city-skyline.mp4',
+  '/pexels/videos/cleaning-service.mp4',
+  '/pexels/videos/moving-boxes.mp4',
+  '/pexels/videos/rental-feed-scroll.mp4',
+];
+
+const feedImagePoolsByPostType = {
+  Property: ['/pexels/images/feed-flat-1.jpg', '/pexels/images/feed-kitchen-1.jpg', '/pexels/images/feed-balcony-1.jpg', '/pexels/images/bow-landlord-flat.jpg', '/pexels/images/greenwich-viewings.jpg', '/pexels/images/feed-house-1.jpg', '/pexels/images/shoreditch-short-stay.jpg'],
+  Room: ['/pexels/images/stratford-room.jpg', '/pexels/images/feed-room-1.jpg', '/pexels/images/manchester-relocation.jpg', '/pexels/images/clapham-buddy.jpg', '/pexels/images/feed-kitchen-1.jpg', '/pexels/images/feed-balcony-1.jpg'],
+  Looking: ['/pexels/images/hackney-tenant.jpg', '/pexels/images/feed-moving.jpg', '/pexels/images/clapham-buddy.jpg', '/pexels/images/referencing-question.jpg', '/pexels/images/manchester-relocation.jpg'],
+  'House Buddy': ['/pexels/images/clapham-buddy.jpg', '/pexels/images/hackney-tenant.jpg', '/pexels/images/feed-room-1.jpg', '/pexels/images/feed-moving.jpg'],
+  'Short-Term Stay': ['/pexels/images/shoreditch-short-stay.jpg', '/pexels/images/feed-flat-1.jpg', '/pexels/images/feed-balcony-1.jpg', '/pexels/images/manchester-relocation.jpg'],
+  'Serviced Accommodation': ['/pexels/images/shoreditch-short-stay.jpg', '/pexels/images/feed-flat-1.jpg', '/pexels/images/operator-west-london.jpg', '/pexels/images/feed-kitchen-1.jpg'],
+  Availability: ['/pexels/images/manchester-relocation.jpg', '/pexels/images/shoreditch-short-stay.jpg', '/pexels/images/feed-room-1.jpg', '/pexels/images/feed-moving.jpg'],
+  'Operator Offer': ['/pexels/images/operator-west-london.jpg', '/pexels/images/feed-house-1.jpg', '/pexels/images/feed-office-agent.jpg', '/pexels/images/shoreditch-short-stay.jpg'],
+  'Landlord Opportunity': ['/pexels/images/bow-landlord-flat.jpg', '/pexels/images/feed-landlord.jpg', '/pexels/images/feed-house-1.jpg', '/pexels/images/feed-flat-1.jpg'],
+  'Investor Brief': ['/pexels/images/northwest-investor.jpg', '/pexels/images/leeds-student-house.jpg', '/pexels/images/feed-office-agent.jpg', '/pexels/images/feed-house-1.jpg'],
+  'Sourcer Deal': ['/pexels/images/leeds-student-house.jpg', '/pexels/images/northwest-investor.jpg', '/pexels/images/feed-office-agent.jpg', '/pexels/images/feed-house-1.jpg'],
+  'Agent Update': ['/pexels/images/feed-office-agent.jpg', '/pexels/images/greenwich-viewings.jpg', '/pexels/images/canary-area-insight.jpg', '/pexels/images/stratford-room.jpg'],
+  'Landlord Update': ['/pexels/images/feed-landlord.jpg', '/pexels/images/bow-landlord-flat.jpg', '/pexels/images/feed-house-1.jpg', '/pexels/images/feed-office-agent.jpg'],
+  Advice: ['/pexels/images/referencing-question.jpg', '/pexels/images/feed-moving.jpg', '/pexels/images/perk-insurance.jpg', '/pexels/images/feed-office-agent.jpg', '/pexels/images/canary-area-insight.jpg'],
+  Question: ['/pexels/images/referencing-question.jpg', '/pexels/images/feed-office-agent.jpg', '/pexels/images/feed-moving.jpg', '/pexels/images/feed-landlord.jpg'],
+  'Area Insight': ['/pexels/images/canary-area-insight.jpg', '/pexels/images/greenwich-viewings.jpg', '/pexels/images/feed-balcony-1.jpg', '/pexels/images/feed-office-agent.jpg'],
+  'Success Story': ['/pexels/images/feed-moving.jpg', '/pexels/images/hackney-tenant.jpg', '/pexels/images/feed-balcony-1.jpg'],
+  General: feedImagePool,
+};
+
+const videoEligiblePostTypes = new Set(['Short-Term Stay', 'Availability', 'Agent Update', 'Area Insight']);
+
+function stableHash(value = '') {
+  return Array.from(String(value)).reduce((hash, char) => ((hash << 5) - hash + char.charCodeAt(0)) | 0, 0);
+}
+
+function chooseLeastUsedMedia(pool, usage, seed) {
+  const start = Math.abs(seed) % pool.length;
+  let best = pool[start];
+  let bestCount = usage.get(best) || 0;
+  for (let offset = 1; offset < pool.length; offset += 1) {
+    const candidate = pool[(start + offset) % pool.length];
+    const candidateCount = usage.get(candidate) || 0;
+    if (candidateCount < bestCount) {
+      best = candidate;
+      bestCount = candidateCount;
+    }
+  }
+  usage.set(best, bestCount + 1);
+  return best;
+}
+
+function diversifySeedPostMedia(posts) {
+  const mediaUsage = new Map();
+  return posts.map((post, index) => {
+    const pool = feedImagePoolsByPostType[post.postType] || feedImagePool;
+    const seed = stableHash(`${post.id}-${post.postType}-${post.area}-${index}`);
+    const useVideo = videoEligiblePostTypes.has(post.postType) && index % 11 === 3;
+    const media = useVideo
+      ? [chooseLeastUsedMedia(feedVideoPool, mediaUsage, seed)]
+      : [chooseLeastUsedMedia(pool, mediaUsage, seed)];
+    return { ...post, media };
+  });
+}
+
+const allSeededFeedPosts = diversifySeedPostMedia([...seededFeedPosts, ...vocSeededFeedPosts]);
 
 const seededGroups = [
   {
@@ -942,6 +2080,71 @@ const seededGroups = [
     roles: ['Investor', 'Sourcer', 'Operator', 'Landlord'],
     createdAt: '2026-06-01T08:30:00.000Z',
     updatedAt: '2026-06-01T08:30:00.000Z',
+  },
+  {
+    id: 'group-self-employed-renters',
+    name: 'Self-Employed Renters UK',
+    groupType: 'Support network',
+    area: 'UK',
+    description: 'Referencing workarounds, document prep, landlord explanations, guarantor questions, and fair process advice for freelancers and founders.',
+    visibility: 'open',
+    memberCount: 214,
+    postCount: 68,
+    roles: ['Tenant', 'House Buddy', 'Landlord', 'Individual Agent'],
+    createdAt: '2026-06-01T08:40:00.000Z',
+    updatedAt: '2026-06-01T08:40:00.000Z',
+  },
+  {
+    id: 'group-deposit-moveout-records',
+    name: 'Deposits & Move-Out Records',
+    groupType: 'Resident community',
+    area: 'UK',
+    description: 'Inventory photos, checkout notes, repair trails, deposit protection questions, and clean handover checklists.',
+    visibility: 'open',
+    memberCount: 176,
+    postCount: 52,
+    roles: ['Tenant', 'House Buddy', 'Landlord', 'Operator', 'Short-Term Host'],
+    createdAt: '2026-06-01T08:50:00.000Z',
+    updatedAt: '2026-06-01T08:50:00.000Z',
+  },
+  {
+    id: 'group-landlord-screening',
+    name: 'Landlord Screening Room',
+    groupType: 'Role network',
+    area: 'UK',
+    description: 'Pre-screening forms, viewing reliability, fair criteria, direct lets, agent accountability, and reducing no-shows without excluding good renters.',
+    visibility: 'open',
+    memberCount: 139,
+    postCount: 47,
+    roles: ['Landlord', 'Individual Agent', 'Agency / Business', 'Operator'],
+    createdAt: '2026-06-01T09:00:00.000Z',
+    updatedAt: '2026-06-01T09:00:00.000Z',
+  },
+  {
+    id: 'group-due-diligence-deals',
+    name: 'Due Diligence Deal Room',
+    groupType: 'Professional circle',
+    area: 'UK',
+    description: 'Deal packs, comparable rents, refurb assumptions, fees, red flags, compliance checks, and investor feedback before introductions.',
+    visibility: 'open',
+    memberCount: 122,
+    postCount: 39,
+    roles: ['Investor', 'Sourcer', 'Operator', 'Landlord'],
+    createdAt: '2026-06-01T09:10:00.000Z',
+    updatedAt: '2026-06-01T09:10:00.000Z',
+  },
+  {
+    id: 'group-direct-landlord-renters',
+    name: 'Direct Landlord Matches',
+    groupType: 'Matching room',
+    area: 'London',
+    description: 'Renters who want human review and landlords who want to keep vetting control while still running a clear, fair process.',
+    visibility: 'open',
+    memberCount: 188,
+    postCount: 61,
+    roles: ['Tenant', 'House Buddy', 'Landlord'],
+    createdAt: '2026-06-01T09:20:00.000Z',
+    updatedAt: '2026-06-01T09:20:00.000Z',
   },
 ];
 
@@ -1685,13 +2888,13 @@ function EasyPeazyMark({ footer = false }) {
   );
 }
 
-function BrandLogo({ footer = false }) {
+function BrandLogo({ footer = false, compact = false }) {
   return (
     <a href="/" className="inline-flex shrink-0 flex-col items-center" aria-label="RentEazy">
       <img
-        src={footer ? '/images/renteazy-main-logo-transparent.png' : '/images/renteazy-main-logo-transparent-nav.png'}
+        src={footer ? '/images/renteazy-logo-2026-t.png' : '/images/renteazy-mark-2026-t.png'}
         alt="RentEazy"
-        className={footer ? 'h-20 w-auto object-contain' : 'h-10 w-auto object-contain'}
+        className={footer ? 'h-24 w-auto object-contain' : compact ? 'h-9 w-auto object-contain' : 'h-11 w-auto object-contain'}
       />
       {footer && <EasyPeazyMark footer />}
     </a>
@@ -1801,31 +3004,66 @@ function StickyMobileCTA() {
   );
 }
 
-function DemoCardVisual({ card, dimmed = false, quiet = false }) {
+function DemoCardVisual({ card, dimmed = false, quiet = false, photoIndex = 0, onPreviousPhoto, onNextPhoto }) {
   const typeLabel = card.type.charAt(0).toUpperCase() + card.type.slice(1);
+  const gallery = card.gallery?.length ? card.gallery : [card.imageSrc].filter(Boolean);
+  const activePhotoIndex = Math.min(photoIndex, Math.max(0, gallery.length - 1));
+  const activeImage = gallery[activePhotoIndex] || card.imageSrc;
 
   return (
     <div
       className={`absolute inset-0 overflow-hidden bg-slate-200 ${dimmed ? 'opacity-55' : ''}`}
-      style={{
-        backgroundImage: `linear-gradient(to top, rgba(6,24,47,0.9) 0%, rgba(6,24,47,0.18) 42%, rgba(6,24,47,0.02) 100%), url("${card.imageSrc}")`,
-        backgroundPosition: card.imagePosition,
-        backgroundSize: 'cover',
-      }}
     >
       <img
-        src={card.imageSrc}
+        src={activeImage}
         alt={card.imageAlt}
-        className="absolute inset-0 h-full w-full object-cover opacity-0"
+        className="absolute inset-0 h-full w-full object-cover"
         style={{ objectPosition: card.imagePosition }}
         loading="eager"
+        decoding="async"
         draggable="false"
       />
+      <div className="absolute inset-0 bg-linear-to-t from-[rgba(6,24,47,0.9)] via-[rgba(6,24,47,0.18)] to-[rgba(6,24,47,0.02)]" />
       {!quiet && (
         <>
+          {gallery.length > 1 && (
+            <div className="absolute inset-x-5 top-3 z-20 flex gap-1.5">
+              {gallery.map((photo, index) => (
+                <span key={`${photo}-${index}`} className={`h-1 flex-1 rounded-full ${index === activePhotoIndex ? 'bg-white' : 'bg-white/35'}`} />
+              ))}
+            </div>
+          )}
+          {gallery.length > 1 && (
+            <div className="absolute inset-x-4 top-1/2 z-20 flex -translate-y-1/2 justify-between">
+              <button
+                type="button"
+                aria-label="Previous photo"
+                onPointerDown={(event) => event.stopPropagation()}
+                onClick={(event) => {
+                  event.stopPropagation();
+                  onPreviousPhoto?.();
+                }}
+                className="grid h-9 w-9 place-items-center rounded-full bg-black/28 text-lg font-semibold text-white ring-1 ring-white/20 backdrop-blur-md"
+              >
+                ‹
+              </button>
+              <button
+                type="button"
+                aria-label="Next photo"
+                onPointerDown={(event) => event.stopPropagation()}
+                onClick={(event) => {
+                  event.stopPropagation();
+                  onNextPhoto?.();
+                }}
+                className="grid h-9 w-9 place-items-center rounded-full bg-black/28 text-lg font-semibold text-white ring-1 ring-white/20 backdrop-blur-md"
+              >
+                ›
+              </button>
+            </div>
+          )}
           <div className="absolute left-5 right-5 top-5 z-10 flex items-center justify-between gap-3">
             <span className="rounded-full bg-white/92 backdrop-blur-sm px-3 py-1 text-xs font-medium text-[#092243] shadow-[0_8px_18px_-12px_rgba(15,23,42,0.35)]">{card.matchScore}% match</span>
-            <span className="rounded-full bg-white/18 backdrop-blur-sm border border-white/35 px-3 py-1 text-xs text-white">{typeLabel}</span>
+            <span className="rounded-full bg-white/18 backdrop-blur-sm border border-white/35 px-3 py-1 text-xs text-white">{typeLabel} · {activePhotoIndex + 1}/{gallery.length}</span>
           </div>
           <div className="absolute inset-x-0 bottom-0 p-5 pb-24 pt-28 text-white">
             <div className="flex items-end justify-between gap-4">
@@ -1846,7 +3084,7 @@ function DemoCardVisual({ card, dimmed = false, quiet = false }) {
   );
 }
 
-function InteractiveMatchCard({ cards = heroSwipeCards, canSwipe = true, onSwipeAction = () => {}, onBlocked = () => {} }) {
+function InteractiveMatchCard({ cards = heroSwipeCards, canSwipe = true, onSwipeAction = () => {}, onBlocked = () => {}, immersive = false }) {
   const [activeIndex, setActiveIndex] = useState(0);
   const [dragX, setDragX] = useState(0);
   const [dragY, setDragY] = useState(0);
@@ -1864,6 +3102,7 @@ function InteractiveMatchCard({ cards = heroSwipeCards, canSwipe = true, onSwipe
   const progress = ((activeIndex + 1) / totalCards) * 100;
 
   const showTrial = (kind, nextSwipeCount) => {
+    if (immersive) return;
     if (kind === 'superlike') {
       setModal({
         title: 'Get seen sooner.',
@@ -1969,7 +3208,7 @@ function InteractiveMatchCard({ cards = heroSwipeCards, canSwipe = true, onSwipe
   };
 
   return (
-    <div className="relative rounded-[1.7rem] bg-white border border-slate-200 shadow-[0_14px_34px_-26px_rgba(15,23,42,0.42),inset_0_1px_0_white] overflow-hidden">
+    <div className={`relative overflow-hidden ${immersive ? 'rounded-[1.2rem] bg-transparent' : 'rounded-[1.7rem] bg-white border border-slate-200 shadow-[0_14px_34px_-26px_rgba(15,23,42,0.42),inset_0_1px_0_white]'}`}>
       {modal && (
         <div className="absolute inset-x-4 top-4 z-30 rounded-3xl bg-white/96 backdrop-blur-sm border border-white p-5 shadow-[0_24px_52px_-28px_rgba(15,23,42,0.55)]">
           <div className="flex items-start justify-between gap-4">
@@ -1987,18 +3226,18 @@ function InteractiveMatchCard({ cards = heroSwipeCards, canSwipe = true, onSwipe
           </div>
         </div>
       )}
-      <div className="p-4 sm:p-5">
-        <div className="flex items-start justify-between gap-4 pb-4">
+      <div className={immersive ? 'p-0' : 'p-4 sm:p-5'}>
+        {!immersive && <div className="flex items-start justify-between gap-4 pb-4">
           <div>
             <p className="font-['JetBrains_Mono',monospace] text-xs text-[#2670a8]">TRY THE SWIPE DECK</p>
-            <p className="mt-1 text-sm text-slate-500">Pass what does not fit. Like what does. Superlike to get seen sooner.</p>
+            <p className="mt-1 text-sm text-slate-500">Tap not for me when it does not fit. Like what does. Superlike to get seen sooner.</p>
           </div>
           <div className="rounded-full bg-[#edf7ff] border border-[#cde7f8] px-3 py-1 text-xs text-[#154f79]">{activeIndex + 1} / {totalCards}</div>
-        </div>
-        <div className="h-1.5 rounded-full bg-slate-100 overflow-hidden mb-4">
+        </div>}
+        {!immersive && <div className="h-1.5 rounded-full bg-slate-100 overflow-hidden mb-4">
           <div className="h-full rounded-full bg-linear-to-r from-[#2f7d32] to-[#2670a8]" style={{ width: `${progress}%` }}></div>
-        </div>
-        <div className="relative h-126 sm:h-136 lg:h-120 xl:h-128 overflow-visible">
+        </div>}
+        <div className={`relative overflow-visible ${immersive ? 'h-[calc(100vh-13.5rem)] min-h-[34rem]' : 'h-126 sm:h-136 lg:h-120 xl:h-128'}`}>
           <div className="absolute inset-4 rounded-4xl bg-white border border-slate-200 shadow-[0_18px_38px_-28px_rgba(15,23,42,0.35)] rotate-3 scale-[0.96] overflow-hidden">
             <DemoCardVisual card={nextCard} dimmed />
           </div>
@@ -2019,29 +3258,29 @@ function InteractiveMatchCard({ cards = heroSwipeCards, canSwipe = true, onSwipe
             <DemoCardVisual card={card} />
             <div className={`absolute inset-0 flex items-center justify-center pointer-events-none transition-opacity ${Math.abs(dragX) > 28 || dragY < -50 ? 'opacity-100' : 'opacity-0'}`}>
               <span className={`rounded-full px-6 py-3 text-sm font-semibold text-white shadow-xl ${dragY < -50 ? 'bg-[#092243]' : dragX >= 0 ? 'bg-[#2f7d32]' : 'bg-[#ef4444]'}`}>
-                {dragY < -50 ? 'SUPERLIKE' : dragX >= 0 ? 'LIKE' : 'PASS'}
+                {dragY < -50 ? 'SUPERLIKE' : dragX >= 0 ? 'LIKE' : 'NOT FOR ME'}
               </span>
             </div>
             <div className="absolute inset-x-0 bottom-5 z-20 flex items-center justify-center gap-4">
-              <button type="button" aria-label="Pass" onClick={(event) => { event.stopPropagation(); swipe('pass'); }} className="h-14 w-14 rounded-full bg-white/94 backdrop-blur-sm border border-white text-[#ef4444] shadow-[0_16px_30px_-18px_rgba(0,0,0,0.55),inset_0_1px_0_white]">
-                <iconify-icon icon="solar:close-circle-bold" class="text-3xl"></iconify-icon>
+              <button type="button" aria-label="Not for me" onClick={(event) => { event.stopPropagation(); swipe('pass'); }} className="h-14 w-14 rounded-full bg-white/94 backdrop-blur-sm border border-white text-[#ef4444] shadow-[0_16px_30px_-18px_rgba(0,0,0,0.55),inset_0_1px_0_white]">
+                <ArrowDownLeft className="mx-auto h-7 w-7" strokeWidth={2.4} />
               </button>
               <button type="button" aria-label="Superlike" onClick={(event) => { event.stopPropagation(); swipe('superlike'); }} className="h-16 w-16 rounded-full bg-[#092243]/96 backdrop-blur-sm border border-white/20 text-white shadow-[0_18px_34px_-18px_rgba(0,0,0,0.62),inset_0_1px_0_rgba(255,255,255,0.2)]">
-                <iconify-icon icon="solar:star-bold" class="text-3xl"></iconify-icon>
+                <Sparkles className="mx-auto h-8 w-8" strokeWidth={2.2} />
               </button>
               <button type="button" aria-label="Like" onClick={(event) => { event.stopPropagation(); swipe('like'); }} className="h-14 w-14 rounded-full bg-[#2f7d32]/96 backdrop-blur-sm border border-white/20 text-white shadow-[0_16px_30px_-18px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(255,255,255,0.25)]">
-                <iconify-icon icon="solar:heart-bold" class="text-3xl"></iconify-icon>
+                <Check className="mx-auto h-7 w-7" strokeWidth={2.7} />
               </button>
             </div>
           </article>
         </div>
       </div>
-      <div className="mx-4 sm:mx-5 mb-5 flex items-center justify-between gap-4 rounded-2xl bg-[#edf7ff] border border-[#cde7f8] p-3 text-sm">
+      <div className={`${immersive ? 'mx-0 mt-3 mb-0' : 'mx-4 sm:mx-5 mb-5'} flex items-center justify-between gap-4 rounded-2xl bg-[#edf7ff] border border-[#cde7f8] p-3 text-sm`}>
         <span className="text-[#154f79]">{feedback}</span>
         <span className="text-slate-500">{likeCount} liked</span>
       </div>
-      <p className="mx-4 sm:mx-5 mb-5 text-center text-xs text-slate-400">Limited free swipes refresh daily. Answer quick questions to improve this deck.</p>
-      <div className="mx-4 sm:mx-5 mb-5 flex justify-center gap-1.5" aria-hidden="true">
+      {!immersive && <p className="mx-4 sm:mx-5 mb-5 text-center text-xs text-slate-400">Limited free swipes refresh daily. Answer quick questions to improve this deck.</p>}
+      <div className={`${immersive ? 'mt-3 mb-0' : 'mx-4 sm:mx-5 mb-5'} flex justify-center gap-1.5`} aria-hidden="true">
         {deck.slice(0, 12).map((item, index) => <span key={item.id} className={`h-1.5 rounded-full transition-all ${index === activeIndex % Math.min(12, deck.length) ? 'w-6 bg-[#2f7d32]' : 'w-1.5 bg-slate-300'}`}></span>)}
       </div>
     </div>
@@ -2170,7 +3409,7 @@ function HeroSwipeDeck() {
             <DemoCardVisual card={card} quiet />
             <div className={`absolute inset-0 z-20 flex items-center justify-center pointer-events-none transition-opacity ${Math.abs(dragX) > 28 || dragY < -50 ? 'opacity-100' : 'opacity-0'}`}>
               <span className={`rounded-full px-6 py-3 text-sm font-semibold text-white shadow-xl ${dragY < -50 ? 'bg-[#092243]' : dragX >= 0 ? 'bg-[#2f7d32]' : 'bg-[#ff255f]'}`}>
-                {dragY < -50 ? 'SUPERLIKE' : dragX >= 0 ? 'LIKE' : 'PASS'}
+                {dragY < -50 ? 'SUPERLIKE' : dragX >= 0 ? 'LIKE' : 'NOT FOR ME'}
               </span>
             </div>
           </article>
@@ -2206,7 +3445,7 @@ function HeroSwipeDeck() {
 
             <div className="grid grid-cols-5 items-center gap-3">
               <button type="button" aria-label="Rewind" className="flex h-12 items-center justify-center rounded-full bg-white/8 border border-white/10 text-slate-400"><RotateCcw className="h-6 w-6" /></button>
-              <button type="button" aria-label="Pass" onClick={() => moveNext('pass')} className="flex h-16 items-center justify-center rounded-full bg-white/10 border border-white/10 text-[#ff5a73] shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]"><ArrowDownLeft className="h-9 w-9 stroke-[2.8]" /></button>
+              <button type="button" aria-label="Not for me" onClick={() => moveNext('pass')} className="flex h-16 items-center justify-center rounded-full bg-white/10 border border-white/10 text-[#ff5a73] shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]"><ArrowDownLeft className="h-9 w-9 stroke-[2.8]" /></button>
               <button type="button" aria-label="Superlike" onClick={() => moveNext('superlike')} className="flex h-12 items-center justify-center rounded-full bg-white/8 border border-white/10 text-[#2c9cff]"><ArrowUp className="h-6 w-6 stroke-[2.8]" /></button>
               <button type="button" aria-label="Like" onClick={() => moveNext('like')} className="flex h-16 items-center justify-center rounded-full bg-white/10 border border-white/10 text-[#84d64b] shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]"><Check className="h-10 w-10 stroke-3" /></button>
               <a href="#feed" aria-label="Share" className="flex h-12 items-center justify-center rounded-full bg-white/8 border border-white/10 text-[#2c9cff]"><Send className="h-6 w-6 fill-current" /></a>
@@ -2385,7 +3624,7 @@ function getRoleMarketLanes(role) {
 }
 
 function displayRole(role) {
-  return roleOptions.includes(role) ? role : 'Choose role';
+  return roleOptions.includes(role) ? role : 'All market';
 }
 
 function ClerkSessionBridge({ setProfile }) {
@@ -2619,6 +3858,23 @@ function ComposerPanel({ onCreatePost, compact = false, profile = currentUser })
   const [area, setArea] = useState('');
   const [budget, setBudget] = useState('');
   const [tags, setTags] = useState('');
+  const [media, setMedia] = useState([]);
+  const mediaInputRef = useRef(null);
+
+  const addMediaFiles = (event) => {
+    const files = Array.from(event.target.files || []).slice(0, 6 - media.length);
+    if (!files.length) return;
+    const readers = files.map((file) => new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve({ url: reader.result, type: file.type.startsWith('video') ? 'video' : 'image', name: file.name });
+      reader.onerror = () => resolve(null);
+      reader.readAsDataURL(file);
+    }));
+    Promise.all(readers).then((items) => {
+      setMedia((current) => [...current, ...items.filter(Boolean)].slice(0, 6));
+      event.target.value = '';
+    });
+  };
 
   const submit = (event) => {
     event.preventDefault();
@@ -2634,7 +3890,7 @@ function ComposerPanel({ onCreatePost, compact = false, profile = currentUser })
       postType,
       title: cleanTitle,
       body: cleanBody,
-      media: [],
+      media: media.map((item) => item.url),
       area: area.trim(),
       budget: budget.trim(),
       tags: tags.split(',').map((tag) => tag.trim()).filter(Boolean).slice(0, 6),
@@ -2653,37 +3909,71 @@ function ComposerPanel({ onCreatePost, compact = false, profile = currentUser })
     setArea('');
     setBudget('');
     setTags('');
+    setMedia([]);
   };
 
   return (
-    <form onSubmit={submit} className="rounded-[1.75rem] border border-white bg-white/86 p-4 shadow-[0_18px_44px_-34px_rgba(15,23,42,0.45),inset_0_1px_0_white] md:p-5">
-      <div className="flex items-start gap-3">
-        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#edf8ee] text-[#2f7d32]">
-          <UserRound className="h-5 w-5" />
-        </div>
-        <div className="min-w-0 flex-1">
-          <p className="mb-2 text-sm font-medium text-slate-950">What are you looking for, offering, or sharing?</p>
-          <textarea value={body} onChange={(event) => setBody(event.target.value)} rows={compact ? 3 : 4} placeholder="What are you looking for, offering, or sharing?" className="w-full resize-none rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm leading-6 text-slate-900 outline-hidden focus:border-[#2f7d32] focus:bg-white" />
-          <p className="mt-2 text-xs leading-5 text-slate-500">Post a listing, search, question, update, deal, stay, or useful rental-market insight.</p>
+    <form onSubmit={submit} className="overflow-hidden rounded-[2rem] bg-white shadow-[0_26px_80px_-58px_rgba(15,23,42,0.72)] ring-1 ring-black/5">
+      <div className="bg-[#e2f7f3] px-5 pb-6 pt-5">
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <PeepAvatar
+              seed={`${profile.id}-${profile.name}-${profile.role}`}
+              variant={profile.avatarVariant || 'bust'}
+              avatarIndex={profile.avatarIndex}
+              avatarBg={profile.avatarBg || 'mist'}
+              className="h-12 w-12"
+              imageClassName={(profile.avatarVariant || 'bust') === 'bust' ? '' : 'object-contain p-1'}
+            />
+            <div>
+              <p className="text-sm font-bold text-[#050506]">{profile.name || currentUser.name}</p>
+              <p className="text-xs font-medium text-[#050506]/55">{profile.role || currentUser.role} · public post</p>
+            </div>
+          </div>
+          <button className="rounded-full bg-[#050506] px-5 py-2.5 text-sm font-bold text-white">Post</button>
         </div>
       </div>
+      <div className="p-5">
+      <div className="flex items-start gap-3">
+        <div className="min-w-0 flex-1">
+          <textarea value={body} onChange={(event) => setBody(event.target.value)} rows={compact ? 4 : 5} placeholder="What are you looking for, offering, or sharing?" className="w-full resize-none rounded-[1.5rem] border-0 bg-[#f4f7f8] px-4 py-4 text-base leading-7 text-slate-900 outline-hidden placeholder:text-slate-400 focus:bg-[#eef5f3]" />
+        </div>
+      </div>
+      {media.length > 0 && (
+        <div className="mt-4 grid grid-cols-2 gap-2">
+          {media.map((item, index) => (
+            <div key={`${item.name}-${index}`} className="relative overflow-hidden rounded-[1.4rem] bg-slate-100">
+              {item.type === 'video' ? (
+                <video src={item.url} className="aspect-square h-full w-full object-cover" muted playsInline />
+              ) : (
+                <img src={item.url} alt="" className="aspect-square h-full w-full object-cover" />
+              )}
+              <button type="button" onClick={() => setMedia((current) => current.filter((_, mediaIndex) => mediaIndex !== index))} className="absolute right-2 top-2 grid h-8 w-8 place-items-center rounded-full bg-black/62 text-sm font-bold text-white">×</button>
+            </div>
+          ))}
+        </div>
+      )}
       <div className="mt-4 grid gap-3 sm:grid-cols-2">
-        <input value={title} onChange={(event) => setTitle(event.target.value)} required placeholder="Post title" className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-hidden focus:border-[#2f7d32]" />
-        <select value={postType} onChange={(event) => setPostType(event.target.value)} className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-hidden focus:border-[#2f7d32]">
+        <input value={title} onChange={(event) => setTitle(event.target.value)} required placeholder="Post title" className="rounded-[1.15rem] border-0 bg-[#f4f7f8] px-4 py-3 text-sm font-medium outline-hidden focus:bg-[#eef5f3]" />
+        <select value={postType} onChange={(event) => setPostType(event.target.value)} className="rounded-[1.15rem] border-0 bg-[#f4f7f8] px-4 py-3 text-sm font-medium outline-hidden focus:bg-[#eef5f3]">
           {postTypes.map((type) => <option key={type}>{type}</option>)}
         </select>
-        <input value={area} onChange={(event) => setArea(event.target.value)} placeholder="Area" className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-hidden focus:border-[#2f7d32]" />
-        <input value={budget} onChange={(event) => setBudget(event.target.value)} placeholder="Budget or price" className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-hidden focus:border-[#2f7d32]" />
+        <input value={area} onChange={(event) => setArea(event.target.value)} placeholder="Area" className="rounded-[1.15rem] border-0 bg-[#f4f7f8] px-4 py-3 text-sm font-medium outline-hidden focus:bg-[#eef5f3]" />
+        <input value={budget} onChange={(event) => setBudget(event.target.value)} placeholder="Budget or price" className="rounded-[1.15rem] border-0 bg-[#f4f7f8] px-4 py-3 text-sm font-medium outline-hidden focus:bg-[#eef5f3]" />
       </div>
-      <input value={tags} onChange={(event) => setTags(event.target.value)} placeholder="Tags, separated by commas" className="mt-3 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-hidden focus:border-[#2f7d32]" />
+      <input value={tags} onChange={(event) => setTags(event.target.value)} placeholder="Tags, separated by commas" className="mt-3 w-full rounded-[1.15rem] border-0 bg-[#f4f7f8] px-4 py-3 text-sm font-medium outline-hidden focus:bg-[#eef5f3]" />
       <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex flex-wrap gap-2">
-          {['Public', 'Add media', 'Boost option'].map((item) => <span key={item} className="rounded-full bg-[#edf7ff] px-3 py-1 text-xs text-[#154f79]">{item}</span>)}
+          <input ref={mediaInputRef} type="file" accept="image/*,video/*" multiple className="hidden" onChange={addMediaFiles} />
+          <button type="button" onClick={() => mediaInputRef.current?.click()} className="inline-flex items-center gap-2 rounded-full bg-[#f4f7f8] px-4 py-2.5 text-sm font-bold text-[#050506]"><Camera className="h-4 w-4" /> Media</button>
+          <span className="rounded-full bg-[#f4f7f8] px-4 py-2.5 text-sm font-bold text-[#050506]">{postType}</span>
+          <span className="rounded-full bg-[#f4f7f8] px-4 py-2.5 text-sm font-bold text-[#050506]">Public</span>
         </div>
-        <button className="inline-flex items-center justify-center gap-2 rounded-full bg-[#2f7d32] px-5 py-3 text-sm text-white">
+        <button className="inline-flex items-center justify-center gap-2 rounded-full bg-[#2f7d32] px-5 py-3 text-sm font-bold text-white">
           <PlusCircle className="h-4 w-4" />
           Post free
         </button>
+      </div>
       </div>
     </form>
   );
@@ -2881,10 +4171,10 @@ function ProgressiveQuestionsPanel({ profile, answers, setAnswers }) {
 
 function ProfileEditor({ profile, setProfile, answers, setAnswers }) {
   return (
-    <div className="grid gap-5 lg:grid-cols-[1fr_22rem]">
+    <div id="profile-editor" className="grid gap-5 lg:grid-cols-[1fr_22rem]">
       <div className="rounded-4xl border border-white bg-white/86 p-6 shadow-[0_18px_44px_-34px_rgba(15,23,42,0.45),inset_0_1px_0_white]">
-        <h1 className="text-4xl font-normal tracking-tight text-slate-950">Profile</h1>
-        <p className="mt-3 text-slate-600">This is your match profile. It syncs with your RentEazy account.</p>
+        <h1 className="text-4xl font-semibold tracking-tight text-slate-950">Your market profile</h1>
+        <p className="mt-3 text-slate-600">This is how RentEazy understands your role, area, timing, and intent.</p>
         <div className="mt-6 grid gap-3 sm:grid-cols-2">
           <label className="text-sm text-slate-600">Name<input value={profile.name} onChange={(event) => setProfile((current) => ({ ...current, name: event.target.value }))} className="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 outline-hidden focus:border-[#2f7d32]" /></label>
           <label className="text-sm text-slate-600">Role<select value={profile.role || ''} onChange={(event) => setProfile((current) => ({ ...current, role: event.target.value }))} className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-hidden focus:border-[#2f7d32]"><option value="" disabled>Choose your role</option>{roleOptions.map((role) => <option key={role}>{role}</option>)}</select></label>
@@ -2895,9 +4185,117 @@ function ProfileEditor({ profile, setProfile, answers, setAnswers }) {
         </div>
       </div>
       <div className="space-y-4">
+        <AvatarCustomizer profile={profile} setProfile={setProfile} />
         <ProfileStrengthCard profile={profile} answers={answers} />
         <ProgressiveQuestionsPanel profile={profile} answers={answers} setAnswers={setAnswers} />
       </div>
+    </div>
+  );
+}
+
+function ProfileSocialOverview({ profile, answers, reputationProfile, usageLimit, posts, likedIds, savedIds, shares, matches, groups, groupMemberships, wallet, purchases, appStreak, onSelectProduct, onSelectTab }) {
+  const match = getMatchSummary(profile, answers);
+  const strength = calculateProfileStrength(profile, answers);
+  const remaining = Math.max(0, usageLimit.allowance - usageLimit.used);
+  const ownPosts = posts.filter((post) => post.authorId === currentUser.id || post.authorName === profile.name);
+  const latestPost = ownPosts[0] || posts[0];
+  const lanes = getRoleMarketLanes(profile.role).slice(0, 4);
+  const joinedIds = new Set(groupMemberships.map((membership) => membership.groupId));
+  const joinedGroups = groups.filter((group) => joinedIds.has(group.id)).slice(0, 3);
+
+  return (
+    <div className="space-y-5">
+      <section className="overflow-hidden rounded-[2rem] border border-white bg-white shadow-[0_24px_70px_-50px_rgba(15,23,42,0.62)]">
+        <div className="p-5 text-center sm:p-7">
+          <PeepAvatar
+            seed={`${profile.id}-${profile.name}-${profile.role}`}
+            variant={profile.avatarVariant || 'standing'}
+            avatarIndex={profile.avatarIndex}
+            avatarBg={profile.avatarBg || 'mist'}
+            className="mx-auto h-28 w-28 rounded-[1.85rem] shadow-[0_18px_42px_-28px_rgba(15,23,42,0.72)]"
+            ring="ring-4 ring-[#f1f5f9]"
+            imageClassName={(profile.avatarVariant || 'standing') === 'bust' ? '' : 'object-contain p-1'}
+          />
+          <div className="mt-4 flex flex-wrap justify-center gap-2">
+            <span className="rounded-full bg-[#edf7ff] px-3 py-1 text-xs font-semibold text-[#154f79] ring-1 ring-[#cfe9fb]">{displayRole(profile.role)}</span>
+            <span className="rounded-full bg-[#edf8ee] px-3 py-1 text-xs font-semibold text-[#215d27] ring-1 ring-[#d5ecd7]">{reputationProfile.tier} reputation</span>
+          </div>
+          <h1 className="mt-4 text-3xl font-semibold leading-tight tracking-tight text-slate-950 sm:text-4xl">{profile.name || 'RentEazy member'}</h1>
+          <p className="mx-auto mt-2 max-w-2xl text-sm leading-6 text-slate-500">{[profile.area || 'Set area', profile.budget || 'Add budget/range', profile.moveDate || 'Add timing'].join(' · ')}</p>
+          <div className="mt-5 grid grid-cols-2 gap-2 sm:mx-auto sm:max-w-sm">
+            <a href="/app/post" className="rounded-full bg-[#092243] px-4 py-3 text-sm font-semibold text-white shadow-[0_14px_28px_-22px_rgba(9,34,67,0.82)]">Post</a>
+            <a href="/app/swipe" className="rounded-full bg-[#8bdc65] px-4 py-3 text-sm font-semibold text-[#092243] shadow-[0_14px_28px_-22px_rgba(47,125,50,0.65)]">Swipe</a>
+          </div>
+        </div>
+        <div className="grid grid-cols-2 gap-3 border-t border-slate-100 p-4 lg:grid-cols-4">
+          {[
+            [`${match.score}%`, 'Match fit', match.badges.slice(0, 2).join(' · ') || 'Answer questions'],
+            [`${strength.score}%`, 'Profile strength', strength.suggestions.slice(0, 2).join(' · ') || 'Ready'],
+            [`${remaining}`, 'Swipes left', 'Resets daily'],
+            [`${likedIds.length + savedIds.length}`, 'Shortlist', `${matches.length} matches · ${shares.length} shares`],
+          ].map(([value, label, sub]) => (
+            <div key={label} className="rounded-[1.35rem] bg-[#f6f9fb] p-4 ring-1 ring-slate-200/70">
+              <p className="text-2xl font-semibold tracking-tight text-slate-950">{value}</p>
+              <p className="mt-1 text-sm font-medium text-slate-700">{label}</p>
+              <p className="mt-1 truncate text-xs text-slate-500">{sub}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="grid gap-4 lg:grid-cols-[1fr_20rem]">
+        <div className="rounded-[1.75rem] border border-white bg-white/92 p-5 shadow-[0_18px_44px_-34px_rgba(15,23,42,0.45),inset_0_1px_0_white]">
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#2670a8]">Market map</p>
+              <h2 className="mt-2 text-2xl font-semibold tracking-tight text-slate-950">Where you fit today</h2>
+            </div>
+            <a href="/app/feed" className="rounded-full bg-[#092243] px-4 py-2 text-xs font-semibold text-white">Open Feed</a>
+          </div>
+          <div className="mt-4 grid gap-2 sm:grid-cols-2">
+            {lanes.map(([title, body, tab]) => (
+              <button key={title} type="button" onClick={() => onSelectTab(tab)} className="rounded-[1.25rem] border border-slate-200 bg-[#f7faf9] p-4 text-left transition hover:border-[#2f7d32]">
+                <span className="block text-sm font-semibold text-slate-950">{title}</span>
+                <span className="mt-1 block text-xs leading-5 text-slate-500">{body}</span>
+              </button>
+            ))}
+          </div>
+          {latestPost && (
+            <a href="/app/feed" className="mt-4 flex gap-3 rounded-[1.25rem] bg-[#edf7ff] p-3 ring-1 ring-[#cfe9fb]">
+              {latestPost.media?.[0] && <FeedMediaAsset src={latestPost.media[0]} alt="" className="h-20 w-20 shrink-0 rounded-2xl object-cover" />}
+              <span className="min-w-0">
+                <span className="block text-sm font-semibold text-slate-950">{latestPost.title}</span>
+                <span className="mt-1 line-clamp-2 block text-xs leading-5 text-[#154f79]">{latestPost.body}</span>
+              </span>
+            </a>
+          )}
+        </div>
+        <div className="rounded-[1.75rem] border border-white bg-[#092243] p-5 text-white shadow-[0_24px_60px_-42px_rgba(9,34,67,0.9)]">
+          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#8fd0ff]">Account pulse</p>
+          <h2 className="mt-2 text-2xl font-semibold tracking-tight">Useful, not busy.</h2>
+          <div className="mt-4 grid grid-cols-3 gap-2 text-center">
+            {[[wallet.balance, 'Credits'], [purchases.length, 'Buys'], [appStreak.count, 'Days']].map(([value, label]) => (
+              <div key={label} className="rounded-2xl bg-white/10 p-3 ring-1 ring-white/10">
+                <p className="text-xl font-semibold">{value}</p>
+                <p className="mt-1 text-[0.68rem] text-white/55">{label}</p>
+              </div>
+            ))}
+          </div>
+          <button type="button" onClick={() => onSelectProduct('extra-swipes-10')} className="mt-4 w-full rounded-full bg-[#8bdc65] px-4 py-3 text-sm font-semibold text-[#092243]">+10 swipes for 9p</button>
+          <a href="/app/billing" className="mt-2 inline-flex w-full justify-center rounded-full bg-white/12 px-4 py-3 text-sm font-semibold text-white ring-1 ring-white/12">Billing</a>
+        </div>
+      </section>
+
+      {!!joinedGroups.length && (
+        <section className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none]">
+          {joinedGroups.map((group) => (
+            <a key={group.id} href="/app/feed" className="min-w-[15rem] rounded-[1.35rem] bg-white px-4 py-3 text-sm shadow-[0_14px_34px_-28px_rgba(15,23,42,0.45)] ring-1 ring-white">
+              <span className="block font-semibold text-slate-950">{group.name}</span>
+              <span className="mt-1 block text-xs text-slate-500">{group.memberCount} members · {group.area}</span>
+            </a>
+          ))}
+        </section>
+      )}
     </div>
   );
 }
@@ -3022,6 +4420,196 @@ function AppPulseStrip({ wallet, purchases, boosts, reports, shares }) {
   );
 }
 
+function LikesSocialInbox({ posts, likedIds, savedIds, matches, matchMessages, profile, onOpenPost, onSelectProduct }) {
+  const savedPosts = posts.filter((post) => likedIds.includes(post.id) || savedIds.includes(post.id)).slice(0, 10);
+  const matchRows = matches.slice(0, 6).map((match) => {
+    const latestMessage = matchMessages
+      .filter((message) => message.matchId === match.id)
+      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))[0];
+    return {
+      id: match.id,
+      kind: 'match',
+      title: match.subjectTitle,
+      subtitle: latestMessage?.body || `${match.score}% fit · ${match.status.replace(/_/g, ' ')}`,
+      meta: match.reasonBadges?.[0] || 'Mutual match',
+      badge: `${match.score}%`,
+      createdAt: latestMessage?.createdAt || match.createdAt,
+      action: null,
+    };
+  });
+  const postRows = savedPosts.map((post) => ({
+    id: post.id,
+    kind: savedIds.includes(post.id) ? 'saved' : 'liked',
+    title: post.title,
+    subtitle: post.body,
+    meta: `${post.authorName} · ${post.area}`,
+    badge: savedIds.includes(post.id) ? 'Saved' : 'Liked',
+    createdAt: post.createdAt,
+    post,
+  }));
+  const rows = [...matchRows, ...postRows].sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+  const hiddenLikeCount = Math.max(0, likedIds.length + matches.length - 1);
+
+  return (
+    <section className="overflow-hidden rounded-[2rem] border border-white bg-white shadow-[0_24px_70px_-50px_rgba(15,23,42,0.62)]">
+      <div className="flex items-center gap-3 border-b border-slate-100 p-4 sm:p-5">
+        <PeepAvatar
+          seed={`${profile.id}-${profile.name}-${profile.role}`}
+          variant={profile.avatarVariant || 'standing'}
+          avatarIndex={profile.avatarIndex}
+          avatarBg={profile.avatarBg || 'mist'}
+          className="h-12 w-12 rounded-2xl"
+          ring="ring-1 ring-slate-200"
+          imageClassName={(profile.avatarVariant || 'standing') === 'bust' ? '' : 'object-contain p-1'}
+        />
+        <div className="min-w-0 flex-1">
+          <h1 className="text-2xl font-semibold tracking-tight text-slate-950">Likes</h1>
+          <p className="truncate text-sm text-slate-500">Matches, saved posts, and useful threads in one place.</p>
+        </div>
+        <button type="button" onClick={() => onSelectProduct('reveal-like-1')} className="rounded-full bg-[#092243] px-4 py-2 text-sm font-semibold text-white">Unlock</button>
+      </div>
+
+      <div className="p-4 sm:p-5">
+        <div className="flex items-center gap-2 rounded-full bg-[#f3f6f8] px-4 py-3 text-sm text-slate-500">
+          <Search className="h-4 w-4" />
+          <span>Search matches, saved posts, people</span>
+        </div>
+        <div className="mt-3 flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none]">
+          {['All', 'Matches', 'Liked', 'Saved', 'Viewing'].map((chip, index) => (
+            <button key={chip} type="button" className={`shrink-0 rounded-full px-4 py-2 text-sm font-semibold ${index === 0 ? 'bg-[#092243] text-white' : 'bg-[#f3f6f8] text-slate-600'}`}>{chip}</button>
+          ))}
+        </div>
+      </div>
+
+      <div className="divide-y divide-slate-100">
+        <div className="flex items-center gap-3 px-4 py-4 sm:px-5">
+          <div className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-[#ffe9f0] text-[#d91d52]">
+            <Heart className="h-6 w-6" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="font-semibold text-slate-950">Who liked you</p>
+            <p className="line-clamp-1 text-sm text-slate-500">{hiddenLikeCount ? `${hiddenLikeCount} real like${hiddenLikeCount === 1 ? '' : 's'} waiting` : 'No hidden likes yet. Nothing is faked.'}</p>
+          </div>
+          <button type="button" onClick={() => onSelectProduct('reveal-like-1')} className="rounded-full bg-[#edf7ff] px-3 py-2 text-xs font-semibold text-[#154f79]">Reveal</button>
+        </div>
+
+        {rows.map((row) => (
+          <button
+            key={`${row.kind}-${row.id}`}
+            type="button"
+            onClick={() => row.post && onOpenPost(row.post)}
+            className="flex w-full items-center gap-3 px-4 py-4 text-left transition hover:bg-[#f7faf9] sm:px-5"
+          >
+            {row.post?.media?.[0] ? (
+              <FeedMediaAsset src={row.post.media[0]} alt="" className="h-14 w-14 shrink-0 rounded-2xl object-cover" />
+            ) : (
+              <PeepAvatar
+                seed={`${row.id}-${row.title}`}
+                variant="bust"
+                avatarBg={row.kind === 'match' ? 'sky' : 'mint'}
+                className="h-14 w-14 rounded-2xl"
+                ring="ring-1 ring-slate-200"
+              />
+            )}
+            <span className="min-w-0 flex-1">
+              <span className="line-clamp-1 block font-semibold text-slate-950">{row.title}</span>
+              <span className="line-clamp-1 block text-sm text-slate-500">{row.subtitle}</span>
+              <span className="mt-1 block text-xs text-slate-400">{row.meta}</span>
+            </span>
+            <span className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-semibold ${row.kind === 'match' ? 'bg-[#edf8ee] text-[#215d27]' : 'bg-[#f3f6f8] text-slate-500'}`}>{row.badge}</span>
+          </button>
+        ))}
+
+        {!rows.length && (
+          <div className="px-5 py-8 text-sm leading-6 text-slate-500">
+            Like or save posts from the Feed, or create mutual interest from Swipe. They will appear here without fake activity.
+          </div>
+        )}
+      </div>
+    </section>
+  );
+}
+
+function SocialKitProfilePage({ profile, posts, likedIds, savedIds, matches, reputationProfile, answers, onOpenPost }) {
+  const strength = calculateProfileStrength(profile, answers);
+  const ownOrRelevantPosts = posts
+    .filter((post) => post.authorId === currentUser.id || post.authorName === profile.name || likedIds.includes(post.id) || savedIds.includes(post.id))
+    .slice(0, 8);
+  const gallery = (ownOrRelevantPosts.length ? ownOrRelevantPosts : posts).filter((post) => post.media?.[0]).slice(0, 6);
+
+  return (
+    <section className="overflow-hidden rounded-[2rem] bg-white shadow-[0_24px_70px_-52px_rgba(15,23,42,0.62)] ring-1 ring-white">
+      <div className="relative min-h-[18rem] overflow-hidden bg-[#e1f6f4] px-6 pb-6 pt-5">
+        <div className="absolute -right-20 -top-28 h-72 w-72 rotate-45 rounded-[4rem] border border-[#dceee9]" />
+        <div className="absolute -bottom-24 -left-24 h-72 w-72 rotate-45 rounded-[4rem] bg-white/48" />
+        <div className="relative z-10 flex items-center justify-between">
+          <a href="/app/feed" className="grid h-10 w-10 place-items-center rounded-full bg-white/80 text-[#050506] shadow-[0_12px_28px_-20px_rgba(15,23,42,0.5)]">
+            <ArrowDownLeft className="h-4 w-4" />
+          </a>
+          <button type="button" className="grid h-10 w-10 place-items-center rounded-full bg-white/80 text-[#050506] shadow-[0_12px_28px_-20px_rgba(15,23,42,0.5)]">
+            <Bookmark className="h-4 w-4" />
+          </button>
+        </div>
+        <div className="relative z-10 mt-8 text-center">
+          <PeepAvatar
+            seed={`${profile.id}-${profile.name}-${profile.role}`}
+            variant={profile.avatarVariant || 'standing'}
+            avatarIndex={profile.avatarIndex}
+            avatarBg={profile.avatarBg || 'mist'}
+            className="mx-auto h-28 w-28 rounded-[2rem]"
+            ring="ring-8 ring-white/80"
+            imageClassName={(profile.avatarVariant || 'standing') === 'bust' ? '' : 'object-contain p-1'}
+          />
+          <h1 className="mt-4 text-2xl font-bold tracking-tight text-[#050506]">{profile.name || 'RentEazy member'}</h1>
+          <p className="mt-1 text-sm font-semibold text-[#6d7f85]">@{(profile.name || 'renteazy').toLowerCase().replace(/[^a-z0-9]+/g, '') || 'renteazy'} · {displayRole(profile.role)}</p>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-3 gap-2 px-6 py-5 text-center">
+        {[
+          [posts.length, 'Posts'],
+          [reputationProfile.score || 100, 'Trust'],
+          [matches.length, 'Matches'],
+        ].map(([value, label]) => (
+          <div key={label}>
+            <p className="text-2xl font-bold text-[#050506]">{value}</p>
+            <p className="mt-1 text-xs font-semibold text-slate-400">{label}</p>
+          </div>
+        ))}
+      </div>
+
+      <div className="mx-6 rounded-[1.55rem] bg-[#f4f7f8] p-3">
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <p className="text-sm font-bold text-[#050506]">{strength.score}% profile strength</p>
+            <p className="mt-1 line-clamp-1 text-xs text-slate-500">{strength.suggestions.slice(0, 2).join(' · ') || 'Ready for matching'}</p>
+          </div>
+          <a href="#profile-editor" className="rounded-full bg-[#050506] px-4 py-2 text-xs font-bold text-white">Edit</a>
+        </div>
+      </div>
+
+      <div className="px-6 pb-6 pt-5">
+        <div className="mb-4 flex items-center justify-center gap-2">
+          <button type="button" className="rounded-full bg-[#050506] px-5 py-2 text-xs font-bold text-white">Photos</button>
+          <button type="button" className="rounded-full bg-[#f4f7f8] px-5 py-2 text-xs font-bold text-slate-500">Saved</button>
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          {gallery.map((post, index) => (
+            <button
+              key={post.id}
+              type="button"
+              onClick={() => onOpenPost(post)}
+              className={`overflow-hidden rounded-[1.55rem] bg-slate-100 ${index % 3 === 0 ? 'row-span-2 aspect-[0.72]' : 'aspect-square'}`}
+            >
+              <FeedMediaAsset src={post.media[0]} alt="" className="h-full w-full object-cover" />
+            </button>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function SocialHomeHeader({ profile, usageLimit, groups, memberships, posts, onSelectTab }) {
   const remaining = Math.max(0, usageLimit.allowance - usageLimit.used);
   const joinedCount = memberships.length;
@@ -3029,43 +4617,49 @@ function SocialHomeHeader({ profile, usageLimit, groups, memberships, posts, onS
   const popularAreas = [...new Set(posts.map((post) => post.area).filter(Boolean))].slice(0, 3);
 
   return (
-    <section className="overflow-hidden rounded-[2rem] border border-white bg-white/92 shadow-[0_22px_54px_-38px_rgba(15,23,42,0.48),inset_0_1px_0_white]">
-      <div className="bg-linear-to-br from-[#092243] via-[#123f63] to-[#2f7d32] p-5 text-white sm:p-6">
-        <div className="flex items-start justify-between gap-4">
-          <div className="min-w-0">
-            <p className="text-sm text-white/68">Home</p>
-            <h1 className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">What’s happening in your rental world?</h1>
-            <p className="mt-3 max-w-2xl text-sm leading-6 text-white/72">Browse people, places, posts, groups, deals, stays, and useful local updates in one calm Feed.</p>
-          </div>
-          <a href="/app/profile" className="shrink-0 rounded-full bg-white/14 px-3 py-2 text-xs text-white ring-1 ring-white/16">{roleLabel}</a>
-        </div>
-        <div className="mt-5 grid grid-cols-3 gap-2">
-          {[
-            [remaining, 'Swipes today'],
-            [joinedCount, 'Groups joined'],
-            [posts.length, 'Live posts'],
-          ].map(([value, label]) => (
-            <div key={label} className="rounded-2xl bg-white/12 px-3 py-3 ring-1 ring-white/12">
-              <p className="text-xl font-semibold">{value}</p>
-              <p className="mt-1 text-[0.68rem] text-white/58">{label}</p>
-            </div>
-          ))}
+    <section className="overflow-hidden rounded-[1.65rem] border border-white/75 bg-white/76 p-3 shadow-[0_24px_70px_-58px_rgba(15,23,42,0.7),inset_0_1px_0_rgba(255,255,255,0.96)] backdrop-blur-2xl">
+      <div className="flex items-center gap-2">
+        <a href="/app/post" className="flex min-w-0 flex-1 items-center gap-3 rounded-[1.3rem] bg-[#f7faf9] px-3 py-3 text-left ring-1 ring-black/5 transition-transform active:scale-[0.99]">
+          <span className="relative flex shrink-0">
+            <PeepAvatar
+              seed={`${profile.id}-${profile.name}-${profile.role}`}
+              variant={profile.avatarVariant || 'bust'}
+              avatarIndex={profile.avatarIndex}
+              avatarBg={profile.avatarBg || 'mist'}
+              className="h-10 w-10 shadow-[0_12px_28px_-16px_rgba(9,34,67,0.55)]"
+              ring="ring-1 ring-black/5"
+              imageClassName={(profile.avatarVariant || 'bust') === 'bust' ? '' : 'object-contain p-1'}
+            />
+            <span className="absolute -right-0.5 -bottom-0.5 h-3 w-3 rounded-full border-2 border-white bg-[#2f7d32]" />
+          </span>
+          <span className="min-w-0">
+            <span className="block truncate text-sm font-medium text-slate-950">What are you looking for, offering, or sharing?</span>
+            <span className="mt-0.5 block truncate text-xs text-slate-500">Post into the rental market feed</span>
+          </span>
+        </a>
+        <div className="flex shrink-0 gap-1.5">
+          <button type="button" aria-label="Groups" onClick={() => onSelectTab('Groups')} className="flex h-11 w-11 items-center justify-center rounded-full bg-white text-[#092243] ring-1 ring-black/5 shadow-[0_10px_24px_-18px_rgba(15,23,42,0.5)]"><Users className="h-4 w-4" /></button>
+          <a href="/app/swipe" aria-label="Swipe" className="flex h-11 w-11 items-center justify-center rounded-full bg-[#2f7d32] text-white shadow-[0_14px_30px_-18px_rgba(47,125,50,0.7)]"><Flame className="h-4 w-4" /></a>
         </div>
       </div>
-      <div className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center">
-        <a href="/app/post" className="flex min-w-0 flex-1 items-center gap-3 rounded-full bg-slate-50 px-4 py-3 text-left text-sm text-slate-500 ring-1 ring-slate-100">
-          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#edf8ee] text-[#2f7d32]"><UserRound className="h-4 w-4" /></span>
-          <span className="truncate">Post a listing, question, update, deal, stay, or local tip</span>
+      <div className="mt-3 grid grid-cols-3 gap-2 text-center">
+        <a href="/app/profile" className="rounded-2xl bg-[#edf7ff] px-2 py-2 text-[#154f79]">
+          <span className="block truncate text-[0.68rem] text-[#154f79]/70">Role</span>
+          <span className="block truncate text-xs font-semibold">{roleLabel}</span>
         </a>
-        <div className="flex shrink-0 gap-2">
-          <button type="button" onClick={() => onSelectTab('Groups')} className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700"><Users className="h-4 w-4" />Groups</button>
-          <a href="/app/swipe" className="inline-flex items-center gap-2 rounded-full bg-[#2f7d32] px-4 py-3 text-sm text-white"><Flame className="h-4 w-4" />Swipe</a>
-        </div>
+        <a href="/app/swipe" className="rounded-2xl bg-[#edf8ee] px-2 py-2 text-[#215d27]">
+          <span className="block text-[0.68rem] text-[#215d27]/70">Swipes</span>
+          <span className="block text-xs font-semibold">{remaining} ready</span>
+        </a>
+        <button type="button" onClick={() => onSelectTab('Groups')} className="rounded-2xl bg-white px-2 py-2 text-slate-700 ring-1 ring-black/5">
+          <span className="block text-[0.68rem] text-slate-400">Groups</span>
+          <span className="block text-xs font-semibold">{joinedCount} joined</span>
+        </button>
       </div>
       {popularAreas.length > 0 && (
-        <div className="flex flex-wrap gap-2 px-4 pb-4">
+        <div className="mt-3 flex gap-2 overflow-x-auto pb-0.5">
           {popularAreas.map((area) => (
-            <button key={area} type="button" onClick={() => onSelectTab('For You')} className="rounded-full bg-[#edf7ff] px-3 py-1.5 text-xs text-[#154f79]">{area}</button>
+            <button key={area} type="button" onClick={() => onSelectTab('For You')} className="shrink-0 rounded-full bg-[#f7faf9] px-3 py-1.5 text-xs font-medium text-slate-600 ring-1 ring-black/5">{area}</button>
           ))}
         </div>
       )}
@@ -3074,22 +4668,53 @@ function SocialHomeHeader({ profile, usageLimit, groups, memberships, posts, onS
 }
 
 function SocialStoryRail({ posts, groups, onSelectTab }) {
+  const mediaPosts = posts
+    .filter((post) => post.media?.[0])
+    .slice(0, 5)
+    .map((post) => ({
+      id: post.id,
+      title: post.postType === 'Area Insight' ? post.area : post.postType,
+      body: post.authorName.split(' ')[0],
+      media: getVideoPreviewImage(post) || post.media[0],
+      tab: post.postType === 'Room' || post.postType === 'Property' ? 'Properties' : post.postType === 'Looking' ? 'Looking' : post.postType === 'House Buddy' ? 'Buddies' : 'For You',
+    }));
   const stories = [
-    { id: 'for-you', title: 'For You', body: 'Best market signals', icon: Sparkles, tab: 'For You', tone: 'bg-[#092243] text-white' },
-    { id: 'groups', title: 'Groups', body: `${groups.length} open`, icon: Users, tab: 'Groups', tone: 'bg-[#edf8ee] text-[#215d27]' },
-    { id: 'properties', title: 'Properties', body: `${posts.filter((post) => ['Property', 'Room', 'Serviced Accommodation'].includes(post.postType)).length} posts`, icon: Home, tab: 'Properties', tone: 'bg-[#edf7ff] text-[#154f79]' },
-    { id: 'deals', title: 'Deals', body: 'Investors + sourcers', icon: BadgeCheck, tab: 'Investors', tone: 'bg-[#fff7ed] text-[#9a3412]' },
-    { id: 'perks', title: 'Perks', body: 'Useful partners', icon: Gift, tab: 'Perks', tone: 'bg-white text-slate-700' },
+    { id: 'post', title: 'Post', body: 'Free', media: '', tab: 'Post' },
+    ...mediaPosts,
+    { id: 'groups', title: 'Groups', body: `${groups.length} open`, media: '', tab: 'Groups' },
+    { id: 'perks', title: 'Perks', body: 'Useful', media: '', tab: 'Perks' },
   ];
 
+  const openStory = (tab) => {
+    if (tab === 'Post') {
+      window.location.href = '/app/post';
+      return;
+    }
+    onSelectTab(tab);
+  };
+
   return (
-    <div className="overflow-x-auto pb-1">
+    <div className="-mx-6 overflow-x-auto px-6 pb-1 [scrollbar-width:none]">
       <div className="flex min-w-max gap-3">
-        {stories.map(({ id, title, body, icon: Icon, tab, tone }) => (
-          <button key={id} type="button" onClick={() => onSelectTab(tab)} className={`w-32 rounded-[1.35rem] border border-white p-4 text-left shadow-[0_14px_34px_-30px_rgba(15,23,42,0.48)] ${tone}`}>
-            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-white/18 ring-1 ring-current/10"><Icon className="h-5 w-5" /></span>
-            <span className="mt-5 block text-sm font-semibold">{title}</span>
-            <span className="mt-1 block text-xs opacity-70">{body}</span>
+        {stories.map(({ id, title, body, media, tab }) => (
+          <button key={id} type="button" onClick={() => openStory(tab)} className="w-[76px] shrink-0 text-left">
+            <span className="relative block h-[96px] overflow-hidden rounded-[1.45rem] bg-[#e2f7f3] shadow-[0_18px_40px_-28px_rgba(15,23,42,0.74)] ring-1 ring-black/5">
+              {media ? (
+                <>
+                  <FeedMediaAsset src={media} alt="" className="absolute inset-0 h-full w-full object-cover" />
+                  <span className="absolute inset-0 bg-linear-to-t from-black/62 via-black/10 to-transparent" />
+                </>
+              ) : (
+                <span className="absolute inset-0 bg-linear-to-br from-[#dff8f3] via-white to-[#cfe9fb]" />
+              )}
+              <span className={`absolute left-2 top-2 grid h-7 w-7 place-items-center rounded-full ${id === 'post' ? 'bg-[#050506] text-white' : 'bg-white/86 text-[#050506]'} shadow-[0_10px_24px_-18px_rgba(0,0,0,0.7)]`}>
+                {id === 'post' ? <PlusCircle className="h-4 w-4" /> : id === 'groups' ? <Users className="h-4 w-4" /> : id === 'perks' ? <Gift className="h-4 w-4" /> : <Sparkles className="h-3.5 w-3.5" />}
+              </span>
+              <span className="absolute inset-x-0 bottom-0 p-2">
+                <span className={`block truncate text-xs font-bold ${media ? 'text-white' : 'text-[#050506]'}`}>{title}</span>
+                <span className={`block truncate text-[0.64rem] font-medium ${media ? 'text-white/72' : 'text-[#050506]/55'}`}>{body}</span>
+              </span>
+            </span>
           </button>
         ))}
       </div>
@@ -4207,9 +5832,9 @@ function MiniShopPanel({ onSelectProduct, compact = false }) {
 
   return (
     <div className="rounded-[1.75rem] border border-white bg-white/86 p-5 shadow-[0_18px_44px_-34px_rgba(15,23,42,0.45),inset_0_1px_0_white]">
-      <p className="font-['JetBrains_Mono',monospace] text-xs text-[#2670a8]">MINI SHOP</p>
-      <h2 className="mt-2 text-2xl font-normal tracking-tight text-slate-950">Tiny upgrades</h2>
-      <p className="mt-2 text-sm leading-6 text-slate-600">Most boosts and actions are under £1. Credits keep tiny actions simple and transparent.</p>
+      <p className="font-['JetBrains_Mono',monospace] text-xs text-[#2670a8]">PERKS</p>
+      <h2 className="mt-2 text-2xl font-normal tracking-tight text-slate-950">Boosts and extras</h2>
+      <p className="mt-2 text-sm leading-6 text-slate-600">Small paid extras are clearly priced. Credits can keep low-cost actions simple and transparent.</p>
       <div className="mt-4 grid gap-2">
         {products.map((product) => (
           <button key={product.id} type="button" onClick={() => onSelectProduct(product.id)} className="flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-left hover:border-[#2f7d32]">
@@ -4233,7 +5858,7 @@ function ClerkBillingSurface() {
       <div className="rounded-[1.75rem] border border-[#d5ecd7] bg-[#edf8ee] p-5 text-[#215d27]">
         <p className="font-['JetBrains_Mono',monospace] text-xs">BILLING</p>
         <h2 className="mt-2 text-2xl font-normal tracking-tight text-slate-950">Sign in to manage plans.</h2>
-        <p className="mt-2 text-sm leading-6">Plans, seats, upgrades, and billing are handled securely inside your RentEazy account.</p>
+          <p className="mt-2 text-sm leading-6">Plans, seats, paid extras, and billing are handled securely inside your RentEazy account.</p>
         <SignInButton mode="modal" fallbackRedirectUrl="/app/billing">
           <button type="button" className="mt-4 inline-flex w-full items-center justify-center rounded-full bg-[#2f7d32] px-5 py-3 text-sm text-white">Sign in</button>
         </SignInButton>
@@ -4245,6 +5870,189 @@ function ClerkBillingSurface() {
     <div className="overflow-hidden rounded-[1.75rem] border border-white bg-white p-3 shadow-[0_18px_44px_-34px_rgba(15,23,42,0.45),inset_0_1px_0_white]">
       <PricingTable appearance={clerkAppearance} />
     </div>
+  );
+}
+
+function buildContextualUpsells({ routeTab, activeFeedTab, remainingSwipes, newPost, profile, answers, posts, likedIds, savedIds, shares, boosts, matches }) {
+  const strength = calculateProfileStrength(profile, answers);
+  const ownPosts = posts.filter((post) => post.authorId === currentUser.id || post.authorName === profile.name || post.authorName === currentUser.name);
+  const warmPost = ownPosts.find((post) => Number(post.likeCount || 0) + Number(post.saveCount || 0) + Number(post.shareCount || 0) + Number(post.commentCount || 0) > 0);
+  const businessRoles = ['Landlord', 'Individual Agent', 'Agency / Business', 'Short-Term Host', 'Operator', 'Sourcer', 'Investor'];
+  const cards = [];
+
+  if (routeTab === 'Swipe' && remainingSwipes <= 3) {
+    cards.push({
+      id: 'extra-swipes-10',
+      priority: remainingSwipes === 0 ? 100 : 70,
+      eyebrow: remainingSwipes === 0 ? 'Swipe run ended' : 'Almost out',
+      title: remainingSwipes === 0 ? 'Keep this swipe run going.' : `${remainingSwipes} swipes left.`,
+      body: 'Add 10 more swipes for today without unlocking a full plan.',
+      trigger: 'Shown when the free daily swipe allowance is low.',
+      cta: 'Get 10 for 9p',
+      icon: Flame,
+      tone: 'navy',
+    });
+  }
+
+  if (routeTab === 'Swipe' && remainingSwipes > 0 && remainingSwipes <= 8) {
+    cards.push({
+      id: 'superlike-1',
+      priority: 48,
+      eyebrow: 'Strong fit moment',
+      title: 'Found a card that matters?',
+      body: 'Use one Superlike when you want to be shown sooner to a suitable match.',
+      trigger: 'Shown only inside the swipe deck.',
+      cta: 'Superlike for 19p',
+      icon: Sparkles,
+      tone: 'green',
+    });
+  }
+
+  if (newPost && ['Feed', 'Post'].includes(routeTab)) {
+    cards.push({
+      id: 'post-bump-small',
+      priority: 92,
+      eyebrow: 'Fresh post',
+      title: 'This is the right time to bump it.',
+      body: 'New posts have the best context. Give it a small labelled visibility lift while it is warm.',
+      trigger: 'Shown after creating a post.',
+      cta: 'Boost from 29p',
+      icon: Megaphone,
+      tone: 'green',
+      secondaryAction: 'share',
+    });
+  }
+
+  if (!newPost && warmPost && routeTab === 'Feed' && activeFeedTab !== 'Perks' && activeFeedTab !== 'Groups') {
+    cards.push({
+      id: 'post-bump-small',
+      priority: 54,
+      eyebrow: 'Post traction',
+      title: 'Your post has activity.',
+      body: 'A small bump can reach more suitable people while the signal is fresh.',
+      trigger: 'Shown when one of your posts has real activity.',
+      cta: 'Boost from 29p',
+      icon: Megaphone,
+      tone: 'blue',
+    });
+  }
+
+  if (routeTab === 'Likes' && (matches.length || likedIds.length || savedIds.length)) {
+    cards.push({
+      id: 'reveal-like-1',
+      priority: 78,
+      eyebrow: 'Real interest',
+      title: 'Check one like without buying a plan.',
+      body: 'Reveal one real like when likes exist, or keep building your shortlist for free.',
+      trigger: 'Shown on Likes when there is saved, liked, or matched activity.',
+      cta: 'Reveal one for 9p',
+      icon: Heart,
+      tone: 'navy',
+    });
+  }
+
+  if (routeTab === 'Profile' && strength.score < 72) {
+    cards.push({
+      id: 'profile-polish',
+      priority: routeTab === 'Profile' ? 82 : 38,
+      eyebrow: 'Profile gap',
+      title: 'Make your profile easier to match.',
+      body: 'Polish wording and match clarity once you have filled the basics.',
+      trigger: 'Shown when profile strength is below 72%.',
+      cta: 'Polish for 49p',
+      icon: UserRound,
+      tone: 'blue',
+      freeAlternative: 'Answer 3 quick questions first',
+    });
+  }
+
+  if (routeTab === 'Feed' && businessRoles.includes(profile.role) && ['Agents', 'Landlords', 'Operators', 'Sourcers', 'Investors', 'For You'].includes(activeFeedTab)) {
+    cards.push({
+      id: 'sponsored-post-starter',
+      priority: 42,
+      eyebrow: 'Business reach',
+      title: 'Test a labelled sponsored post.',
+      body: 'Useful for listings, offers, services, or deal posts aimed at rental-market intent.',
+      trigger: 'Shown to business roles in relevant Feed tabs.',
+      cta: 'Starter for 99p',
+      icon: BadgeCheck,
+      tone: 'green',
+    });
+  }
+
+  if (routeTab === 'Feed' && shares.length > 0 && !boosts.length) {
+    cards.push({
+      id: 'extra-swipes-10',
+      priority: 35,
+      eyebrow: 'Share reward',
+      title: 'You are creating reach.',
+      body: 'Keep exploring after sharing with a small swipe top-up.',
+      trigger: 'Shown after real share intent is recorded.',
+      cta: '+10 swipes for 9p',
+      icon: Share2,
+      tone: 'blue',
+    });
+  }
+
+  return cards.sort((a, b) => b.priority - a.priority);
+}
+
+function GenUpsellCard({ card, onSelectProduct, onDismiss, onSharePost, newPost, compact = false }) {
+  if (!card) return null;
+  const product = microProducts.find((item) => item.id === card.id);
+  const Icon = card.icon || Sparkles;
+  const tone = {
+    navy: {
+      wrap: 'bg-[#092243] text-white ring-white/10',
+      icon: 'bg-white text-[#092243]',
+      chip: 'bg-white/12 text-white/68 ring-white/12',
+      cta: 'bg-white text-[#092243]',
+      ghost: 'bg-white/10 text-white ring-white/12',
+    },
+    green: {
+      wrap: 'bg-[#edf8ee] text-[#123d22] ring-[#d5ecd7]',
+      icon: 'bg-[#2f7d32] text-white',
+      chip: 'bg-white/70 text-[#215d27] ring-[#d5ecd7]',
+      cta: 'bg-[#2f7d32] text-white',
+      ghost: 'bg-white text-[#215d27] ring-[#d5ecd7]',
+    },
+    blue: {
+      wrap: 'bg-[#edf7ff] text-[#092243] ring-[#cfe9fb]',
+      icon: 'bg-[#2670a8] text-white',
+      chip: 'bg-white/80 text-[#154f79] ring-[#cfe9fb]',
+      cta: 'bg-[#092243] text-white',
+      ghost: 'bg-white text-[#154f79] ring-[#cfe9fb]',
+    },
+  }[card.tone || 'blue'];
+
+  return (
+    <section className={`overflow-hidden rounded-[1.55rem] p-4 shadow-[0_18px_44px_-34px_rgba(15,23,42,0.55)] ring-1 ${tone.wrap}`}>
+      <div className="flex items-start gap-3">
+        <span className={`grid h-11 w-11 shrink-0 place-items-center rounded-[1.05rem] ${tone.icon}`}>
+          <Icon className="h-5 w-5" />
+        </span>
+        <div className="min-w-0 flex-1">
+          <div className="flex items-start justify-between gap-2">
+            <div>
+              <p className={`inline-flex rounded-full px-2.5 py-1 text-[0.68rem] font-semibold uppercase tracking-[0.08em] ring-1 ${tone.chip}`}>{card.eyebrow}</p>
+              <h2 className={`${compact ? 'mt-2 text-lg' : 'mt-3 text-xl'} font-semibold leading-tight tracking-tight`}>{card.title}</h2>
+            </div>
+            <button type="button" onClick={() => onDismiss(card.id)} className={`shrink-0 rounded-full px-2.5 py-1 text-xs ring-1 ${tone.ghost}`}>Not now</button>
+          </div>
+          <p className="mt-2 text-sm leading-6 opacity-75">{card.body}</p>
+          <p className="mt-2 text-xs leading-5 opacity-58">{card.trigger}</p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <button type="button" onClick={() => onSelectProduct(card.id)} className={`rounded-full px-4 py-2 text-sm font-semibold ${tone.cta}`}>
+              {card.cta || product?.price || 'Open'}
+            </button>
+            {card.secondaryAction === 'share' && newPost && (
+              <button type="button" onClick={() => onSharePost(newPost)} className={`rounded-full px-4 py-2 text-sm font-semibold ring-1 ${tone.ghost}`}>Share Everywhere</button>
+            )}
+            {card.freeAlternative && <span className={`inline-flex items-center rounded-full px-3 py-2 text-xs ring-1 ${tone.chip}`}>{card.freeAlternative}</span>}
+          </div>
+        </div>
+      </div>
+    </section>
   );
 }
 
@@ -4274,7 +6082,7 @@ function BillingPanel({ onSelectProduct, purchases, boosts, wallet }) {
         <div className="rounded-[1.75rem] border border-[#fed7aa] bg-[#fff7ed] p-5 text-[#9a3412]">
           <p className="font-['JetBrains_Mono',monospace] text-xs">BILLING SETUP</p>
           <h2 className="mt-2 text-2xl font-normal tracking-tight text-slate-950">Billing is ready to connect.</h2>
-          <p className="mt-2 text-sm leading-6">Add the account and billing keys for launch. The local mini shop remains available for development until live billing products are configured.</p>
+          <p className="mt-2 text-sm leading-6">Connect billing products before taking live payments. Until then, this screen only previews the offer flow.</p>
         </div>
       )}
       <MiniShopPanel onSelectProduct={onSelectProduct} />
@@ -4304,7 +6112,7 @@ function MicroUpsellModal({ product, onClose, onConfirm, billingEnabled = false 
         {billingEnabled ? (
           <a href={`/app/billing?sku=${encodeURIComponent(product.sku)}`} className="mt-5 inline-flex w-full items-center justify-center rounded-full bg-[#2f7d32] px-5 py-3 text-sm text-white">Open billing</a>
         ) : (
-          <button type="button" onClick={() => onConfirm(product)} className="mt-5 inline-flex w-full items-center justify-center rounded-full bg-[#2f7d32] px-5 py-3 text-sm text-white">Add to local account</button>
+          <button type="button" onClick={() => onConfirm(product)} className="mt-5 inline-flex w-full items-center justify-center rounded-full bg-[#2f7d32] px-5 py-3 text-sm text-white">Add to account</button>
         )}
       </div>
     </div>
@@ -4348,6 +6156,118 @@ function ModerationQueueCard({ reports }) {
   );
 }
 
+function isVideoMedia(src = '') {
+  return /\.(mp4|webm|mov)$/i.test(String(src).split('?')[0]);
+}
+
+function getVideoPreviewImage(post) {
+  const pool = feedImagePoolsByPostType[post?.postType] || feedImagePool;
+  const seed = stableHash(`${post?.id || ''}-${post?.area || ''}-video-preview`);
+  return pool[Math.abs(seed) % pool.length] || feedImagePool[0];
+}
+
+function FeedMediaAsset({ src, className = '', alt = '', mode = 'preview' }) {
+  if (!src) return null;
+  if (isVideoMedia(src)) {
+    const shouldAutoplay = mode === 'motion';
+    return (
+      <video
+        src={src}
+        className={className}
+        muted
+        loop={shouldAutoplay}
+        autoPlay={shouldAutoplay}
+        playsInline
+        preload="metadata"
+        disablePictureInPicture
+        aria-label={alt || 'Feed video'}
+      />
+    );
+  }
+  return <img src={src} alt={alt} className={className} loading="lazy" />;
+}
+
+function FeedTimelineCard({ post, ranking, card, liked, saved, followed, commentCount, onOpen, onLike, onSave, onFollow, onShare, onComment, onReport }) {
+  const schema = card || createFeedCardSchema(post, ranking, 0);
+  const image = schema.heroImage;
+  const isVideo = isVideoMedia(image);
+  const previewImage = isVideo ? getVideoPreviewImage(post) : image;
+  const rank = ranking || { score: 50, reasons: ['Fresh'] };
+
+  const stop = (handler) => (event) => {
+    event.stopPropagation();
+    handler?.();
+  };
+
+  return (
+    <article
+      data-feed-card={post.id}
+      onClick={onOpen}
+      className="group overflow-hidden rounded-[2.1rem] bg-white shadow-[0_24px_70px_-52px_rgba(15,23,42,0.62)] ring-1 ring-white transition active:scale-[0.99]"
+    >
+      <div className="flex items-center justify-between gap-3 px-4 pb-3 pt-4">
+        <div className="flex min-w-0 items-center gap-3">
+          <PeepAvatar seed={`${post.authorId}-${post.authorName}-${post.authorType}`} className="h-12 w-12" ring="ring-1 ring-slate-200" />
+          <div className="min-w-0">
+            <div className="flex items-center gap-1.5">
+              <p className="truncate text-sm font-semibold text-slate-950">{post.authorName}</p>
+              {['Agent', 'Landlord', 'Operator', 'Sourcer', 'Investor'].includes(post.authorType) && <BadgeCheck className="h-3.5 w-3.5 shrink-0 text-[#2670a8]" />}
+            </div>
+            <p className="truncate text-xs font-medium text-slate-400">{post.authorType} · {post.area} · 2 hrs ago</p>
+          </div>
+        </div>
+        <button type="button" onClick={stop(() => onFollow(post.authorId))} className={`grid h-10 w-10 shrink-0 place-items-center rounded-full ${followed ? 'bg-[#092243] text-white' : 'bg-[#f2f5f7] text-slate-600'}`} aria-label={followed ? 'Following' : 'Follow'}>
+          <UserPlus className="h-4 w-4" />
+        </button>
+      </div>
+
+      {previewImage && (
+        <div className="relative mx-4 overflow-hidden rounded-[2rem] bg-slate-200">
+          <FeedMediaAsset src={previewImage} alt="" className="aspect-[4/5] w-full object-cover transition duration-500 group-hover:scale-[1.018]" />
+          {isVideo && (
+            <div className="absolute left-4 top-4 rounded-full bg-black/42 px-3 py-1.5 text-xs font-semibold text-white ring-1 ring-white/20 backdrop-blur-md">
+              Video
+            </div>
+          )}
+          <div className="absolute inset-x-0 top-0 flex items-start justify-between gap-3 p-4">
+            <span className="rounded-full bg-white/88 px-3 py-1.5 text-xs font-semibold text-[#092243] shadow-[0_12px_30px_-22px_rgba(15,23,42,0.7)] backdrop-blur-md">{schema.matchPercent || rank.score}% fit</span>
+            {post.sponsoredStatus && <span className="rounded-full bg-[#fff7ed]/95 px-3 py-1.5 text-xs font-semibold text-[#9a3412]">{post.sponsoredStatus}</span>}
+          </div>
+          <div className="absolute inset-x-0 bottom-0 bg-linear-to-t from-black/74 via-black/18 to-transparent p-4 pt-20">
+            <h2 className="line-clamp-2 text-2xl font-semibold leading-tight tracking-tight text-white">{post.title}</h2>
+            <p className="mt-1 line-clamp-1 text-sm font-medium text-white/78">{schema.price || post.budget || post.area} · {post.postType}</p>
+            <button type="button" onClick={stop(() => onOpen?.())} className="mt-3 rounded-full bg-white/16 px-3 py-1.5 text-xs font-semibold text-white ring-1 ring-white/20 backdrop-blur-md">View post</button>
+          </div>
+          <div className="absolute bottom-4 right-4 flex items-center gap-1 rounded-full bg-[#05070b]/88 p-1.5 text-white shadow-[0_18px_44px_-20px_rgba(0,0,0,0.9)] ring-1 ring-white/10 backdrop-blur-xl">
+            <button type="button" onClick={stop(() => onLike(post.id, post))} className={`grid h-10 w-10 place-items-center rounded-full ${liked ? 'bg-[#ff3366] text-white' : 'text-white/90 hover:bg-white/12'}`} aria-label="Like"><Heart className={`h-5 w-5 ${liked ? 'fill-current' : ''}`} /></button>
+            <button type="button" onClick={stop(() => onComment(post))} className="grid h-10 w-10 place-items-center rounded-full text-white/90 hover:bg-white/12" aria-label="Comment"><MessageCircle className="h-5 w-5" /></button>
+            <button type="button" onClick={stop(() => onSave(post.id, post))} className={`grid h-10 w-10 place-items-center rounded-full ${saved ? 'bg-[#8bdc65] text-[#092243]' : 'text-white/90 hover:bg-white/12'}`} aria-label="Save"><Bookmark className={`h-5 w-5 ${saved ? 'fill-current' : ''}`} /></button>
+          </div>
+        </div>
+      )}
+
+      <div className="px-4 pb-4 pt-3">
+        <p className="line-clamp-2 text-sm leading-6 text-slate-600">{post.body}</p>
+        <div className="mt-3 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-4 text-xs font-semibold text-slate-400">
+            <span>{post.likeCount + (liked ? 1 : 0)} likes</span>
+            <span>{commentCount} comments</span>
+            <span>{post.saveCount + (saved ? 1 : 0)} saves</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <button type="button" onClick={stop(() => onShare(post))} className="grid h-9 w-9 place-items-center rounded-full bg-[#f2f5f7] text-slate-600" aria-label="Share"><Share2 className="h-4 w-4" /></button>
+            <button type="button" onClick={stop(() => onReport(post))} className="grid h-9 w-9 place-items-center rounded-full bg-[#f2f5f7] text-slate-400" aria-label="Report"><Flag className="h-4 w-4" /></button>
+          </div>
+        </div>
+        <div className="mt-3 flex flex-wrap gap-2">
+          {(rank.reasons || ['Fresh rental signal']).slice(0, 2).map((reason) => <span key={reason} className="rounded-full bg-[#edf8ee] px-3 py-1 text-xs font-semibold text-[#215d27]">{reason}</span>)}
+          <span className="rounded-full bg-[#edf7ff] px-3 py-1 text-xs font-semibold text-[#154f79]">{post.area}</span>
+        </div>
+      </div>
+    </article>
+  );
+}
+
 function FeedPostCard({ post, ranking, card, streamId, liked, saved, followed, commentCount, onLike, onSave, onFollow, onShare, onComment, onBoost, onHide, onReport, onExplain, onPass, onMatch, onSignal }) {
   const schema = card || createFeedCardSchema(post, ranking, 0);
   const image = schema.heroImage;
@@ -4381,45 +6301,52 @@ function FeedPostCard({ post, ranking, card, streamId, liked, saved, followed, c
   }, [onSignal, post, rank.sequence, streamId]);
 
   const actionSpeedMs = () => Date.now() - mountedAtRef.current;
+  const adaptiveFacts = {
+    price: schema.price,
+    location: schema.area,
+    match: schema.matchPercent >= 72 ? 'Strong fit' : 'For you',
+    trust: schema.trustSignal.replace(' source', ''),
+  };
 
   return (
-    <article ref={rootRef} data-feed-card={post.id} className="overflow-hidden rounded-[1.75rem] border border-white bg-white/92 shadow-[0_18px_44px_-34px_rgba(15,23,42,0.45),inset_0_1px_0_white]">
-      <div className="relative h-[27rem] overflow-hidden bg-slate-200">
-        {image && <img src={image} alt="" className="absolute inset-0 h-full w-full object-cover" loading="lazy" />}
-        <div className="absolute inset-0 bg-linear-to-t from-[#06172f]/92 via-[#06172f]/24 to-transparent" />
-        <div className="absolute left-4 right-4 top-4 flex items-start justify-between gap-3">
-          <div className="flex flex-wrap gap-2">
-            <span className="rounded-full bg-white px-3 py-1.5 text-xs font-semibold text-[#092243] shadow-[0_8px_18px_-12px_rgba(15,23,42,0.45)]">{schema.matchPercent}% match</span>
-            <span className="rounded-full bg-[#edf8ee] px-3 py-1.5 text-xs text-[#215d27]">{schema.trustSignal}</span>
-            {schema.explorationLabel && <span className="rounded-full bg-[#fff7ed] px-3 py-1.5 text-xs text-[#9a3412]">{schema.explorationLabel}</span>}
-          </div>
-          <button type="button" onClick={() => onFollow(post.authorId)} className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-3 py-2 text-xs backdrop-blur ${followed ? 'bg-[#8bdc65] text-[#092243]' : 'bg-white/88 text-[#092243]'}`}>
-            <UserPlus className="h-3.5 w-3.5" />
-            {followed ? 'Following' : 'Follow'}
-          </button>
-        </div>
-        <div className="absolute inset-x-0 bottom-0 p-5 text-white">
-          <div className="mb-3 flex flex-wrap items-center gap-2 text-sm text-white/86">
-            <span>{schema.price}</span>
-            <span>•</span>
-            <span>{schema.area}</span>
-            <span>•</span>
-            <span>{schema.bedsBaths}</span>
-          </div>
-          <h2 className="text-3xl font-normal tracking-tight">{post.title}</h2>
-          <p className="mt-2 text-sm text-white/78">{schema.standout}</p>
-          <div className="mt-4 grid grid-cols-[1fr_1fr] gap-3">
-            <button type="button" data-feed-action="pass" onClick={() => onPass?.(post, actionSpeedMs())} className="rounded-full border border-white/20 bg-white/12 px-5 py-3 text-sm font-semibold text-white backdrop-blur active:scale-[0.98]">Pass</button>
-            <button type="button" data-feed-action="match" onClick={() => onMatch?.(post, actionSpeedMs())} className="rounded-full bg-[#8bdc65] px-5 py-3 text-sm font-semibold text-[#092243] shadow-[0_16px_30px_-20px_rgba(139,220,101,0.8)] active:scale-[0.98]">Match</button>
-          </div>
-        </div>
+    <article ref={rootRef} data-feed-card={post.id} className="relative h-[100dvh] snap-start overflow-hidden bg-slate-950 text-white">
+      {image && <FeedMediaAsset src={image} alt="" mode="motion" className="absolute inset-0 h-full w-full object-cover" />}
+      <div className="absolute inset-0 bg-linear-to-t from-black/88 via-black/18 to-black/42" />
+
+      <div className="absolute right-3 top-1/2 z-20 flex -translate-y-1/2 flex-col items-center gap-3">
+        <button type="button" aria-label="Like" onClick={() => onLike(post.id, post)} className={`grid h-12 w-12 place-items-center rounded-full backdrop-blur-md ring-1 ring-white/18 ${liked ? 'bg-[#edf8ee] text-[#2f7d32]' : 'bg-black/34 text-white'}`}><Heart className={`h-5 w-5 ${liked ? 'fill-current' : ''}`} /></button>
+        <span className="text-[0.68rem] font-semibold text-white/80">{post.likeCount + (liked ? 1 : 0)}</span>
+        <button type="button" aria-label="Comment" onClick={() => onComment(post)} className="grid h-12 w-12 place-items-center rounded-full bg-black/34 text-white ring-1 ring-white/18 backdrop-blur-md"><MessageCircle className="h-5 w-5" /></button>
+        <span className="text-[0.68rem] font-semibold text-white/80">{commentCount}</span>
+        <button type="button" aria-label="Save" onClick={() => onSave(post.id, post)} className={`grid h-12 w-12 place-items-center rounded-full backdrop-blur-md ring-1 ring-white/18 ${saved ? 'bg-[#edf7ff] text-[#154f79]' : 'bg-black/34 text-white'}`}><Bookmark className={`h-5 w-5 ${saved ? 'fill-current' : ''}`} /></button>
+        <button type="button" aria-label="Share" onClick={() => onShare(post)} className="grid h-12 w-12 place-items-center rounded-full bg-black/34 text-white ring-1 ring-white/18 backdrop-blur-md"><Share2 className="h-5 w-5" /></button>
+        <button type="button" aria-label="Report post" onClick={() => onReport(post)} className="grid h-10 w-10 place-items-center rounded-full bg-black/28 text-white/78 ring-1 ring-white/14 backdrop-blur-md"><Flag className="h-4 w-4" /></button>
       </div>
-      <div className="p-4">
-        <div className="flex items-start justify-between gap-3">
-          <div className="min-w-0">
-            <p className="text-xs text-[#2670a8]">{post.postType} · {post.authorName}</p>
-            <p className="mt-1 line-clamp-2 text-sm leading-6 text-slate-600">{post.body}</p>
+
+      <div className="absolute inset-x-0 bottom-0 z-10 p-4 pb-28 pr-20">
+        <div className="mb-3 flex min-w-0 items-center justify-between gap-3">
+          <div className="flex min-w-0 items-center gap-2.5">
+            <PeepAvatar seed={`${post.authorId}-${post.authorName}-${post.authorType}`} className="h-10 w-10" ring="ring-2 ring-white/60" />
+            <div className="min-w-0">
+              <div className="flex items-center gap-1.5">
+                <p className="truncate text-sm font-semibold">{post.authorName}</p>
+                {['Agent', 'Landlord', 'Operator', 'Sourcer', 'Investor'].includes(post.authorType) && <BadgeCheck className="h-3.5 w-3.5 shrink-0 text-[#8fd0ff]" />}
+              </div>
+              <p className="truncate text-xs text-white/70">{post.authorType} · {post.area} · {post.postType}</p>
+            </div>
           </div>
+          <button type="button" onClick={() => onFollow(post.authorId)} className={`shrink-0 rounded-full px-3 py-1.5 text-xs font-semibold backdrop-blur-md ${followed ? 'bg-[#edf8ee] text-[#215d27]' : 'bg-white/18 text-white ring-1 ring-white/18'}`}>{followed ? 'Following' : 'Follow'}</button>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {(schema.fieldOrder || ['price', 'location', 'match', 'trust']).slice(0, 3).map((field) => (
+            <span key={field} className="rounded-full bg-white/16 px-3 py-1.5 text-xs font-semibold text-white ring-1 ring-white/14 backdrop-blur-md">{adaptiveFacts[field]}</span>
+          ))}
+          {post.sponsoredStatus && <span className="rounded-full bg-[#fff7ed]/95 px-3 py-1.5 text-xs font-semibold text-[#9a3412]">{post.sponsoredStatus}</span>}
+        </div>
+        <h2 className="mt-3 text-[1.6rem] font-semibold leading-tight tracking-tight">{post.title}</h2>
+        <p className="mt-2 line-clamp-3 text-sm leading-6 text-white/82">{post.body}</p>
+        <div className="mt-3 flex items-center gap-2">
+          <button type="button" data-feed-action="interested" onClick={() => onMatch?.(post, actionSpeedMs())} className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-[#092243] active:scale-[0.98]">{schema.ctaText || 'I’m interested'}</button>
           <button type="button" onClick={() => {
             const next = !showWhy;
             setShowWhy(next);
@@ -4427,23 +6354,11 @@ function FeedPostCard({ post, ranking, card, streamId, liked, saved, followed, c
               onSignal?.('expand', post, { streamId, objective: rank.objective, score: rank.score });
               onExplain?.(post, rank);
             }
-          }} className="shrink-0 rounded-full bg-slate-100 px-3 py-2 text-xs text-slate-600">{showWhy ? 'Hide why' : 'Why'}</button>
+          }} className="rounded-full bg-black/30 px-4 py-2 text-sm font-semibold text-white ring-1 ring-white/16 backdrop-blur-md">{showWhy ? 'Hide' : 'Why this'}</button>
         </div>
         {showWhy && (
-          <div className="mt-3 flex flex-wrap gap-2">
-            {(rank.reasons?.length ? rank.reasons : ['Relevant rental signal']).map((reason) => <span key={reason} className="rounded-full bg-[#edf8ee] px-3 py-1 text-xs text-[#215d27]">{reason}</span>)}
-            {(rank.negativeSignals || []).map((signal) => <span key={signal} className="rounded-full bg-[#fff7ed] px-3 py-1 text-xs text-[#9a3412]">{signal}</span>)}
-          </div>
-        )}
-        <div className="mt-4 grid grid-cols-4 gap-1 rounded-2xl bg-slate-50 p-1.5">
-          <button type="button" onClick={() => onSave(post.id, post)} className={`rounded-xl px-2 py-2 text-xs ${saved ? 'bg-[#edf7ff] text-[#154f79]' : 'text-slate-600'}`}><Bookmark className={`mx-auto h-4 w-4 ${saved ? 'fill-current' : ''}`} />Save</button>
-          <button type="button" onClick={() => onShare(post)} className="rounded-xl px-2 py-2 text-xs text-slate-600"><Share2 className="mx-auto h-4 w-4" />Share</button>
-          <button type="button" onClick={() => onComment(post)} className="rounded-xl px-2 py-2 text-xs text-slate-600"><MessageCircle className="mx-auto h-4 w-4" />{commentCount}</button>
-          <button type="button" onClick={() => onReport(post)} className="rounded-xl px-2 py-2 text-xs text-slate-600"><Flag className="mx-auto h-4 w-4" />Report</button>
-        </div>
-        {post.sponsoredStatus && (
-          <div className="mt-3 rounded-2xl border border-[#fed7aa] bg-[#fff7ed] px-3 py-2 text-xs text-[#9a3412]">
-            <span>{post.sponsoredStatus} content is labelled and reportable.</span>
+          <div className="mt-3 rounded-2xl bg-black/34 p-3 ring-1 ring-white/14 backdrop-blur-md">
+            <p className="text-xs leading-5 text-white/78">{schema.whyThisForYou}</p>
           </div>
         )}
       </div>
@@ -4451,11 +6366,221 @@ function FeedPostCard({ post, ranking, card, streamId, liked, saved, followed, c
   );
 }
 
+function FeedImmersiveViewer({ items, initialIndex, likedIds, savedIds, followedIds, comments, onClose, onLike, onSave, onFollow, onShare, onComment, onBoost, onHide, onReport, onExplain, onPass, onMatch, onSignal }) {
+  const scrollerRef = useRef(null);
+
+  useEffect(() => {
+    const node = scrollerRef.current;
+    if (!node) return;
+    requestAnimationFrame(() => {
+      node.scrollTop = Math.max(0, initialIndex) * window.innerHeight;
+    });
+  }, [initialIndex]);
+
+  if (initialIndex == null || initialIndex < 0) return null;
+
+  return (
+    <div className="fixed inset-0 z-[80] bg-black text-white">
+      <div className="pointer-events-none absolute inset-x-0 top-0 z-30 mx-auto max-w-[480px] px-3 pt-3">
+        <div className="pointer-events-auto flex items-center justify-between">
+          <button type="button" onClick={onClose} className="rounded-full bg-black/38 px-4 py-2 text-sm font-semibold text-white ring-1 ring-white/14 backdrop-blur-md">
+            Close
+          </button>
+          <span className="rounded-full bg-black/32 px-3 py-2 text-xs font-semibold text-white/80 ring-1 ring-white/12 backdrop-blur-md">Scroll posts</span>
+        </div>
+      </div>
+      <div ref={scrollerRef} className="mx-auto h-[100dvh] max-w-[480px] snap-y snap-mandatory overflow-y-auto overscroll-contain scroll-smooth bg-black">
+        {items.map((item) => {
+          const post = item.post;
+          return (
+            <FeedPostCard
+              key={item.streamId}
+              post={post}
+              ranking={{ ...item.ranking, sequence: item.sequence, rewardSpike: item.rewardSpike }}
+              card={item.card}
+              streamId={item.streamId}
+              liked={likedIds.includes(post.id)}
+              saved={savedIds.includes(post.id)}
+              followed={followedIds.includes(post.authorId)}
+              commentCount={post.commentCount + comments.filter((comment) => comment.postId === post.id).length}
+              onLike={onLike}
+              onSave={onSave}
+              onFollow={onFollow}
+              onShare={onShare}
+              onComment={onComment}
+              onBoost={onBoost}
+              onHide={onHide}
+              onReport={onReport}
+              onExplain={onExplain}
+              onPass={onPass}
+              onMatch={onMatch}
+              onSignal={onSignal}
+            />
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function SupportDisclosure({ title, subtitle, children, defaultOpen = false }) {
+  return (
+    <details open={defaultOpen} className="group overflow-hidden rounded-[1.55rem] bg-white shadow-[0_18px_44px_-36px_rgba(15,23,42,0.58)] ring-1 ring-black/5">
+      <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-4 py-4">
+        <span className="min-w-0">
+          <span className="block text-sm font-bold text-[#050506]">{title}</span>
+          {subtitle && <span className="mt-0.5 block truncate text-xs font-medium text-slate-400">{subtitle}</span>}
+        </span>
+        <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-[#f4f7f8] text-[#050506] transition group-open:rotate-180">
+          <ArrowUp className="h-4 w-4" />
+        </span>
+      </summary>
+      <div className="border-t border-slate-100 p-3">
+        {children}
+      </div>
+    </details>
+  );
+}
+
+function AppSupportSidebar({
+  routeTab,
+  wallet,
+  purchases,
+  boosts,
+  reports,
+  shares,
+  posts,
+  savedIds,
+  comments,
+  entitlements,
+  appStreak,
+  usageLimit,
+  profile,
+  answers,
+  notifications,
+  markNotificationRead,
+  activeRecommendationInsights,
+  openRecommendedOffer,
+  referrals,
+  createReferral,
+  residentProfiles,
+  maintenanceRequests,
+  rentRecords,
+  logMaintenanceRequest,
+  logRentRecord,
+  landlordProperties,
+  addLandlordProperty,
+  tenantDemandSignals,
+  marketIntroductions,
+  shortlistTenantDemand,
+  professionalProfiles,
+  groups,
+  dealWatchlist,
+  watchDeal,
+  updateDealStatus,
+  operatorPortfolioSignals,
+  addOperatorSignal,
+  activeFeedTab,
+  setActiveFeedTab,
+  likedIds,
+  feedAds,
+  openUpsell,
+}) {
+  return (
+    <aside className="sticky top-5 hidden max-h-[calc(100vh-2.5rem)] space-y-3 overflow-y-auto pr-1 lg:block [scrollbar-width:none]">
+      <div className="rounded-[1.75rem] bg-[#050506] p-5 text-white shadow-[0_26px_70px_-48px_rgba(0,0,0,0.82)]">
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-[0.08em] text-white/38">{routeTab}</p>
+            <h2 className="mt-2 text-2xl font-bold tracking-tight">Your day</h2>
+          </div>
+          <span className="rounded-full bg-[#bff4ef] px-3 py-1.5 text-xs font-bold text-[#050506]">{wallet.balance} credits</span>
+        </div>
+        <div className="mt-4 grid grid-cols-2 gap-2 text-sm">
+          {[
+            [posts.length, 'Posts'],
+            [shares.length, 'Shares'],
+            [savedIds.length, 'Saves'],
+            [reports.length, 'Reports'],
+          ].map(([value, label]) => (
+            <div key={label} className="rounded-[1.2rem] bg-white/10 p-3">
+              <p className="text-2xl font-bold">{value}</p>
+              <p className="mt-0.5 text-xs font-medium text-white/45">{label}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <DailySwipePanel usageLimit={usageLimit} onBuyMore={openUpsell} />
+      <ProfileStrengthCard profile={profile} answers={answers} />
+
+      <SupportDisclosure title="Notifications" subtitle={`${notifications.filter((item) => !item.read).length} unread`} defaultOpen>
+        <UsefulNotificationsPanel notifications={notifications} onMarkRead={markNotificationRead} />
+      </SupportDisclosure>
+
+      <SupportDisclosure title="For you" subtitle="Perks and next steps">
+        <RecommendationLoopPanel insights={activeRecommendationInsights} onOpenOffer={openRecommendedOffer} />
+      </SupportDisclosure>
+
+      <SupportDisclosure title="Growth" subtitle="Invites and community loops">
+        <ReferralLoopPanel profile={profile} referrals={referrals} onCreateReferral={createReferral} />
+        <div className="mt-3">
+          <RoleLanesPanel profile={profile} onSelectTab={setActiveFeedTab} />
+        </div>
+      </SupportDisclosure>
+
+      <SupportDisclosure title="Resident Records" subtitle="Maintenance and rent history">
+        <ResidentModePanel residentProfiles={residentProfiles} maintenanceRequests={maintenanceRequests} rentRecords={rentRecords} onLogMaintenance={logMaintenanceRequest} onLogRent={logRentRecord} />
+      </SupportDisclosure>
+
+      <SupportDisclosure title="Business Tools" subtitle="Landlords, operators, sourcers, investors">
+        <LandlordModePanel properties={landlordProperties} posts={posts} onAddProperty={addLandlordProperty} />
+        <div className="mt-3">
+          <TenantDemandPipelinePanel signals={tenantDemandSignals} properties={landlordProperties} introductions={marketIntroductions} onShortlist={shortlistTenantDemand} />
+        </div>
+        <div className="mt-3">
+          <ProfessionalModePanel profile={profile} professionalProfiles={professionalProfiles} posts={posts} groups={groups} />
+        </div>
+        <div className="mt-3">
+          <DealTrackingPanel posts={posts} watchlist={dealWatchlist} onWatchDeal={watchDeal} onUpdateDealStatus={updateDealStatus} />
+        </div>
+        <div className="mt-3">
+          <OperatorSignalsPanel signals={operatorPortfolioSignals} onAddSignal={addOperatorSignal} />
+        </div>
+      </SupportDisclosure>
+
+      <SupportDisclosure title="Boosts and Perks" subtitle="Paid reach, clear labels">
+        <TractionPanel posts={posts} likedIds={likedIds} savedIds={savedIds} shares={shares} comments={comments} onBoost={openUpsell} />
+        <div className="mt-3">
+          <BoostPerformanceCard boosts={boosts} onBoost={openUpsell} />
+        </div>
+        <div className="mt-3">
+          <AdsInventoryPanel onBoost={openUpsell} />
+        </div>
+        <div className="mt-3">
+          <MiniShopPanel onSelectProduct={openUpsell} compact />
+        </div>
+      </SupportDisclosure>
+
+      <SupportDisclosure title="Safety" subtitle="Reports and trust">
+        <ModerationQueueCard reports={reports} />
+        <div className="mt-3">
+          <TrustReputationPanel reports={reports} comments={comments} profile={profile} />
+        </div>
+      </SupportDisclosure>
+
+      <div className="rounded-[1.55rem] bg-white p-4 text-sm font-medium text-slate-500 shadow-[0_18px_44px_-36px_rgba(15,23,42,0.58)] ring-1 ring-black/5">
+        {purchases.length} purchases · {appStreak.count} day streak · {feedAds.length} labelled offers · {activeFeedTab} active
+      </div>
+    </aside>
+  );
+}
+
 function RentEazyAppShell() {
   const path = typeof window === 'undefined' ? '/app/feed' : window.location.pathname;
   const routeTab = path.includes('/billing') ? 'Billing' : path.includes('/post') ? 'Post' : path.includes('/likes') ? 'Likes' : path.includes('/profile') ? 'Profile' : path.includes('/swipe') ? 'Swipe' : 'Feed';
   const [activeFeedTab, setActiveFeedTab] = useStoredState('renteazy-feed-tab', 'For You');
-  const [posts, setPosts] = useStoredState('renteazy-feed-posts', seededFeedPosts);
+  const [posts, setPosts] = useStoredState('renteazy-feed-posts', allSeededFeedPosts);
   const [likedIds, setLikedIds] = useStoredState('renteazy-liked-posts', []);
   const [savedIds, setSavedIds] = useStoredState('renteazy-saved-posts', []);
   const [followedIds, setFollowedIds] = useStoredState('renteazy-followed-authors', []);
@@ -4498,6 +6623,7 @@ function RentEazyAppShell() {
   const [marketIntroductions, setMarketIntroductions] = useStoredState('renteazy-market-introductions', seededMarketIntroductions);
   const [notifications, setNotifications] = useStoredState('renteazy-notifications', seededNotifications);
   const [openedOfferId, setOpenedOfferId] = useState('');
+  const [selectedFeedViewerIndex, setSelectedFeedViewerIndex] = useState(null);
   const [sharePost, setSharePost] = useState(null);
   const [reportPost, setReportPost] = useState(null);
   const [commentPost, setCommentPost] = useState(null);
@@ -4516,9 +6642,56 @@ function RentEazyAppShell() {
     .sort((a, b) => (b.recommendationScore || 0) - (a.recommendationScore || 0)), [answers, behavioralEvents, profile, recommendationInsights]);
   const localRecommendationInsights = useMemo(() => buildLocalRecommendationInsights({ profile, answers, feedRankings, behavioralEvents, partnerOffers }), [answers, behavioralEvents, feedRankings, partnerOffers, profile]);
   const activeRecommendationInsights = recommendationInsights || localRecommendationInsights;
+  const contextualUpsells = useMemo(() => buildContextualUpsells({
+    routeTab,
+    activeFeedTab,
+    remainingSwipes,
+    newPost,
+    profile,
+    answers,
+    posts,
+    likedIds,
+    savedIds,
+    shares,
+    boosts,
+    matches,
+  }).filter((card) => !dismissedUpsells.includes(card.id)).slice(0, 2), [activeFeedTab, answers, boosts, dismissedUpsells, likedIds, matches, newPost, posts, profile, remainingSwipes, routeTab, savedIds, shares]);
+  const primaryContextualUpsell = contextualUpsells[0];
   const recommendedOfferIds = new Set((activeRecommendationInsights?.perkRecommendations || []).map((offer) => offer.offerId));
   const sortedPartnerOffers = useMemo(() => [...partnerOffers].sort((a, b) => Number(recommendedOfferIds.has(b.id)) - Number(recommendedOfferIds.has(a.id))), [partnerOffers, activeRecommendationInsights]);
   const dailyPicks = rankedSwipeCards.slice(0, 3);
+
+  useEffect(() => {
+    const seedById = new Map(allSeededFeedPosts.map((post) => [post.id, post]));
+    const missingSeeds = allSeededFeedPosts.filter((post) => !posts.some((currentPost) => currentPost.id === post.id));
+    const hasStaleSeedMedia = posts.some((post) => {
+      const seed = seedById.get(post.id);
+      return seed && seed.media?.[0] && seed.media[0] !== post.media?.[0];
+    });
+    if (!missingSeeds.length && !hasStaleSeedMedia) return;
+    setPosts((current) => {
+      const nextIds = new Set(current.map((post) => post.id));
+      const nextMissingSeeds = allSeededFeedPosts.filter((post) => !nextIds.has(post.id));
+      const refreshedCurrent = current.map((post) => {
+        const seed = seedById.get(post.id);
+        return seed?.media?.[0] && seed.media[0] !== post.media?.[0]
+          ? { ...post, media: seed.media }
+          : post;
+      });
+      return nextMissingSeeds.length ? [...nextMissingSeeds, ...refreshedCurrent] : refreshedCurrent;
+    });
+  }, [posts, setPosts]);
+
+  useEffect(() => {
+    const currentIds = new Set(groups.map((group) => group.id));
+    const missingGroups = seededGroups.filter((group) => !currentIds.has(group.id));
+    if (!missingGroups.length) return;
+    setGroups((current) => {
+      const nextIds = new Set(current.map((group) => group.id));
+      const nextMissingGroups = seededGroups.filter((group) => !nextIds.has(group.id));
+      return nextMissingGroups.length ? [...nextMissingGroups, ...current] : current;
+    });
+  }, [groups, setGroups]);
 
   const applyApiState = (state) => {
     if (!state) return;
@@ -4530,7 +6703,7 @@ function RentEazyAppShell() {
     if (state.comments) setComments(state.comments);
     if (state.shares) setShares(state.shares);
     if (state.reports) setReports(state.reports);
-    if (state.profile) setProfile(state.profile);
+    if (state.profile) setProfile((current) => ({ ...current, ...state.profile }));
     if (state.answers) setAnswers(state.answers);
     if (state.usageLimit) setUsageLimit(state.usageLimit);
     if (state.entitlements) setEntitlements(state.entitlements);
@@ -4589,6 +6762,9 @@ function RentEazyAppShell() {
       budget: profile.budget,
       moveDate: profile.moveDate,
       lookingFor: profile.lookingFor,
+      avatarVariant: profile.avatarVariant,
+      avatarIndex: profile.avatarIndex,
+      avatarBg: profile.avatarBg,
     };
     const payload = JSON.stringify(editableProfile);
     if (profileSyncRef.current === payload) return;
@@ -4692,6 +6868,10 @@ function RentEazyAppShell() {
   const closeUpsell = () => {
     if (upsellProductId) setDismissedUpsells((current) => [...new Set([...current, upsellProductId])]);
     setUpsellProductId(null);
+  };
+
+  const dismissUpsell = (productId) => {
+    setDismissedUpsells((current) => [...new Set([...current, productId])]);
   };
 
   const toggleId = (setter, id) => {
@@ -5151,7 +7331,7 @@ function RentEazyAppShell() {
     behavioralEvents,
     feedSignals,
     activeFeedTab,
-    minItems: 36,
+    minItems: 60,
   }), [activeFeedTab, answers, behavioralEvents, comments, feedSignals, followedIds, hiddenPostIds, likedIds, posts, profile, savedIds]);
   const rankingById = feedStream.rankingById;
   const feedItems = feedStream.items;
@@ -5165,7 +7345,7 @@ function RentEazyAppShell() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#eef5f2] pb-24 text-slate-900 antialiased">
+    <div className={`${routeTab === 'Feed' ? 'min-h-screen bg-white pb-24' : 'min-h-screen bg-[#f7f9fa] pb-24'} text-slate-900 antialiased`} style={{ fontFamily: 'Poppins, Inter, sans-serif' }}>
       {clerkEnabled && <ClerkSessionBridge setProfile={setProfile} />}
       {(sharePost || (routeTab === 'Post' && newPost)) && (
         <ShareEverywhereModal post={sharePost || newPost} onClose={() => setSharePost(null)} onShared={trackShare} />
@@ -5173,12 +7353,39 @@ function RentEazyAppShell() {
       {reportPost && <ReportModal post={reportPost} onClose={() => setReportPost(null)} onReport={submitReport} />}
       {commentPost && <CommentModal post={commentPost} comments={comments.filter((comment) => comment.postId === commentPost.id)} onClose={() => setCommentPost(null)} onComment={addComment} />}
       <MicroUpsellModal product={activeUpsellProduct} onClose={closeUpsell} onConfirm={confirmMicroProduct} billingEnabled={clerkEnabled} />
-      <header className="sticky top-0 z-40 border-b border-white/70 bg-[#eef5f2]/88 px-4 py-3 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-6xl items-center justify-between gap-3">
-          <BrandLogo />
+      <FeedImmersiveViewer
+        items={feedItems}
+        initialIndex={selectedFeedViewerIndex}
+        likedIds={likedIds}
+        savedIds={savedIds}
+        followedIds={followedIds}
+        comments={comments}
+        onClose={() => setSelectedFeedViewerIndex(null)}
+        onLike={toggleLike}
+        onSave={toggleSave}
+        onFollow={toggleFollow}
+        onShare={setSharePost}
+        onComment={setCommentPost}
+        onBoost={(post) => boostPost(post.id)}
+        onHide={hidePost}
+        onReport={setReportPost}
+        onExplain={explainFeedItem}
+        onPass={passFeedCard}
+        onMatch={matchFeedCard}
+        onSignal={recordFeedSignal}
+      />
+      {routeTab !== 'Feed' && <header className="sticky top-0 z-40 px-3 pt-3">
+        <div className={`mx-auto flex items-center justify-between gap-2 rounded-[1.45rem] border border-white/80 bg-white/78 px-3 py-2 shadow-[0_18px_48px_-34px_rgba(15,23,42,0.55),inset_0_1px_0_rgba(255,255,255,0.96)] backdrop-blur-2xl ${routeTab === 'Feed' ? 'max-w-2xl' : routeTab === 'Swipe' ? 'max-w-xl' : 'max-w-6xl'}`}>
+          <BrandLogo compact />
+          {routeTab === 'Feed' && (
+            <button type="button" onClick={() => setActiveFeedTab('For You')} className="flex min-w-0 flex-1 items-center gap-2 rounded-full bg-[#f7faf9] px-3 py-2 text-left text-xs text-slate-500 ring-1 ring-black/5 sm:max-w-xs">
+              <Search className="h-4 w-4 shrink-0 text-slate-400" />
+              <span className="truncate">Search areas, posts, groups</span>
+            </button>
+          )}
           <nav className="hidden items-center gap-2 md:flex">
             {navItems.map(([label, href, Icon]) => (
-              <a key={label} href={href} className={`inline-flex items-center gap-2 rounded-full px-3 py-2 text-sm ${routeTab === label ? 'bg-[#092243] text-white' : 'text-slate-600 hover:bg-slate-50'}`}>
+              <a key={label} href={href} className={`inline-flex items-center gap-2 rounded-full px-3 py-2 text-sm ${routeTab === label ? 'bg-[#092243] text-white shadow-[0_12px_24px_-18px_rgba(9,34,67,0.75)]' : 'text-slate-600 hover:bg-slate-50'}`}>
                 <Icon className="h-4 w-4" />
                 {label}
               </a>
@@ -5186,57 +7393,115 @@ function RentEazyAppShell() {
           </nav>
           <div className="flex items-center gap-2">
             <a href="/app/profile" className="hidden rounded-full bg-[#edf7ff] px-3 py-1.5 text-xs text-[#154f79] sm:inline-flex">{displayRole(profile.role)}</a>
-            <span className={`hidden rounded-full px-3 py-1.5 text-xs sm:inline-flex ${backendStatus === 'connected' ? 'bg-[#edf8ee] text-[#215d27]' : backendStatus === 'checking' ? 'bg-[#edf7ff] text-[#154f79]' : 'bg-[#fff7ed] text-[#9a3412]'}`}>{backendStatus === 'connected' ? 'API connected' : backendStatus === 'checking' ? 'API checking' : 'Offline mode'}</span>
-            <span className="hidden rounded-full bg-[#edf8ee] px-3 py-1.5 text-xs text-[#215d27] sm:inline-flex">5 extra swipes available after sharing</span>
-            {clerkEnabled ? <ClerkAccountControls /> : <button className="flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600"><Bell className="h-4 w-4" /></button>}
+            <span className={`hidden rounded-full px-3 py-1.5 text-xs lg:inline-flex ${backendStatus === 'connected' ? 'bg-[#edf8ee] text-[#215d27]' : backendStatus === 'checking' ? 'bg-[#edf7ff] text-[#154f79]' : 'bg-[#fff7ed] text-[#9a3412]'}`}>{backendStatus === 'connected' ? 'API connected' : backendStatus === 'checking' ? 'API checking' : 'Offline mode'}</span>
+            {clerkEnabled ? <ClerkAccountControls /> : <button className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-slate-600 ring-1 ring-black/5"><Bell className="h-4 w-4" /></button>}
           </div>
         </div>
-      </header>
+      </header>}
 
-      <main className="mx-auto grid max-w-6xl gap-6 px-4 py-5 lg:grid-cols-[1fr_20rem]">
+      <main className={`mx-auto grid ${routeTab === 'Feed' ? 'max-w-[520px] gap-4 px-3 py-3 lg:max-w-7xl lg:grid-cols-[17rem_minmax(0,36rem)_20rem] lg:items-start lg:px-6 lg:py-5' : 'gap-6 px-4 py-5'} ${routeTab === 'Swipe' ? 'max-w-xl' : routeTab === 'Feed' ? '' : 'max-w-6xl lg:grid-cols-[1fr_20rem]'}`}>
+        {routeTab === 'Feed' && (
+          <aside className="sticky top-5 hidden space-y-4 lg:block">
+            <div className="rounded-[1.65rem] border border-white/80 bg-white/88 p-4 shadow-[0_18px_48px_-38px_rgba(15,23,42,0.48),inset_0_1px_0_rgba(255,255,255,0.96)] backdrop-blur-xl">
+              <a href="/app/feed" className="flex items-baseline gap-0.5 text-2xl font-bold tracking-tight text-[#092243]">
+                Rent<span className="text-[#2f7d32]">Eazy</span>
+              </a>
+              <p className="mt-1 text-xs font-medium text-slate-400">EasyPeazy</p>
+              <nav className="mt-5 space-y-1.5">
+                {navItems.map(([label, href, Icon]) => (
+                  <a key={label} href={href} className={`flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-semibold transition ${routeTab === label ? 'bg-[#092243] text-white shadow-[0_12px_28px_-18px_rgba(9,34,67,0.7)]' : 'text-slate-600 hover:bg-slate-50'}`}>
+                    <Icon className="h-4 w-4" />
+                    {label}
+                  </a>
+                ))}
+              </nav>
+              <a href="/app/post" className="mt-5 flex items-center justify-center gap-2 rounded-full bg-[#2f7d32] px-4 py-3 text-sm font-semibold text-white shadow-[0_16px_34px_-22px_rgba(47,125,50,0.72)]">
+                <PlusCircle className="h-4 w-4" />
+                Post to Feed
+              </a>
+            </div>
+
+            <div className="rounded-[1.65rem] border border-white/80 bg-white/78 p-4 shadow-[0_18px_48px_-40px_rgba(15,23,42,0.42)] backdrop-blur-xl">
+              <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[#2670a8]">Market rooms</p>
+              <div className="mt-3 space-y-2">
+                {['East London Renters', 'London Landlords', 'Operators & Hosts'].map((groupName) => (
+                  <button key={groupName} type="button" onClick={() => setActiveFeedTab('Groups')} className="flex w-full items-center justify-between rounded-2xl bg-white px-3 py-2 text-left text-sm text-slate-700 ring-1 ring-black/5">
+                    <span className="truncate">{groupName}</span>
+                    <Users className="h-4 w-4 text-slate-400" />
+                  </button>
+                ))}
+              </div>
+            </div>
+          </aside>
+        )}
         <section className="min-w-0">
           {routeTab === 'Feed' && (
             <>
-              <div className="mb-4">
-                <SocialHomeHeader profile={profile} usageLimit={usageLimit} groups={groups} memberships={groupMemberships} posts={posts} onSelectTab={setActiveFeedTab} />
-              </div>
-              <div className="mb-4">
+              <div className="sticky top-0 z-40 -mx-3 space-y-4 bg-white/96 px-6 pb-4 pt-5 backdrop-blur-xl lg:hidden">
+                <div className="flex items-center justify-between gap-3">
+                  <a href="/app/feed" className="flex items-baseline gap-0.5 text-[1.35rem] font-bold tracking-tight text-[#050506]">
+                    Rent<span className="text-[#2f7d32]">Eazy</span>
+                  </a>
+                  <div className="flex items-center gap-2">
+                    <button type="button" onClick={() => setActiveFeedTab('Groups')} className="grid h-10 w-10 place-items-center rounded-full bg-[#f3f6f8] text-[#050506]"><Users className="h-4 w-4" /></button>
+                    <a href="/app/post" className="grid h-10 w-10 place-items-center rounded-full bg-[#050506] text-white shadow-[0_16px_34px_-22px_rgba(0,0,0,0.75)]"><PlusCircle className="h-4 w-4" /></a>
+                    <a href="/app/swipe" className="grid h-10 w-10 place-items-center rounded-full bg-[#bff4ef] text-[#050506]"><Flame className="h-4 w-4" /></a>
+                  </div>
+                </div>
+                <div>
+                  <h1 className="text-[2.7rem] font-bold leading-none tracking-tight text-[#050506]">Feed</h1>
+                  <p className="mt-1 text-sm font-medium text-slate-400">{activeFeedTab}</p>
+                </div>
                 <SocialStoryRail posts={posts} groups={groups} onSelectTab={setActiveFeedTab} />
-              </div>
-              <div className="mb-4">
-                <DailyReturnPanel profile={profile} lifecycleTasks={lifecycleTasks} reputationProfile={reputationProfile} onCompleteTask={completeLifecycleTask} />
-              </div>
-              <div className="mb-4">
-                <RecommendationLoopPanel insights={activeRecommendationInsights} onOpenOffer={openRecommendedOffer} />
-              </div>
-              <div className="mb-4">
-                <UsefulNotificationsPanel notifications={notifications} onMarkRead={markNotificationRead} />
-              </div>
-              <div className="mb-4 overflow-x-auto pb-1">
-                <div className="flex min-w-max gap-2">
+                <a href="/app/post" className="flex items-center gap-3 rounded-[1.55rem] bg-[#f4f7f8] px-3 py-3">
+                  <PeepAvatar
+                    seed={`${profile.id}-${profile.name}-${profile.role}`}
+                    variant={profile.avatarVariant || 'bust'}
+                    avatarIndex={profile.avatarIndex}
+                    avatarBg={profile.avatarBg || 'mist'}
+                    className="h-10 w-10"
+                    imageClassName={(profile.avatarVariant || 'bust') === 'bust' ? '' : 'object-contain p-1'}
+                  />
+                  <span className="min-w-0">
+                    <span className="block truncate text-sm font-bold text-slate-950">Post into RentEazy</span>
+                    <span className="block truncate text-xs font-medium text-slate-400">Listings, questions, updates</span>
+                  </span>
+                </a>
+                <div className="-mx-6 overflow-x-auto px-6 [scrollbar-width:none]">
+                  <div className="flex min-w-max gap-2 pb-1">
                   {feedTabs.map((tab) => (
-                    <button key={tab} onClick={() => setActiveFeedTab(tab)} className={`rounded-full px-4 py-2 text-sm ${activeFeedTab === tab ? 'bg-[#092243] text-white' : 'border border-slate-200 bg-white text-slate-600'}`}>{tab}</button>
+                    <button key={tab} onClick={() => setActiveFeedTab(tab)} className={`rounded-full px-4 py-2 text-sm font-bold transition ${activeFeedTab === tab ? 'bg-[#050506] text-white shadow-[0_14px_28px_-20px_rgba(0,0,0,0.7)]' : 'bg-[#f4f7f8] text-slate-500'}`}>{tab}</button>
                   ))}
+                  </div>
                 </div>
               </div>
-              {activeFeedTab !== 'Groups' && activeFeedTab !== 'Perks' && (
-                <div className="mb-4 rounded-[1.75rem] border border-white bg-white/92 p-4 shadow-[0_18px_44px_-34px_rgba(15,23,42,0.35),inset_0_1px_0_white]">
-                  <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <p className="font-['JetBrains_Mono',monospace] text-xs text-[#2670a8]">LIVE DISCOVERY ENGINE</p>
-                      <h2 className="mt-2 text-xl font-normal tracking-tight text-slate-950">Scroll teaches the next card</h2>
-                      <p className="mt-1 text-sm leading-6 text-slate-500">High-fit cards, near matches, and labelled explorations are mixed continuously as you interact.</p>
-                    </div>
-                    <span className="shrink-0 rounded-full bg-[#edf8ee] px-3 py-1 text-xs text-[#215d27]">{feedStream.state.replaceAll('_', ' ')}</span>
-                  </div>
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    {['80/20 fit + exploration', 'Reward spikes', 'Within-session learning'].map((signal) => (
-                      <span key={signal} className="rounded-full bg-slate-50 px-3 py-1.5 text-xs text-slate-600">{signal}</span>
+              <div className="hidden lg:block">
+                <SocialHomeHeader profile={profile} usageLimit={usageLimit} groups={groups} memberships={groupMemberships} posts={posts} onSelectTab={setActiveFeedTab} />
+                <div className="mb-4 rounded-[1.6rem] border border-white/80 bg-white/88 p-4 shadow-[0_18px_48px_-38px_rgba(15,23,42,0.42),inset_0_1px_0_rgba(255,255,255,0.96)] backdrop-blur-xl">
+                  <a href="/app/post" className="flex items-center gap-3">
+                    <PeepAvatar
+                      seed={`${profile.id}-${profile.name}-${profile.role}`}
+                      variant={profile.avatarVariant || 'bust'}
+                      avatarIndex={profile.avatarIndex}
+                      avatarBg={profile.avatarBg || 'mist'}
+                      className="h-11 w-11"
+                      imageClassName={(profile.avatarVariant || 'bust') === 'bust' ? '' : 'object-contain p-1'}
+                    />
+                    <span className="min-w-0 flex-1">
+                      <span className="block truncate text-sm font-semibold text-slate-950">What are you looking for, offering, or sharing?</span>
+                      <span className="block truncate text-xs text-slate-500">Post into the rental-market network</span>
+                    </span>
+                    <span className="rounded-full bg-[#092243] px-4 py-2 text-sm font-semibold text-white">Post</span>
+                  </a>
+                </div>
+                <div className="sticky top-5 z-30 -mx-1 mb-4 overflow-x-auto px-1 [scrollbar-width:none]">
+                  <div className="flex min-w-max gap-2 pb-1">
+                    {feedTabs.map((tab) => (
+                      <button key={tab} onClick={() => setActiveFeedTab(tab)} className={`rounded-full px-4 py-2 text-sm font-semibold transition ${activeFeedTab === tab ? 'bg-[#092243] text-white shadow-[0_14px_28px_-20px_rgba(9,34,67,0.65)]' : 'bg-white text-slate-600 shadow-[0_10px_24px_-22px_rgba(15,23,42,0.45)] ring-1 ring-white/80'}`}>{tab}</button>
                     ))}
                   </div>
                 </div>
-              )}
-              {activeFeedTab !== 'Groups' && activeFeedTab !== 'Perks' && <ComposerPanel onCreatePost={addPost} compact profile={profile} />}
+              </div>
               {newPost && (
                 <div className="mt-4 rounded-3xl border border-[#d5ecd7] bg-[#edf8ee] p-4">
                   <p className="text-sm font-medium text-[#215d27]">Want more people to see this?</p>
@@ -5251,7 +7516,7 @@ function RentEazyAppShell() {
                   Perk opened. RentEazy records the signal so future offers can be more relevant.
                 </div>
               )}
-              <div className="mt-5 space-y-4">
+              <div className="space-y-4 pb-4">
                 {activeFeedTab === 'Groups' ? (
                   <GroupsPanel groups={groups} memberships={groupMemberships} onJoinGroup={joinGroup} onCreateGroup={createGroup} />
                 ) : activeFeedTab === 'Perks' ? (
@@ -5261,60 +7526,30 @@ function RentEazyAppShell() {
                     const post = item.post;
                     return (
                     <React.Fragment key={item.streamId}>
-                      <FeedPostCard
+                      <FeedTimelineCard
                         post={post}
                         ranking={{ ...item.ranking, sequence: item.sequence, rewardSpike: item.rewardSpike }}
                         card={item.card}
-                        streamId={item.streamId}
                         liked={likedIds.includes(post.id)}
                         saved={savedIds.includes(post.id)}
                         followed={followedIds.includes(post.authorId)}
                         commentCount={post.commentCount + comments.filter((comment) => comment.postId === post.id).length}
+                        onOpen={() => setSelectedFeedViewerIndex(index)}
                         onLike={toggleLike}
                         onSave={toggleSave}
                         onFollow={toggleFollow}
                         onShare={setSharePost}
                         onComment={setCommentPost}
-                        onBoost={(post) => boostPost(post.id)}
-                        onHide={hidePost}
                         onReport={setReportPost}
-                        onExplain={explainFeedItem}
-                        onPass={passFeedCard}
-                        onMatch={matchFeedCard}
-                        onSignal={recordFeedSignal}
                       />
-                      {index === 0 && (
-                        <GroupsPanel groups={groups} memberships={groupMemberships} onJoinGroup={joinGroup} onCreateGroup={createGroup} compact />
-                      )}
-                      {index === 1 && (
-                        <div className="space-y-4">
-                          <DailySwipePanel usageLimit={usageLimit} onBuyMore={openUpsell} />
-                          <MissionPanel posts={posts} shares={shares} likedIds={likedIds} savedIds={savedIds} answers={answers} onSelectProduct={openUpsell} />
-                          <DailyPicksPanel picks={dailyPicks} />
-                        </div>
-                      )}
-                      {index === 2 && feedAds.filter((ad) => !hiddenAdIds.includes(ad.id))[0] && (
-                        <NativeAdCard ad={feedAds.filter((ad) => !hiddenAdIds.includes(ad.id))[0]} onOpen={openNativeAd} onHide={hideNativeAd} onReport={reportNativeAd} />
-                      )}
-                      {index === 3 && (
-                        <PerksRail partnerOffers={sortedPartnerOffers} profile={profile} onOpenOffer={openPartnerOffer} compact />
-                      )}
-                      {index === 4 && (
-                        <div className="space-y-4">
-                          <RoleLanesPanel profile={profile} onSelectTab={setActiveFeedTab} />
-                          <ProfessionalModePanel profile={profile} professionalProfiles={professionalProfiles} posts={posts} groups={groups} />
-                          <DealTrackingPanel posts={posts} watchlist={dealWatchlist} onWatchDeal={watchDeal} onUpdateDealStatus={updateDealStatus} />
-                          <ReferralLoopPanel profile={profile} referrals={referrals} onCreateReferral={createReferral} />
-                          <TractionPanel posts={posts} likedIds={likedIds} savedIds={savedIds} shares={shares} comments={comments} onBoost={openUpsell} />
-                        </div>
-                      )}
-                      {index === 5 && (
-                        <div className="space-y-4">
-                          <ResidentModePanel residentProfiles={residentProfiles} maintenanceRequests={maintenanceRequests} rentRecords={rentRecords} onLogMaintenance={logMaintenanceRequest} onLogRent={logRentRecord} />
-                          <LandlordModePanel properties={landlordProperties} posts={posts} onAddProperty={addLandlordProperty} />
-                          <TenantDemandPipelinePanel signals={tenantDemandSignals} properties={landlordProperties} introductions={marketIntroductions} onShortlist={shortlistTenantDemand} />
-                          <OperatorSignalsPanel signals={operatorPortfolioSignals} onAddSignal={addOperatorSignal} />
-                        </div>
+                      {primaryContextualUpsell && index === 3 && (
+                        <GenUpsellCard
+                          card={primaryContextualUpsell}
+                          onSelectProduct={openUpsell}
+                          onDismiss={dismissUpsell}
+                          onSharePost={setSharePost}
+                          newPost={newPost}
+                        />
                       )}
                     </React.Fragment>
                     );
@@ -5325,19 +7560,24 @@ function RentEazyAppShell() {
           )}
 
           {routeTab === 'Post' && (
-            <div className="space-y-5">
-              <AppPulseStrip wallet={wallet} purchases={purchases} boosts={boosts} reports={reports} shares={shares} />
-              <div>
-                <h1 className="text-4xl font-normal tracking-tight text-slate-950">Create a free post</h1>
-                <p className="mt-3 text-slate-600">Post what you need, what you have, or what you know.</p>
+            <div className="mx-auto max-w-2xl space-y-5">
+              <div className="rounded-b-[2.4rem] bg-[#e2f7f3] px-5 pb-7 pt-6 lg:rounded-[2.4rem]">
+                <div className="flex items-center justify-between gap-3">
+                  <a href="/app/feed" className="grid h-10 w-10 place-items-center rounded-full bg-white/78 text-[#050506]"><ArrowDownLeft className="h-4 w-4" /></a>
+                  <p className="text-sm font-bold text-[#050506]/55">Create</p>
+                  <button type="button" onClick={() => openUpsell('post-bump-small')} className="grid h-10 w-10 place-items-center rounded-full bg-[#050506] text-white"><Megaphone className="h-4 w-4" /></button>
+                </div>
+                <h1 className="mt-8 text-[2.65rem] font-bold leading-none tracking-tight text-[#050506]">Post</h1>
+                <p className="mt-2 text-sm font-medium text-[#050506]/55">Listings, updates, deals, questions, rooms, stays.</p>
               </div>
               <ComposerPanel onCreatePost={addPost} profile={profile} />
-              <div className="grid gap-4 lg:grid-cols-2">
-                <div className="rounded-3xl border border-[#d5ecd7] bg-[#edf8ee] p-4 text-sm leading-6 text-[#215d27]">
-                  After posting, Share Everywhere rewards the user with 5 extra swipes today. Useful posts can be boosted from 29p.
+              <div className="grid gap-4 md:grid-cols-2">
+                <div className="rounded-[2rem] bg-[#050506] p-5 text-white shadow-[0_28px_70px_-48px_rgba(0,0,0,0.72)]">
+                  <p className="text-lg font-bold">Share and boost</p>
+                  <p className="mt-2 text-sm leading-6 text-white/62">Reach more relevant people after the post is live.</p>
                   <div className="mt-3 flex flex-wrap gap-2">
-                    <button type="button" onClick={() => openUpsell('post-bump-small')} className="rounded-full bg-[#092243] px-4 py-2 text-sm text-white">Boost post from 29p</button>
-                    <button type="button" onClick={() => openUpsell('profile-polish')} className="rounded-full bg-[#2f7d32] px-4 py-2 text-sm text-white">Listing polish for 49p</button>
+                    <button type="button" onClick={() => openUpsell('post-bump-small')} className="rounded-full bg-[#bff4ef] px-4 py-2 text-sm font-bold text-[#050506]">Boost from 29p</button>
+                    <button type="button" onClick={() => openUpsell('profile-polish')} className="rounded-full bg-white/12 px-4 py-2 text-sm font-bold text-white">Polish 49p</button>
                   </div>
                 </div>
                 <MiniShopPanel onSelectProduct={openUpsell} compact />
@@ -5348,95 +7588,86 @@ function RentEazyAppShell() {
           )}
 
           {routeTab === 'Swipe' && (
-            <div>
-              <div className="mb-5">
-                <AppPulseStrip wallet={wallet} purchases={purchases} boosts={boosts} reports={reports} shares={shares} />
+            <div className="min-h-[calc(100vh-8.5rem)]">
+              <div className="mb-3 flex items-center justify-between gap-3">
+                <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[#2670a8]">RentEazy Match</p>
+                <button type="button" onClick={() => openUpsell('extra-swipes-10')} className="rounded-full bg-[#092243] px-4 py-2 text-sm font-semibold text-white">{remainingSwipes} left</button>
               </div>
-              <h1 className="text-4xl font-normal tracking-tight text-slate-950">Swipe</h1>
-              <p className="mt-3 text-slate-600">Swipe through suitable homes, rooms, stays, and people one card at a time.</p>
-              <div className="mt-5"><MatchSummaryStrip profile={profile} answers={answers} /></div>
-              <div className="mt-5"><DailySwipePanel usageLimit={usageLimit} onBuyMore={openUpsell} /></div>
-              <div className="mt-5"><InteractiveMatchCard cards={rankedSwipeCards} canSwipe={remainingSwipes > 0} onSwipeAction={handleSwipeAction} onBlocked={() => openUpsell('extra-swipes-10')} /></div>
-              <div className="mt-5">
-                <MatchPipelinePanel matches={matches} messages={matchMessages} viewings={viewings} reviews={reviews} onSendMessage={sendMatchMessage} onRequestViewing={requestViewing} onSubmitReview={submitMatchReview} />
-              </div>
-              <div className="mt-5 rounded-3xl border border-[#d5ecd7] bg-[#edf8ee] p-4 text-sm leading-6 text-[#215d27]">
-                After a match or viewing, Protect Basic keeps the interaction on record for £0.99/month.
-              </div>
+              {primaryContextualUpsell && (
+                <div className="mb-3">
+                  <GenUpsellCard
+                    card={primaryContextualUpsell}
+                    onSelectProduct={openUpsell}
+                    onDismiss={dismissUpsell}
+                    onSharePost={setSharePost}
+                    newPost={newPost}
+                    compact
+                  />
+                </div>
+              )}
+              <InteractiveMatchCard cards={rankedSwipeCards} canSwipe={remainingSwipes > 0} onSwipeAction={handleSwipeAction} onBlocked={() => openUpsell('extra-swipes-10')} immersive />
             </div>
           )}
 
           {routeTab === 'Likes' && (
             <div className="space-y-4">
-              <AppPulseStrip wallet={wallet} purchases={purchases} boosts={boosts} reports={reports} shares={shares} />
-              <div className="rounded-4xl border border-white bg-white/86 p-6 shadow-[0_18px_44px_-34px_rgba(15,23,42,0.45),inset_0_1px_0_white]">
-                <h1 className="text-4xl font-normal tracking-tight text-slate-950">Likes</h1>
-                <p className="mt-3 text-slate-600">Saved posts and liked posts stay here so you can come back to them quickly.</p>
-              </div>
+              <LikesSocialInbox
+                posts={posts}
+                likedIds={likedIds}
+                savedIds={savedIds}
+                matches={matches}
+                matchMessages={matchMessages}
+                profile={profile}
+                onSelectProduct={openUpsell}
+                onOpenPost={(post) => {
+                  const index = feedItems.findIndex((item) => item.post.id === post.id);
+                  if (index >= 0) setSelectedFeedViewerIndex(index);
+                }}
+              />
+              {primaryContextualUpsell && (
+                <GenUpsellCard
+                  card={primaryContextualUpsell}
+                  onSelectProduct={openUpsell}
+                  onDismiss={dismissUpsell}
+                  onSharePost={setSharePost}
+                  newPost={newPost}
+                />
+              )}
               <MatchPipelinePanel matches={matches} messages={matchMessages} viewings={viewings} reviews={reviews} onSendMessage={sendMatchMessage} onRequestViewing={requestViewing} onSubmitReview={submitMatchReview} />
-              <div className="rounded-[1.75rem] border border-white bg-white/86 p-5 shadow-[0_18px_44px_-34px_rgba(15,23,42,0.45),inset_0_1px_0_white]">
-                <p className="font-['JetBrains_Mono',monospace] text-xs text-[#2670a8]">WHO LIKED YOU</p>
-                <h2 className="mt-2 text-2xl font-normal tracking-tight text-slate-950">No hidden likes yet</h2>
-                <p className="mt-2 text-sm leading-6 text-slate-600">When real users like your posts or profile, blurred likes can appear here. No likes are shown until real activity exists.</p>
-                <div className="mt-4 flex flex-wrap gap-2">
-                  <button type="button" onClick={() => openUpsell('reveal-like-1')} className="rounded-full bg-[#092243] px-4 py-2 text-sm text-white">Unlock Likes</button>
-                  <button type="button" onClick={() => openUpsell('extra-swipes-10')} className="rounded-full bg-[#2f7d32] px-4 py-2 text-sm text-white">Get 10 more for 9p</button>
-                </div>
-              </div>
-              <div className="grid gap-4 sm:grid-cols-2">
-                {posts.filter((post) => likedIds.includes(post.id) || savedIds.includes(post.id)).map((post) => (
-                  <FeedPostCard
-                    key={post.id}
-                    post={post}
-                    ranking={rankingById.get(post.id)}
-                    liked={likedIds.includes(post.id)}
-                    saved={savedIds.includes(post.id)}
-                    followed={followedIds.includes(post.authorId)}
-                    commentCount={post.commentCount + comments.filter((comment) => comment.postId === post.id).length}
-                    onLike={toggleLike}
-                    onSave={toggleSave}
-                    onFollow={toggleFollow}
-                    onShare={setSharePost}
-                    onComment={setCommentPost}
-                    onBoost={(post) => boostPost(post.id)}
-                    onHide={hidePost}
-                    onReport={setReportPost}
-                    onExplain={explainFeedItem}
-                  />
-                ))}
-                {posts.filter((post) => likedIds.includes(post.id) || savedIds.includes(post.id)).length === 0 && <p className="rounded-[1.75rem] border border-white bg-white/86 p-6 text-sm text-slate-600">Like or save posts from the Feed and they will appear here.</p>}
-              </div>
             </div>
           )}
 
           {routeTab === 'Profile' && (
             <div className="space-y-5">
-              <AppPulseStrip wallet={wallet} purchases={purchases} boosts={boosts} reports={reports} shares={shares} />
-              <div className="rounded-[1.75rem] border border-[#cfe9fb] bg-white/88 p-4 shadow-[0_14px_34px_-28px_rgba(15,23,42,0.45)]">
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-slate-950">Billing and upgrades</p>
-                    <p className="mt-1 text-sm leading-6 text-slate-600">Manage Match, Priority, Protect, credits, boosts, and business starter upgrades.</p>
-                  </div>
-                  <a href="/app/billing" className="inline-flex shrink-0 items-center justify-center rounded-full bg-[#092243] px-5 py-3 text-sm text-white">Open billing</a>
-                </div>
-              </div>
+              <SocialKitProfilePage
+                profile={profile}
+                answers={answers}
+                reputationProfile={reputationProfile}
+                posts={posts}
+                likedIds={likedIds}
+                savedIds={savedIds}
+                matches={matches}
+                onOpenPost={(post) => {
+                  const index = feedItems.findIndex((item) => item.post.id === post.id);
+                  if (index >= 0) setSelectedFeedViewerIndex(index);
+                }}
+              />
+              {primaryContextualUpsell && (
+                <GenUpsellCard
+                  card={primaryContextualUpsell}
+                  onSelectProduct={openUpsell}
+                  onDismiss={dismissUpsell}
+                  onSharePost={setSharePost}
+                  newPost={newPost}
+                />
+              )}
               <ProfileEditor profile={profile} setProfile={setProfile} answers={answers} setAnswers={setAnswers} />
-              <DailyReturnPanel profile={profile} lifecycleTasks={lifecycleTasks} reputationProfile={reputationProfile} onCompleteTask={completeLifecycleTask} />
-              <RecommendationLoopPanel insights={activeRecommendationInsights} onOpenOffer={openRecommendedOffer} />
-              <ReputationScoreCard reputationProfile={reputationProfile} />
-              <UsefulNotificationsPanel notifications={notifications} onMarkRead={markNotificationRead} />
-              <ResidentModePanel residentProfiles={residentProfiles} maintenanceRequests={maintenanceRequests} rentRecords={rentRecords} onLogMaintenance={logMaintenanceRequest} onLogRent={logRentRecord} />
-              <LandlordModePanel properties={landlordProperties} posts={posts} onAddProperty={addLandlordProperty} />
-              <TenantDemandPipelinePanel signals={tenantDemandSignals} properties={landlordProperties} introductions={marketIntroductions} onShortlist={shortlistTenantDemand} />
-              <ProfessionalModePanel profile={profile} professionalProfiles={professionalProfiles} posts={posts} groups={groups} />
-              <DealTrackingPanel posts={posts} watchlist={dealWatchlist} onWatchDeal={watchDeal} onUpdateDealStatus={updateDealStatus} />
-              <OperatorSignalsPanel signals={operatorPortfolioSignals} onAddSignal={addOperatorSignal} />
-              <ReferralLoopPanel profile={profile} referrals={referrals} onCreateReferral={createReferral} />
-              <MatchPipelinePanel matches={matches} messages={matchMessages} viewings={viewings} reviews={reviews} onSendMessage={sendMatchMessage} onRequestViewing={requestViewing} onSubmitReview={submitMatchReview} />
-              <TrustReputationPanel reports={reports} comments={comments} profile={profile} />
-              <ActivityInbox usageLimit={usageLimit} posts={posts} shares={shares} reports={reports} boosts={boosts} profile={profile} />
-              <MiniShopPanel onSelectProduct={openUpsell} />
+              <div className="grid gap-5 lg:grid-cols-2">
+                <DailyReturnPanel profile={profile} lifecycleTasks={lifecycleTasks} reputationProfile={reputationProfile} onCompleteTask={completeLifecycleTask} />
+                <ReputationScoreCard reputationProfile={reputationProfile} />
+                <UsefulNotificationsPanel notifications={notifications} onMarkRead={markNotificationRead} />
+                <TrustReputationPanel reports={reports} comments={comments} profile={profile} />
+              </div>
             </div>
           )}
 
@@ -5445,50 +7676,76 @@ function RentEazyAppShell() {
           )}
         </section>
 
-        <aside className="hidden space-y-4 lg:block">
-          <div className="rounded-[1.75rem] border border-white bg-white/86 p-5 shadow-[0_18px_44px_-34px_rgba(15,23,42,0.45),inset_0_1px_0_white]">
-            <p className="font-['JetBrains_Mono',monospace] text-xs text-[#2670a8]">LAUNCH STATS</p>
-            <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
-              <div className="rounded-2xl bg-slate-50 p-4"><p className="text-2xl text-slate-950">{posts.length}</p><p className="text-slate-500">Posts</p></div>
-              <div className="rounded-2xl bg-slate-50 p-4"><p className="text-2xl text-slate-950">{shares.length}</p><p className="text-slate-500">Shares</p></div>
-              <div className="rounded-2xl bg-slate-50 p-4"><p className="text-2xl text-slate-950">{savedIds.length}</p><p className="text-slate-500">Saves</p></div>
-              <div className="rounded-2xl bg-slate-50 p-4"><p className="text-2xl text-slate-950">{reports.length}</p><p className="text-slate-500">Reports</p></div>
-            </div>
-          </div>
+        {routeTab === 'Feed' && (
+          <aside className="sticky top-5 hidden space-y-4 lg:block">
+            <DailySwipePanel usageLimit={usageLimit} onBuyMore={openUpsell} />
+            <ProfileStrengthCard profile={profile} answers={answers} />
+            <UsefulNotificationsPanel notifications={notifications} onMarkRead={markNotificationRead} />
+            <RecommendationLoopPanel insights={activeRecommendationInsights} onOpenOffer={openRecommendedOffer} />
+            <MiniShopPanel onSelectProduct={openUpsell} compact />
+          </aside>
+        )}
+
+        {routeTab === 'Profile' && <aside className="hidden space-y-4 lg:block">
           <DailySwipePanel usageLimit={usageLimit} onBuyMore={openUpsell} />
-          <div className="rounded-[1.75rem] border border-[#d5ecd7] bg-[#edf8ee] p-5 text-sm leading-7 text-[#215d27]">
-            Share Everywhere creates a caption, tracking link, copy actions, share sheet, and reward record.
-          </div>
-          <UsefulNotificationsPanel notifications={notifications} onMarkRead={markNotificationRead} />
           <ProfileStrengthCard profile={profile} answers={answers} />
+          <UsefulNotificationsPanel notifications={notifications} onMarkRead={markNotificationRead} />
           <RecommendationLoopPanel insights={activeRecommendationInsights} onOpenOffer={openRecommendedOffer} />
-          <ReferralLoopPanel profile={profile} referrals={referrals} onCreateReferral={createReferral} />
-          <ResidentModePanel residentProfiles={residentProfiles} maintenanceRequests={maintenanceRequests} rentRecords={rentRecords} onLogMaintenance={logMaintenanceRequest} onLogRent={logRentRecord} />
-          <LandlordModePanel properties={landlordProperties} posts={posts} onAddProperty={addLandlordProperty} />
-          <TenantDemandPipelinePanel signals={tenantDemandSignals} properties={landlordProperties} introductions={marketIntroductions} onShortlist={shortlistTenantDemand} />
-          <ProfessionalModePanel profile={profile} professionalProfiles={professionalProfiles} posts={posts} groups={groups} />
-          <DealTrackingPanel posts={posts} watchlist={dealWatchlist} onWatchDeal={watchDeal} onUpdateDealStatus={updateDealStatus} />
-          <OperatorSignalsPanel signals={operatorPortfolioSignals} onAddSignal={addOperatorSignal} />
-          <ActivityInbox usageLimit={usageLimit} posts={posts} shares={shares} reports={reports} boosts={boosts} profile={profile} />
-          <RoleLanesPanel profile={profile} onSelectTab={setActiveFeedTab} />
-          <TractionPanel posts={posts} likedIds={likedIds} savedIds={savedIds} shares={shares} comments={comments} onBoost={openUpsell} />
-          <BoostPerformanceCard boosts={boosts} onBoost={openUpsell} />
-          <AdsInventoryPanel onBoost={openUpsell} />
           <MiniShopPanel onSelectProduct={openUpsell} compact />
-          <ModerationQueueCard reports={reports} />
-          <TrustReputationPanel reports={reports} comments={comments} profile={profile} />
-          <div className="rounded-[1.75rem] border border-white bg-white/86 p-5 text-sm leading-7 text-slate-600 shadow-[0_18px_44px_-34px_rgba(15,23,42,0.45)]">
-            <p className="font-['JetBrains_Mono',monospace] text-xs text-[#2670a8]">WALLET</p>
-            <p className="mt-2 text-2xl text-slate-950">{wallet.balance} credits</p>
-            <p>{purchases.length} purchases · {entitlements.length} entitlements · {appStreak.count} day streak</p>
-          </div>
-        </aside>
+        </aside>}
+
+        {routeTab !== 'Feed' && routeTab !== 'Swipe' && routeTab !== 'Profile' && (
+          <AppSupportSidebar
+            routeTab={routeTab}
+            wallet={wallet}
+            purchases={purchases}
+            boosts={boosts}
+            reports={reports}
+            shares={shares}
+            posts={posts}
+            savedIds={savedIds}
+            comments={comments}
+            entitlements={entitlements}
+            appStreak={appStreak}
+            usageLimit={usageLimit}
+            profile={profile}
+            answers={answers}
+            notifications={notifications}
+            markNotificationRead={markNotificationRead}
+            activeRecommendationInsights={activeRecommendationInsights}
+            openRecommendedOffer={openRecommendedOffer}
+            referrals={referrals}
+            createReferral={createReferral}
+            residentProfiles={residentProfiles}
+            maintenanceRequests={maintenanceRequests}
+            rentRecords={rentRecords}
+            logMaintenanceRequest={logMaintenanceRequest}
+            logRentRecord={logRentRecord}
+            landlordProperties={landlordProperties}
+            addLandlordProperty={addLandlordProperty}
+            tenantDemandSignals={tenantDemandSignals}
+            marketIntroductions={marketIntroductions}
+            shortlistTenantDemand={shortlistTenantDemand}
+            professionalProfiles={professionalProfiles}
+            groups={groups}
+            dealWatchlist={dealWatchlist}
+            watchDeal={watchDeal}
+            updateDealStatus={updateDealStatus}
+            operatorPortfolioSignals={operatorPortfolioSignals}
+            addOperatorSignal={addOperatorSignal}
+            activeFeedTab={activeFeedTab}
+            setActiveFeedTab={setActiveFeedTab}
+            likedIds={likedIds}
+            feedAds={feedAds}
+            openUpsell={openUpsell}
+          />
+        )}
       </main>
 
-      <nav className="fixed inset-x-0 bottom-0 z-50 border-t border-white bg-white/92 px-3 py-2 backdrop-blur-xl lg:hidden">
-        <div className="mx-auto grid max-w-md grid-cols-5 gap-1 rounded-full bg-slate-950 p-1.5 text-white">
+      <nav className="fixed inset-x-0 bottom-0 z-50 px-5 pb-5 pt-2 lg:hidden">
+        <div className="mx-auto grid max-w-[335px] grid-cols-5 gap-1 rounded-[2rem] bg-[#050506] p-1.5 text-white/55 shadow-[0_24px_60px_-26px_rgba(0,0,0,0.75)]">
           {navItems.map(([label, href, Icon]) => (
-            <a key={label} href={href} className={`flex flex-col items-center gap-1 rounded-full px-2 py-2 text-[0.7rem] ${routeTab === label ? 'bg-white/18' : 'text-white/72'}`}>
+            <a key={label} href={href} className={`flex flex-col items-center gap-1 rounded-[1.45rem] px-2 py-2 text-[0.64rem] font-bold transition ${routeTab === label ? 'bg-[#bff4ef] text-[#050506]' : 'hover:bg-white/10 hover:text-white'}`}>
               <Icon className="h-5 w-5" />
               <span>{label}</span>
             </a>

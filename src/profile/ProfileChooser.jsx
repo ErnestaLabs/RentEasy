@@ -14,11 +14,13 @@ export default function ProfileChooser({ onSelect }) {
       </div>
 
       <div className="relative mx-auto flex min-h-screen max-w-5xl flex-col items-center justify-center px-6 py-16">
-        <img
-          src="/images/renteazy-main-logo-transparent-nav.png"
-          alt="RentEazy"
-          className="mb-10 h-10 w-auto object-contain brightness-0 invert"
-        />
+        <span className="mb-10 inline-flex items-center justify-center rounded-3xl bg-white px-6 py-4 shadow-[0_18px_44px_-26px_rgba(0,0,0,0.6)]">
+          <img
+            src="/images/renteazy-logo-2026-t.png"
+            alt="RentEazy"
+            className="h-14 w-auto object-contain"
+          />
+        </span>
 
         <p className="font-['JetBrains_Mono',monospace] text-xs tracking-[0.16em] text-[#9bd383]">FIRST — WHO ARE YOU?</p>
         <h1 className="mt-4 text-center font-['Bricolage_Grotesque_Variable',Inter,sans-serif] text-4xl font-normal leading-[1.05] tracking-tight md:text-5xl">
