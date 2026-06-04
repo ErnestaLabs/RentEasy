@@ -179,6 +179,9 @@ export default function FeedScreen({
             visibleFeedItems.map((item, index) => {
               const post = item.post;
               const lockedPreviewCard = isPreviewVisitor && index >= 2;
+              // Preview visitors: show 2 full cards + ONE gated teaser, not the
+              // banner stamped on every locked card down the page.
+              if (isPreviewVisitor && index > 2) return null;
               return (
                 <React.Fragment key={item.streamId}>
                   <div className="relative">
