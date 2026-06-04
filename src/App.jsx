@@ -14,6 +14,13 @@ import { useProfile } from '@/profile/useProfile';
 import { getProfile } from '@/profile/profiles';
 import RoleStory from '@/landing/RoleStory';
 import { buildRentEazyFeed, createFeedSignal, createFeedCardSchema } from '@/lib/feedEngine';
+import AppBottomNav from '@/app/components/AppBottomNav';
+import BillingScreen from '@/app/screens/BillingScreen';
+import FeedScreen from '@/app/screens/FeedScreen';
+import LikesScreen from '@/app/screens/LikesScreen';
+import PostScreen from '@/app/screens/PostScreen';
+import ProfileScreen from '@/app/screens/ProfileScreen';
+import SwipeScreen from '@/app/screens/SwipeScreen';
 // Code-split the VSL: Remotion is ~400KB and sits below the fold, so it must
 // not block the hero paint. Loads lazily when the user scrolls toward it.
 const VSLPlayer = React.lazy(() => import('@/components/vsl/VSLPlayer'));
@@ -4372,13 +4379,15 @@ function ProfileSocialOverview({ profile, answers, reputationProfile, usageLimit
       </section>
 
       {!!joinedGroups.length && (
-        <section className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none]">
+        <section className="w-full overflow-hidden">
+          <div className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none]">
           {joinedGroups.map((group) => (
             <a key={group.id} href="/app/feed" className="min-w-[15rem] rounded-[1.35rem] bg-white px-4 py-3 text-sm shadow-[0_14px_34px_-28px_rgba(15,23,42,0.45)] ring-1 ring-white">
               <span className="block font-semibold text-slate-950">{group.name}</span>
               <span className="mt-1 block text-xs text-slate-500">{group.memberCount} members · {group.area}</span>
             </a>
           ))}
+          </div>
         </section>
       )}
     </div>
@@ -5947,21 +5956,24 @@ function GlobalChatWidget({ matches, messages, profile, onSendMessage, routeTab 
     setMessageBody('');
   };
 
-  const ConversationButton = ({ conversation, compact = false }) => (
+  const ConversationButton = ({ conversation, compact = false, rail = false }) => (
     <button
       type="button"
       onClick={() => {
         setSelectedMatchId(conversation.id);
         setShowConversationList(false);
       }}
-      className={`flex w-full items-center gap-3 rounded-2xl text-left transition ${selectedConversation?.id === conversation.id ? 'bg-[#edf8ee] text-slate-950 ring-1 ring-[#c7e8ca]' : 'text-slate-600 hover:bg-slate-100'} ${compact ? 'p-3' : 'p-2.5'}`}
+      title={conversation.title}
+      className={`relative flex w-full items-center gap-3 rounded-2xl text-left transition ${selectedConversation?.id === conversation.id ? 'bg-[#edf8ee] text-slate-950 ring-1 ring-[#c7e8ca]' : 'text-slate-600 hover:bg-slate-100'} ${rail ? 'justify-center p-2' : compact ? 'p-3' : 'p-2.5'}`}
     >
       <PeepAvatar seed={conversation.title} variant="bust" className={compact ? 'h-12 w-12' : 'h-10 w-10'} avatarBg={selectedConversation?.id === conversation.id ? 'mint' : 'sky'} ring="ring-1 ring-white" />
-      <span className="min-w-0 flex-1">
-        <span className="block truncate text-sm font-bold">{conversation.title}</span>
-        <span className="block truncate text-xs text-slate-500">{conversation.lastMessage?.body || conversation.subjectTitle}</span>
-      </span>
-      {conversation.unreadCount > 0 && <span className="grid h-5 min-w-5 place-items-center rounded-full bg-[#2f7d32] px-1 text-[0.62rem] font-bold text-white">{Math.min(conversation.unreadCount, 9)}</span>}
+      {!rail && (
+        <span className="min-w-0 flex-1">
+          <span className="block truncate text-sm font-bold">{conversation.title}</span>
+          <span className="block truncate text-xs text-slate-500">{conversation.lastMessage?.body || conversation.subjectTitle}</span>
+        </span>
+      )}
+      {conversation.unreadCount > 0 && <span className={`${rail ? 'absolute right-1 top-1' : ''} grid h-5 min-w-5 place-items-center rounded-full bg-[#2f7d32] px-1 text-[0.62rem] font-bold text-white`}>{Math.min(conversation.unreadCount, 9)}</span>}
     </button>
   );
 
@@ -6019,14 +6031,14 @@ function GlobalChatWidget({ matches, messages, profile, onSendMessage, routeTab 
               </div>
             </div>
           ) : !selectedConversation ? null : (
-            <div className="relative grid min-h-0 flex-1 md:grid-cols-[168px_1fr]">
+            <div className="relative grid min-h-0 flex-1 md:grid-cols-[5.5rem_1fr]">
               <aside className="hidden min-h-0 border-r border-slate-100 bg-white p-2 md:block">
-                <div className="mb-2 px-2 py-2">
-                  <p className="text-xs font-bold uppercase tracking-[0.12em] text-slate-400">Chats</p>
+                <div className="mb-2 px-1 py-2 text-center">
+                  <p className="text-[0.62rem] font-bold uppercase tracking-[0.12em] text-slate-400">Chats</p>
                 </div>
                 <div className="max-h-[398px] space-y-1 overflow-y-auto pr-1">
                   {conversations.map((conversation) => (
-                    <ConversationButton key={conversation.id} conversation={conversation} />
+                    <ConversationButton key={conversation.id} conversation={conversation} rail />
                   ))}
                 </div>
               </aside>
@@ -6151,6 +6163,99 @@ function ClerkBillingSurface() {
   return (
     <div className="overflow-hidden rounded-[1.75rem] border border-white bg-white p-3 shadow-[0_18px_44px_-34px_rgba(15,23,42,0.45),inset_0_1px_0_white]">
       <PricingTable appearance={clerkAppearance} />
+    </div>
+  );
+}
+
+function SignupAction({ children, className = '' }) {
+  if (clerkEnabled) {
+    return (
+      <SignUpButton mode="modal" fallbackRedirectUrl="/app/feed">
+        <button type="button" className={className}>{children}</button>
+      </SignUpButton>
+    );
+  }
+
+  return <a href="/signup" className={className}>{children}</a>;
+}
+
+function PreviewSignupPrompt({ action = 'continue', onClose }) {
+  const copyByAction = {
+    like: ['Create a free account to like posts.', 'Likes tune your Feed and open the right match signals.'],
+    save: ['Create a free account to save this.', 'Saved posts stay with your profile and improve recommendations.'],
+    post: ['Create a free account to post.', 'Post what you need, what you have, or what you know.'],
+    match: ['Create a free account to start matching.', 'Swipe cards, send interest, and open conversations after mutual fit.'],
+    comment: ['Create a free account to reply.', 'Keep useful rental conversations attached to your profile.'],
+    share: ['Create a free account to share from RentEazy.', 'Share links, track interest, and bring replies back into RentEazy.'],
+    follow: ['Create a free account to follow people and groups.', 'Following makes the Feed more relevant.'],
+    report: ['Create a free account to report this.', 'Reports are tied to accountable RentEazy profiles.'],
+    continue: ['Create a free account to continue.', 'The preview is open. Interaction starts after signup.'],
+  };
+  const [title, body] = copyByAction[action] || copyByAction.continue;
+
+  return (
+    <div className="fixed inset-0 z-[95] grid place-items-end bg-[#050506]/46 p-3 backdrop-blur-sm sm:place-items-center">
+      <section className="w-full max-w-md overflow-hidden rounded-[2rem] bg-white shadow-[0_34px_90px_-38px_rgba(15,23,42,0.78)]">
+        <div className="bg-[#092243] px-5 py-5 text-white">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.14em] text-white/48">RentEazy preview</p>
+              <h2 className="mt-2 text-2xl font-bold tracking-tight">{title}</h2>
+            </div>
+            <button type="button" onClick={onClose} className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-white/10 text-white" aria-label="Close signup prompt">
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+        <div className="p-5">
+          <p className="text-sm leading-6 text-slate-600">{body}</p>
+          <div className="mt-5 grid gap-2">
+            <SignupAction className="inline-flex w-full items-center justify-center rounded-full bg-[#2f7d32] px-5 py-3 text-sm font-bold text-white shadow-[0_16px_34px_-24px_rgba(47,125,50,0.8)]">
+              Create free account
+            </SignupAction>
+            <button type="button" onClick={onClose} className="inline-flex w-full items-center justify-center rounded-full bg-slate-100 px-5 py-3 text-sm font-bold text-slate-700">
+              Keep previewing
+            </button>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function FeedPreviewBanner({ onSignup }) {
+  return (
+    <section className="overflow-hidden rounded-[1.7rem] bg-[#092243] p-4 text-white shadow-[0_22px_58px_-38px_rgba(9,34,67,0.86)]">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <p className="text-xs font-bold uppercase tracking-[0.14em] text-white/44">Preview mode</p>
+          <h2 className="mt-1 text-xl font-bold tracking-tight">Browse the Feed. Sign up to interact.</h2>
+          <p className="mt-1 text-sm leading-6 text-white/62">Like, post, match, comment, save, and message after creating a free account.</p>
+        </div>
+        <button type="button" onClick={onSignup} className="shrink-0 rounded-full bg-[#8bdc65] px-5 py-3 text-sm font-bold text-[#092243]">Create account</button>
+      </div>
+    </section>
+  );
+}
+
+function PreviewRouteGate({ action = 'continue', title, body }) {
+  return (
+    <div className="mx-auto grid min-h-[calc(100vh-10rem)] max-w-xl place-items-center px-4">
+      <section className="overflow-hidden rounded-[2rem] bg-white shadow-[0_24px_70px_-50px_rgba(15,23,42,0.62)] ring-1 ring-white">
+        <div className="bg-[#092243] p-6 text-white">
+          <p className="text-xs font-bold uppercase tracking-[0.14em] text-white/46">RentEazy preview</p>
+          <h1 className="mt-2 text-3xl font-bold tracking-tight">{title}</h1>
+        </div>
+        <div className="p-6">
+          <p className="text-sm leading-7 text-slate-600">{body}</p>
+          <SignupAction className="mt-5 inline-flex w-full items-center justify-center rounded-full bg-[#2f7d32] px-5 py-3 text-sm font-bold text-white">
+            Create free account
+          </SignupAction>
+          <a href="/app/feed" className="mt-2 inline-flex w-full items-center justify-center rounded-full bg-slate-100 px-5 py-3 text-sm font-bold text-slate-700">
+            Back to preview Feed
+          </a>
+        </div>
+      </section>
     </div>
   );
 }
@@ -6858,7 +6963,7 @@ function AppSupportSidebar({
   );
 }
 
-function RentEazyAppShell() {
+function RentEazyAppContainer({ isPreviewVisitor = false }) {
   const path = typeof window === 'undefined' ? '/app/feed' : window.location.pathname;
   const routeTab = path.includes('/billing') ? 'Billing' : path.includes('/post') ? 'Post' : path.includes('/likes') ? 'Likes' : path.includes('/profile') ? 'Profile' : path.includes('/swipe') ? 'Swipe' : 'Feed';
   const [activeFeedTab, setActiveFeedTab] = useStoredState('renteazy-feed-tab', 'For You');
@@ -6909,6 +7014,7 @@ function RentEazyAppShell() {
   const [sharePost, setSharePost] = useState(null);
   const [reportPost, setReportPost] = useState(null);
   const [commentPost, setCommentPost] = useState(null);
+  const [previewPrompt, setPreviewPrompt] = useState(null);
   const [upsellProductId, setUpsellProductId] = useState(null);
   const [dismissedUpsells, setDismissedUpsells] = useState([]);
   const [newPost, setNewPost] = useState(null);
@@ -7617,6 +7723,31 @@ function RentEazyAppShell() {
   }), [activeFeedTab, answers, behavioralEvents, comments, feedSignals, followedIds, hiddenPostIds, likedIds, posts, profile, savedIds]);
   const rankingById = feedStream.rankingById;
   const feedItems = feedStream.items;
+  const visibleFeedItems = isPreviewVisitor ? feedItems.slice(0, 6) : feedItems;
+  const requireAccount = (action = 'continue') => {
+    setPreviewPrompt(action);
+    return false;
+  };
+  const previewGuard = (action, handler) => (...args) => {
+    if (isPreviewVisitor) {
+      requireAccount(action);
+      return undefined;
+    }
+    return handler?.(...args);
+  };
+  const guardedToggleLike = previewGuard('like', toggleLike);
+  const guardedToggleSave = previewGuard('save', toggleSave);
+  const guardedToggleFollow = previewGuard('follow', toggleFollow);
+  const guardedShare = previewGuard('share', setSharePost);
+  const guardedComment = previewGuard('comment', setCommentPost);
+  const guardedReport = previewGuard('report', setReportPost);
+  const guardedOpenFeedItem = (index) => {
+    if (isPreviewVisitor) {
+      requireAccount('continue');
+      return;
+    }
+    setSelectedFeedViewerIndex(index);
+  };
 
   const navItems = [
     ['Feed', '/app/feed', Home],
@@ -7625,6 +7756,33 @@ function RentEazyAppShell() {
     ['Post', '/app/post', PlusCircle],
     ['Profile', '/app/profile', UserRound],
   ];
+  const appScreenComponents = {
+    ActivityInbox,
+    AdsInventoryPanel,
+    BillingPanel,
+    BrandLogo,
+    ComposerPanel,
+    DailyReturnPanel,
+    FeedPreviewBanner,
+    FeedTimelineCard,
+    GenUpsellCard,
+    GroupsPanel,
+    InteractiveMatchCard,
+    LikesSocialInbox,
+    MiniShopPanel,
+    PeepAvatar,
+    PerksRail,
+    PreviewRouteGate,
+    ProfileEditor,
+    ReputationScoreCard,
+    SocialHomeHeader,
+    SocialKitProfilePage,
+    SocialStoryRail,
+    TrustReputationPanel,
+    UsefulNotificationsPanel,
+    navItems,
+    routeTab,
+  };
 
   return (
     <div className={`${routeTab === 'Feed' ? 'min-h-screen bg-white pb-24' : routeTab === 'Swipe' ? 'min-h-screen bg-[#050506] pb-0' : 'min-h-screen bg-[#f7f9fa] pb-24'} text-slate-900 antialiased`} style={{ fontFamily: 'Poppins, Inter, sans-serif' }}>
@@ -7635,28 +7793,29 @@ function RentEazyAppShell() {
       {reportPost && <ReportModal post={reportPost} onClose={() => setReportPost(null)} onReport={submitReport} />}
       {commentPost && <CommentModal post={commentPost} comments={comments.filter((comment) => comment.postId === commentPost.id)} onClose={() => setCommentPost(null)} onComment={addComment} />}
       <MicroUpsellModal product={activeUpsellProduct} onClose={closeUpsell} onConfirm={confirmMicroProduct} billingEnabled={clerkEnabled} />
+      {previewPrompt && <PreviewSignupPrompt action={previewPrompt} onClose={() => setPreviewPrompt(null)} />}
       <FeedImmersiveViewer
-        items={feedItems}
+        items={visibleFeedItems}
         initialIndex={selectedFeedViewerIndex}
         likedIds={likedIds}
         savedIds={savedIds}
         followedIds={followedIds}
         comments={comments}
         onClose={() => setSelectedFeedViewerIndex(null)}
-        onLike={toggleLike}
-        onSave={toggleSave}
-        onFollow={toggleFollow}
-        onShare={setSharePost}
-        onComment={setCommentPost}
+        onLike={guardedToggleLike}
+        onSave={guardedToggleSave}
+        onFollow={guardedToggleFollow}
+        onShare={guardedShare}
+        onComment={guardedComment}
         onBoost={(post) => boostPost(post.id)}
         onHide={hidePost}
-        onReport={setReportPost}
+        onReport={guardedReport}
         onExplain={explainFeedItem}
         onPass={passFeedCard}
         onMatch={matchFeedCard}
         onSignal={recordFeedSignal}
       />
-      <GlobalChatWidget matches={matches} messages={matchMessages} profile={profile} onSendMessage={sendMatchMessage} routeTab={routeTab} />
+      {!isPreviewVisitor && <GlobalChatWidget matches={matches} messages={matchMessages} profile={profile} onSendMessage={sendMatchMessage} routeTab={routeTab} />}
       {routeTab !== 'Feed' && routeTab !== 'Swipe' && <header className="sticky top-0 z-40 px-3 pt-3">
         <div className={`mx-auto flex items-center justify-between gap-2 rounded-[1.45rem] border border-white/80 bg-white/78 px-3 py-2 shadow-[0_18px_48px_-34px_rgba(15,23,42,0.55),inset_0_1px_0_rgba(255,255,255,0.96)] backdrop-blur-2xl ${routeTab === 'Feed' ? 'max-w-2xl' : routeTab === 'Swipe' ? 'max-w-xl' : 'max-w-6xl'}`}>
           <BrandLogo compact />
@@ -7684,6 +7843,43 @@ function RentEazyAppShell() {
 
       <main className={`mx-auto grid ${routeTab === 'Feed' ? 'max-w-[520px] gap-4 px-3 py-3 lg:max-w-7xl lg:grid-cols-[17rem_minmax(0,36rem)_20rem] lg:items-start lg:px-6 lg:py-5' : routeTab === 'Swipe' ? 'max-w-[430px] gap-0 px-0 py-0 md:px-4 md:py-4' : 'gap-6 px-4 py-5'} ${routeTab === 'Swipe' ? '' : routeTab === 'Feed' ? '' : 'max-w-6xl lg:grid-cols-[1fr_20rem]'}`}>
         {routeTab === 'Feed' && (
+          <FeedScreen
+            activeFeedTab={activeFeedTab}
+            comments={comments}
+            components={appScreenComponents}
+            createGroup={createGroup}
+            dismissUpsell={dismissUpsell}
+            feedTabs={feedTabs}
+            followedIds={followedIds}
+            groupMemberships={groupMemberships}
+            groups={groups}
+            guardedComment={guardedComment}
+            guardedOpenFeedItem={guardedOpenFeedItem}
+            guardedReport={guardedReport}
+            guardedShare={guardedShare}
+            guardedToggleFollow={guardedToggleFollow}
+            guardedToggleLike={guardedToggleLike}
+            guardedToggleSave={guardedToggleSave}
+            isPreviewVisitor={isPreviewVisitor}
+            joinGroup={joinGroup}
+            likedIds={likedIds}
+            newPost={newPost}
+            openedOfferId={openedOfferId}
+            openPartnerOffer={openPartnerOffer}
+            openUpsell={openUpsell}
+            posts={posts}
+            primaryContextualUpsell={primaryContextualUpsell}
+            profile={profile}
+            requireAccount={requireAccount}
+            savedIds={savedIds}
+            setActiveFeedTab={setActiveFeedTab}
+            setSharePost={setSharePost}
+            sortedPartnerOffers={sortedPartnerOffers}
+            usageLimit={usageLimit}
+            visibleFeedItems={visibleFeedItems}
+          />
+        )}
+        {false && routeTab === 'Feed' && (
           <aside className="sticky top-5 hidden space-y-4 lg:block">
             <div className="rounded-[1.65rem] border border-white/80 bg-white/88 p-4 shadow-[0_18px_48px_-38px_rgba(15,23,42,0.48),inset_0_1px_0_rgba(255,255,255,0.96)] backdrop-blur-xl">
               <a href="/app/feed" className="flex items-baseline gap-0.5 text-2xl font-bold tracking-tight text-[#092243]">
@@ -7717,7 +7913,7 @@ function RentEazyAppShell() {
             </div>
           </aside>
         )}
-        <section className="min-w-0">
+        {routeTab !== 'Feed' && <section className="min-w-0">
           {routeTab === 'Feed' && (
             <>
               <div className="sticky top-0 z-40 -mx-3 space-y-4 bg-white/96 px-6 pb-4 pt-5 backdrop-blur-xl lg:hidden">
@@ -7799,16 +7995,24 @@ function RentEazyAppShell() {
                   Perk opened. RentEazy records the signal so future offers can be more relevant.
                 </div>
               )}
+              {isPreviewVisitor && (
+                <div className="mt-4">
+                  <FeedPreviewBanner onSignup={() => requireAccount('continue')} />
+                </div>
+              )}
               <div className="space-y-4 pb-4">
                 {activeFeedTab === 'Groups' ? (
                   <GroupsPanel groups={groups} memberships={groupMemberships} onJoinGroup={joinGroup} onCreateGroup={createGroup} />
                 ) : activeFeedTab === 'Perks' ? (
                   <PerksRail partnerOffers={sortedPartnerOffers} profile={profile} onOpenOffer={openPartnerOffer} />
                 ) : (
-                  feedItems.map((item, index) => {
+                  visibleFeedItems.map((item, index) => {
                     const post = item.post;
+                    const lockedPreviewCard = isPreviewVisitor && index >= 2;
                     return (
                     <React.Fragment key={item.streamId}>
+                      <div className="relative">
+                        <div className={lockedPreviewCard ? 'pointer-events-none select-none blur-[2.5px]' : ''}>
                       <FeedTimelineCard
                         post={post}
                         ranking={{ ...item.ranking, sequence: item.sequence, rewardSpike: item.rewardSpike }}
@@ -7817,15 +8021,28 @@ function RentEazyAppShell() {
                         saved={savedIds.includes(post.id)}
                         followed={followedIds.includes(post.authorId)}
                         commentCount={post.commentCount + comments.filter((comment) => comment.postId === post.id).length}
-                        onOpen={() => setSelectedFeedViewerIndex(index)}
-                        onLike={toggleLike}
-                        onSave={toggleSave}
-                        onFollow={toggleFollow}
-                        onShare={setSharePost}
-                        onComment={setCommentPost}
-                        onReport={setReportPost}
+                        onOpen={() => guardedOpenFeedItem(index)}
+                        onLike={guardedToggleLike}
+                        onSave={guardedToggleSave}
+                        onFollow={guardedToggleFollow}
+                        onShare={guardedShare}
+                        onComment={guardedComment}
+                        onReport={guardedReport}
                       />
-                      {primaryContextualUpsell && index === 3 && (
+                        </div>
+                        {lockedPreviewCard && (
+                          <button
+                            type="button"
+                            onClick={() => requireAccount('continue')}
+                            className="absolute inset-0 grid place-items-center rounded-[2.1rem] bg-[#092243]/28 p-5 text-center backdrop-blur-[1px]"
+                          >
+                            <span className="rounded-[1.5rem] bg-white px-5 py-4 text-sm font-bold text-[#092243] shadow-[0_24px_60px_-36px_rgba(15,23,42,0.72)]">
+                              Create a free account to keep browsing and interact
+                            </span>
+                          </button>
+                        )}
+                      </div>
+                      {primaryContextualUpsell && !isPreviewVisitor && index === 3 && (
                         <GenUpsellCard
                           card={primaryContextualUpsell}
                           onSelectProduct={openUpsell}
@@ -7843,116 +8060,83 @@ function RentEazyAppShell() {
           )}
 
           {routeTab === 'Post' && (
-            <div className="mx-auto max-w-2xl space-y-5">
-              <div className="rounded-b-[2.4rem] bg-[#e2f7f3] px-5 pb-7 pt-6 lg:rounded-[2.4rem]">
-                <div className="flex items-center justify-between gap-3">
-                  <a href="/app/feed" className="grid h-10 w-10 place-items-center rounded-full bg-white/78 text-[#050506]"><ArrowDownLeft className="h-4 w-4" /></a>
-                  <p className="text-sm font-bold text-[#050506]/55">Create</p>
-                  <button type="button" onClick={() => openUpsell('post-bump-small')} className="grid h-10 w-10 place-items-center rounded-full bg-[#050506] text-white"><Megaphone className="h-4 w-4" /></button>
-                </div>
-                <h1 className="mt-8 text-[2.65rem] font-bold leading-none tracking-tight text-[#050506]">Post</h1>
-                <p className="mt-2 text-sm font-medium text-[#050506]/55">Listings, updates, deals, questions, rooms, stays.</p>
-              </div>
-              <ComposerPanel onCreatePost={addPost} profile={profile} />
-              <div className="grid gap-4 md:grid-cols-2">
-                <div className="rounded-[2rem] bg-[#050506] p-5 text-white shadow-[0_28px_70px_-48px_rgba(0,0,0,0.72)]">
-                  <p className="text-lg font-bold">Share and boost</p>
-                  <p className="mt-2 text-sm leading-6 text-white/62">Reach more relevant people after the post is live.</p>
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    <button type="button" onClick={() => openUpsell('post-bump-small')} className="rounded-full bg-[#bff4ef] px-4 py-2 text-sm font-bold text-[#050506]">Boost from 29p</button>
-                    <button type="button" onClick={() => openUpsell('profile-polish')} className="rounded-full bg-white/12 px-4 py-2 text-sm font-bold text-white">Polish 49p</button>
-                  </div>
-                </div>
-                <MiniShopPanel onSelectProduct={openUpsell} compact />
-                <AdsInventoryPanel onBoost={openUpsell} />
-                <ActivityInbox usageLimit={usageLimit} posts={posts} shares={shares} reports={reports} boosts={boosts} profile={profile} />
-              </div>
-            </div>
+            <PostScreen
+              addPost={addPost}
+              boosts={boosts}
+              components={appScreenComponents}
+              isPreviewVisitor={isPreviewVisitor}
+              openUpsell={openUpsell}
+              posts={posts}
+              profile={profile}
+              reports={reports}
+              shares={shares}
+              usageLimit={usageLimit}
+            />
           )}
 
           {routeTab === 'Swipe' && (
-            <div className="relative min-h-screen md:min-h-0">
-              <div className="fixed left-4 top-4 z-[45] md:absolute md:left-5 md:top-5">
-                <a href="/app/feed" className="grid h-10 w-10 place-items-center rounded-full border border-white/10 bg-white/10 text-white backdrop-blur-xl" aria-label="Back to Feed">
-                  <ArrowDownLeft className="h-4 w-4" />
-                </a>
-              </div>
-              <button
-                type="button"
-                onClick={() => openUpsell('extra-swipes-10')}
-                className="fixed right-[4.25rem] top-4 z-[45] rounded-full border border-white/10 bg-white/10 px-3 py-2 text-xs font-bold text-white backdrop-blur-xl md:absolute md:right-[4.25rem] md:top-5"
-              >
-                {remainingSwipes} swipes
-              </button>
-              <InteractiveMatchCard cards={rankedSwipeCards} canSwipe={remainingSwipes > 0} onSwipeAction={handleSwipeAction} onBlocked={() => openUpsell('extra-swipes-10')} immersive />
-            </div>
+            <SwipeScreen
+              components={appScreenComponents}
+              handleSwipeAction={handleSwipeAction}
+              isPreviewVisitor={isPreviewVisitor}
+              openUpsell={openUpsell}
+              rankedSwipeCards={rankedSwipeCards}
+              remainingSwipes={remainingSwipes}
+              requireAccount={requireAccount}
+            />
           )}
 
           {routeTab === 'Likes' && (
-            <div className="space-y-4">
-              <LikesSocialInbox
-                posts={posts}
-                likedIds={likedIds}
-                savedIds={savedIds}
-                matches={matches}
-                matchMessages={matchMessages}
-                profile={profile}
-                onSelectProduct={openUpsell}
-                onOpenPost={(post) => {
-                  const index = feedItems.findIndex((item) => item.post.id === post.id);
-                  if (index >= 0) setSelectedFeedViewerIndex(index);
-                }}
-              />
-              {primaryContextualUpsell && (
-                <GenUpsellCard
-                  card={primaryContextualUpsell}
-                  onSelectProduct={openUpsell}
-                  onDismiss={dismissUpsell}
-                  onSharePost={setSharePost}
-                  newPost={newPost}
-                />
-              )}
-            </div>
+            <LikesScreen
+              components={appScreenComponents}
+              dismissUpsell={dismissUpsell}
+              feedItems={feedItems}
+              likedIds={likedIds}
+              matches={matches}
+              matchMessages={matchMessages}
+              newPost={newPost}
+              openUpsell={openUpsell}
+              posts={posts}
+              primaryContextualUpsell={primaryContextualUpsell}
+              profile={profile}
+              savedIds={savedIds}
+              setSelectedFeedViewerIndex={setSelectedFeedViewerIndex}
+              setSharePost={setSharePost}
+            />
           )}
 
           {routeTab === 'Profile' && (
-            <div className="space-y-5">
-              <SocialKitProfilePage
-                profile={profile}
-                answers={answers}
-                reputationProfile={reputationProfile}
-                posts={posts}
-                likedIds={likedIds}
-                savedIds={savedIds}
-                matches={matches}
-                onOpenPost={(post) => {
-                  const index = feedItems.findIndex((item) => item.post.id === post.id);
-                  if (index >= 0) setSelectedFeedViewerIndex(index);
-                }}
-              />
-              {primaryContextualUpsell && (
-                <GenUpsellCard
-                  card={primaryContextualUpsell}
-                  onSelectProduct={openUpsell}
-                  onDismiss={dismissUpsell}
-                  onSharePost={setSharePost}
-                  newPost={newPost}
-                />
-              )}
-              <ProfileEditor profile={profile} setProfile={setProfile} answers={answers} setAnswers={setAnswers} />
-              <div className="grid gap-5 lg:grid-cols-2">
-                <DailyReturnPanel profile={profile} lifecycleTasks={lifecycleTasks} reputationProfile={reputationProfile} onCompleteTask={completeLifecycleTask} />
-                <ReputationScoreCard reputationProfile={reputationProfile} />
-                <UsefulNotificationsPanel notifications={notifications} onMarkRead={markNotificationRead} />
-                <TrustReputationPanel reports={reports} comments={comments} profile={profile} />
-              </div>
-            </div>
+            <ProfileScreen
+              answers={answers}
+              comments={comments}
+              components={appScreenComponents}
+              completeLifecycleTask={completeLifecycleTask}
+              dismissUpsell={dismissUpsell}
+              feedItems={feedItems}
+              lifecycleTasks={lifecycleTasks}
+              likedIds={likedIds}
+              markNotificationRead={markNotificationRead}
+              matches={matches}
+              newPost={newPost}
+              notifications={notifications}
+              openUpsell={openUpsell}
+              posts={posts}
+              primaryContextualUpsell={primaryContextualUpsell}
+              profile={profile}
+              reports={reports}
+              reputationProfile={reputationProfile}
+              savedIds={savedIds}
+              setAnswers={setAnswers}
+              setProfile={setProfile}
+              setSelectedFeedViewerIndex={setSelectedFeedViewerIndex}
+              setSharePost={setSharePost}
+            />
           )}
 
           {routeTab === 'Billing' && (
-            <BillingPanel onSelectProduct={openUpsell} purchases={purchases} boosts={boosts} wallet={wallet} />
+            <BillingScreen boosts={boosts} components={appScreenComponents} openUpsell={openUpsell} purchases={purchases} wallet={wallet} />
           )}
-        </section>
+        </section>}
 
         {routeTab === 'Feed' && (
           <aside className="sticky top-5 hidden space-y-4 lg:block">
@@ -8020,16 +8204,7 @@ function RentEazyAppShell() {
         )}
       </main>
 
-      <nav className="fixed inset-x-0 bottom-0 z-50 px-5 pb-5 pt-2 lg:hidden">
-        <div className="mx-auto grid max-w-[335px] grid-cols-5 gap-1 rounded-[2rem] bg-[#050506] p-1.5 text-white/55 shadow-[0_24px_60px_-26px_rgba(0,0,0,0.75)]">
-          {navItems.map(([label, href, Icon]) => (
-            <a key={label} href={href} className={`flex flex-col items-center gap-1 rounded-[1.45rem] px-2 py-2 text-[0.64rem] font-bold transition ${routeTab === label ? 'bg-[#bff4ef] text-[#050506]' : 'hover:bg-white/10 hover:text-white'}`}>
-              <Icon className="h-5 w-5" />
-              <span>{label}</span>
-            </a>
-          ))}
-        </div>
-      </nav>
+      <AppBottomNav navItems={navItems} routeTab={routeTab} />
     </div>
   );
 }
@@ -8098,12 +8273,17 @@ function LegalPage({ kind }) {
   );
 }
 
+function ClerkRentEazyAppContainer() {
+  const { isLoaded, isSignedIn } = useUser();
+  return <RentEazyAppContainer isPreviewVisitor={isLoaded && !isSignedIn} />;
+}
+
 export default function App() {
   const { profile, setProfile } = useProfile();
   const pathname = typeof window === 'undefined' ? '/' : window.location.pathname;
 
   if (pathname.startsWith('/app')) {
-    return <RentEazyAppShell />;
+    return clerkEnabled ? <ClerkRentEazyAppContainer /> : <RentEazyAppContainer isPreviewVisitor />;
   }
 
   if (pathname.startsWith('/signup') || pathname.startsWith('/waitlist')) {
