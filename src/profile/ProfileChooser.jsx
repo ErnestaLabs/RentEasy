@@ -36,20 +36,35 @@ export default function ProfileChooser({ onSelect }) {
                 key={key}
                 type="button"
                 onClick={() => onSelect(key)}
-                className="group relative flex flex-col items-start rounded-4xl border border-white/12 bg-white/[0.05] p-6 text-left backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:border-white/25 hover:bg-white/[0.09]"
+                className="group relative flex min-h-[15rem] flex-col items-start overflow-hidden rounded-4xl border border-white/12 bg-white/[0.05] p-6 text-left backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:border-white/25 hover:bg-white/[0.09]"
                 initial={{ opacity: 0, y: 24 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.45, delay: i * 0.08 }}
               >
+                {/* Open Peeps figure — inverted to white line art, on an accent glow */}
+                {p.peep && (
+                  <>
+                    <span
+                      className="pointer-events-none absolute -bottom-6 -right-6 h-32 w-32 rounded-full blur-2xl transition-opacity duration-300 opacity-50 group-hover:opacity-80"
+                      style={{ backgroundColor: p.accent }}
+                    />
+                    <img
+                      src={p.peep}
+                      alt=""
+                      aria-hidden="true"
+                      className="pointer-events-none absolute bottom-0 right-2 h-36 w-auto object-contain opacity-90 transition-transform duration-300 group-hover:-translate-y-1 [filter:brightness(0)_invert(1)]"
+                    />
+                  </>
+                )}
                 <span
-                  className="flex h-12 w-12 items-center justify-center rounded-2xl border"
+                  className="relative flex h-12 w-12 items-center justify-center rounded-2xl border"
                   style={{ backgroundColor: p.iconBg, borderColor: p.iconBorder }}
                 >
                   <iconify-icon icon={p.icon} style={{ color: p.accent }} class="text-2xl"></iconify-icon>
                 </span>
-                <h2 className="mt-5 text-lg font-medium text-white">{p.label}</h2>
-                <p className="mt-2 text-sm font-light leading-6 text-white/55">{p.blurb}</p>
-                <span className="mt-5 inline-flex items-center gap-1.5 text-sm font-medium text-[#9bd383]">
+                <h2 className="relative mt-5 text-lg font-medium text-white">{p.label}</h2>
+                <p className="relative mt-2 max-w-[62%] text-sm font-light leading-6 text-white/55">{p.blurb}</p>
+                <span className="relative mt-auto inline-flex items-center gap-1.5 pt-5 text-sm font-medium text-[#9bd383]">
                   Get my RentEazy
                   <iconify-icon icon="solar:arrow-right-linear" class="text-base transition-transform group-hover:translate-x-0.5"></iconify-icon>
                 </span>
