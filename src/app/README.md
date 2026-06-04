@@ -6,7 +6,7 @@ This folder is the app UI lane.
 
 - `src/app/screens/*`: presentational screen components. Claude can restyle these.
 - `src/app/components/*`: presentational app chrome/components. Claude can restyle these.
-- `src/App.jsx`: still the app container for now. Codex owns state, handlers, Clerk/auth, preview gating, and data contracts.
+- `src/App.jsx`: shared for now under Option B. Claude may edit only the presentational app UI functions listed below. Codex owns state, handlers, Clerk/auth, preview gating, and data contracts.
 - `src/lib/feedEngine.js`: Codex-owned ranking and signal logic.
 - `server/**`: Codex-owned backend/API/persistence.
 
@@ -68,8 +68,78 @@ Handlers are stateful and Codex-owned:
 
 ## Claude UI Rules
 
-Restyle markup/classes/motion in `src/app/**` only.
-Do not change handler names, prop meanings, state keys, preview gating, ranking, auth, or backend files.
+Option B is active: Claude may restyle the app UI directly in `src/App.jsx` when the target function is presentational.
+Do not change handler names, prop meanings, state keys, preview gating, ranking, auth, local storage keys, backend files, or imports used by the stateful container.
+
+Claude-owned presentational functions still in `src/App.jsx`:
+
+- `ComposerPanel`
+- `ShareEverywhereModal`
+- `ReportModal`
+- `CommentModal`
+- `ProfileStrengthCard`
+- `ProgressiveQuestionsPanel`
+- `ProfileEditor`
+- `ProfileSocialOverview`
+- `MatchSummaryStrip`
+- `DailySwipePanel`
+- `DailyPicksPanel`
+- `MissionPanel`
+- `AppPulseStrip`
+- `LikesSocialInbox`
+- `SocialKitProfilePage`
+- `SocialHomeHeader`
+- `SocialStoryRail`
+- `DailyReturnPanel`
+- `RecommendationLoopPanel`
+- `ReferralLoopPanel`
+- `ResidentModePanel`
+- `LandlordModePanel`
+- `ProfessionalModePanel`
+- `TenantDemandPipelinePanel`
+- `DealTrackingPanel`
+- `OperatorSignalsPanel`
+- `UsefulNotificationsPanel`
+- `GroupsPanel`
+- `PerksRail`
+- `NativeAdCard`
+- `AppHeroPanel`
+- `MarketCommandPanel`
+- `ActivityInbox`
+- `RoleLanesPanel`
+- `TractionPanel`
+- `AdsInventoryPanel`
+- `ReputationScoreCard`
+- `MatchPipelinePanel`
+- `GlobalChatWidget`
+- `TrustReputationPanel`
+- `MiniShopPanel`
+- `ClerkBillingSurface`
+- `SignupAction`
+- `PreviewSignupPrompt`
+- `FeedPreviewBanner`
+- `PreviewRouteGate`
+- `GenUpsellCard`
+- `BillingPanel`
+- `MicroUpsellModal`
+- `BoostPerformanceCard`
+- `ModerationQueueCard`
+- `FeedMediaAsset`
+- `FeedTimelineCard`
+- `FeedPostCard`
+- `FeedImmersiveViewer`
+- `SupportDisclosure`
+- `AppSupportSidebar`
+
+Codex-owned functions in `src/App.jsx`:
+
+- `RentEazyAppContainer`
+- Clerk/auth bridge functions
+- storage helpers and state keys
+- feed ranking/scoring helpers
+- contextual offer generation
+- data seed generation
+- all mutating handlers created inside `RentEazyAppContainer`
 
 ## Swipe Component Notes
 

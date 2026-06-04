@@ -3944,6 +3944,18 @@ function SignupBridge() {
   );
 }
 
+/*
+ * APP UI OWNERSHIP - OPTION B
+ *
+ * The presentational app components below are Claude-owned for visual uplift.
+ * Claude may change markup, classes, component-local layout state, transitions,
+ * and copy inside these UI functions.
+ *
+ * Codex keeps ownership of RentEazyAppContainer, persistent state keys, data
+ * contracts, Clerk/auth bridges, ranking/scoring helpers, preview gating, and
+ * mutating handlers. Do not change function props or handler semantics without
+ * coordinating with Codex.
+ */
 function ComposerPanel({ onCreatePost, compact = false, profile = currentUser }) {
   const [postType, setPostType] = useState('Looking');
   const [title, setTitle] = useState('');
@@ -6964,6 +6976,10 @@ function AppSupportSidebar({
   );
 }
 
+/*
+ * END CLAUDE-OWNED APP UI BLOCK.
+ * Stateful container and app wiring below remain Codex-owned.
+ */
 function RentEazyAppContainer({ isPreviewVisitor = false }) {
   const path = typeof window === 'undefined' ? '/app/feed' : window.location.pathname;
   const routeTab = path.includes('/billing') ? 'Billing' : path.includes('/post') ? 'Post' : path.includes('/likes') ? 'Likes' : path.includes('/profile') ? 'Profile' : path.includes('/swipe') ? 'Swipe' : 'Feed';
