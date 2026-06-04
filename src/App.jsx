@@ -17,7 +17,7 @@ import { buildRentEazyFeed, createFeedSignal, createFeedCardSchema } from '@/lib
 // Code-split the VSL: Remotion is ~400KB and sits below the fold, so it must
 // not block the hero paint. Loads lazily when the user scrolls toward it.
 const VSLPlayer = React.lazy(() => import('@/components/vsl/VSLPlayer'));
-import { ArrowDownLeft, ArrowUp, BadgeCheck, Bell, Bookmark, CalendarCheck, Camera, Check, Compass, Copy, Flag, Flame, Gift, Heart, Home, MapPin, Megaphone, MessageCircle, PlusCircle, RotateCcw, Search, Send, Share2, ShieldCheck, Sparkles, Star, UserPlus, UserRound, Users } from 'lucide-react';
+import { ArrowDownLeft, ArrowUp, BadgeCheck, Bell, Bookmark, CalendarCheck, Camera, Check, Compass, Copy, Flag, Flame, Gift, Heart, Home, MapPin, Megaphone, MessageCircle, PlusCircle, RotateCcw, Search, Send, Share2, ShieldCheck, Sparkles, Star, UserPlus, UserRound, Users, X } from 'lucide-react';
 
 const defaultRotatingHeroWords = ['tenant', 'agent', 'room', 'home', 'flat', 'landlord', 'match', 'place'];
 const localSocialAppUrl = 'http://localhost:3002';
@@ -544,14 +544,14 @@ const paidMechanics = [
 
 const productLadder = [
   {
-    name: 'Individual Yearly',
-    price: '£69.99 first year',
-    note: 'Then £99.99/year',
-    desc: 'Best value for serious movers. Lock in before the price rises.',
-    cta: 'Get Yearly Launch Price',
-    href: '#pricing',
+    name: 'Founding Yearly',
+    price: '£69.99/year',
+    note: 'Founding rate — locked for life',
+    desc: 'First 1,000 founding members lock £69.99/year for as long as they stay — instead of the £99.99 standard.',
+    cta: 'Lock founding price',
+    href: '/signup?offer=founding-yearly&plan=yearly',
     featured: true,
-    features: ['About 19p/day first year', 'Save £44.89 vs monthly', 'See who liked you', 'Advanced filters', 'Daily picks', 'Superlikes included', 'Better visibility', 'Profile/listing insights'],
+    features: ['£30/year below standard — for life', 'About 19p/day', 'See who liked you', 'Advanced filters', 'Daily picks', 'Superlikes included', 'Better visibility', 'Profile/listing insights'],
   },
   {
     name: 'Individual Monthly',
@@ -572,8 +572,8 @@ const productLadder = [
   },
   {
     name: 'Business Yearly Seats',
-    price: '£69.99 first year per seat',
-    note: 'Then £99.99/year per seat',
+    price: '£99.99/year per seat',
+    note: 'Volume discounts for teams',
     desc: 'Volume discounts for larger teams.',
     cta: 'Get Team Yearly',
     href: '#pricing',
@@ -3100,6 +3100,7 @@ function InteractiveMatchCard({ cards = heroSwipeCards, canSwipe = true, onSwipe
   const nextCard = deck[(activeIndex + 1) % deck.length];
   const totalCards = deck.length;
   const progress = ((activeIndex + 1) / totalCards) * 100;
+  const visibleIndex = activeIndex % totalCards;
 
   const showTrial = (kind, nextSwipeCount) => {
     if (immersive) return;
@@ -3130,6 +3131,18 @@ function InteractiveMatchCard({ cards = heroSwipeCards, canSwipe = true, onSwipe
         text: 'Want your real matches? Create a free account and try RentEazy Match free for 24 hours.',
       });
     }
+  };
+
+  const rewind = () => {
+    if (swipeCount <= 0) {
+      setFeedback('Nothing to rewind yet');
+      return;
+    }
+    setActiveIndex((current) => (current - 1 + deck.length) % deck.length);
+    setSwipeCount((count) => Math.max(0, count - 1));
+    setDragX(0);
+    setDragY(0);
+    setFeedback('Previous card restored');
   };
 
   const swipe = (action) => {
@@ -3206,6 +3219,78 @@ function InteractiveMatchCard({ cards = heroSwipeCards, canSwipe = true, onSwipe
       swipe('superlike');
     }
   };
+
+  if (immersive) {
+    const actionButtons = [
+      { label: 'Rewind', icon: RotateCcw, onClick: rewind, className: 'h-11 w-11 border-white/10 bg-white/9 text-white/74 hover:bg-white/14' },
+      { label: 'Not for me', icon: X, onClick: () => swipe('pass'), className: 'h-[3.75rem] w-[3.75rem] border-[#ff4f73]/28 bg-[#17191f] text-[#ff4f73] shadow-[0_16px_38px_-22px_rgba(255,79,115,0.8)]' },
+      { label: 'Priority', icon: Sparkles, onClick: () => swipe('superlike'), className: 'h-[4.5rem] w-[4.5rem] border-[#62a8ff]/30 bg-[#0d2a4c] text-[#62a8ff] shadow-[0_20px_46px_-24px_rgba(98,168,255,0.86)]' },
+      { label: 'Interested', icon: Heart, onClick: () => swipe('like'), className: 'h-[3.75rem] w-[3.75rem] border-[#64dd70]/30 bg-[#112416] text-[#64dd70] shadow-[0_16px_38px_-22px_rgba(100,221,112,0.78)]' },
+      { label: 'Send', icon: Send, onClick: () => swipe('superlike'), className: 'h-11 w-11 border-white/10 bg-white/9 text-[#36a3ff] hover:bg-white/14' },
+    ];
+
+    return (
+      <section className="relative h-[100dvh] min-h-[42rem] overflow-hidden bg-[#050506] text-white md:h-[calc(100vh-2rem)] md:min-h-[45rem] md:rounded-[2.15rem] md:border md:border-white/10 md:shadow-[0_34px_84px_-48px_rgba(0,0,0,0.9)]">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(47,125,50,0.26),transparent_34%),linear-gradient(180deg,rgba(255,255,255,0.08),transparent_18%,rgba(0,0,0,0.92)_100%)]" />
+        <div className="absolute inset-x-0 top-0 z-30 flex items-center justify-between px-4 pt-4 md:px-5 md:pt-5">
+          <div>
+            <p className="text-[0.72rem] font-bold uppercase tracking-[0.16em] text-white/52">RentEazy Match</p>
+            <p className="mt-1 text-sm font-semibold text-white">{feedback}</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="rounded-full border border-white/10 bg-white/10 px-3 py-1.5 text-xs font-bold text-white/82 backdrop-blur-xl">{visibleIndex + 1}/{totalCards}</span>
+            <button type="button" onClick={() => swipe('superlike')} className="grid h-10 w-10 place-items-center rounded-full border border-white/10 bg-white/10 text-[#62a8ff] backdrop-blur-xl" aria-label="Priority signal">
+              <Sparkles className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+
+        <div className="absolute inset-x-0 top-[5.25rem] bottom-[12rem] px-3 md:top-[5.75rem] md:bottom-[7.25rem] md:px-4">
+          <div className="absolute inset-x-7 top-6 bottom-0 rounded-[2.2rem] bg-white/6 blur-[1px]" />
+          <article
+            key={card.title}
+            role="button"
+            tabIndex={0}
+            aria-label={`Swipe card: ${card.title}`}
+            onPointerDown={handlePointerDown}
+            onPointerMove={handlePointerMove}
+            onPointerUp={handlePointerUp}
+            onPointerCancel={handlePointerUp}
+            onKeyDown={handleKeyDown}
+            className={`hero-swipe-card absolute inset-3 overflow-hidden rounded-[2.15rem] border border-white/12 bg-[#121318] shadow-[0_34px_76px_-38px_rgba(0,0,0,0.98)] outline-hidden ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
+            style={{ transform: `translate(${dragX}px, ${dragY}px) rotate(${dragX / 24}deg)` }}
+          >
+            <DemoCardVisual card={card} />
+            <div className="pointer-events-none absolute inset-x-0 top-0 h-32 bg-linear-to-b from-black/56 to-transparent" />
+            <div className="pointer-events-none absolute inset-x-0 bottom-0 h-64 bg-linear-to-t from-black/92 via-black/34 to-transparent" />
+            <div className={`absolute inset-0 flex items-center justify-center pointer-events-none transition-opacity ${Math.abs(dragX) > 28 || dragY < -50 ? 'opacity-100' : 'opacity-0'}`}>
+              <span className={`rotate-[-10deg] rounded-2xl border-2 px-6 py-3 text-base font-black uppercase tracking-[0.14em] shadow-2xl ${dragY < -50 ? 'border-[#62a8ff] bg-[#0d2a4c]/84 text-[#62a8ff]' : dragX >= 0 ? 'border-[#64dd70] bg-[#112416]/84 text-[#64dd70]' : 'border-[#ff4f73] bg-[#231018]/84 text-[#ff4f73]'}`}>
+                {dragY < -50 ? 'Priority' : dragX >= 0 ? 'Interested' : 'Not for me'}
+              </span>
+            </div>
+          </article>
+        </div>
+
+        <div className="absolute inset-x-0 bottom-[6.35rem] z-30 flex items-center justify-center gap-2.5 px-4 md:bottom-5 md:gap-3">
+          {actionButtons.map(({ label, icon: Icon, onClick, className }) => (
+            <button
+              key={label}
+              type="button"
+              aria-label={label}
+              title={label}
+              onClick={(event) => {
+                event.stopPropagation();
+                onClick();
+              }}
+              className={`grid shrink-0 place-items-center rounded-full border backdrop-blur-xl transition hover:scale-105 active:scale-95 ${className}`}
+            >
+              <Icon className="h-5 w-5" strokeWidth={label === 'Interested' ? 2.6 : 2.3} />
+            </button>
+          ))}
+        </div>
+      </section>
+    );
+  }
 
   return (
     <div className={`relative overflow-hidden ${immersive ? 'rounded-[1.2rem] bg-transparent' : 'rounded-[1.7rem] bg-white border border-slate-200 shadow-[0_14px_34px_-26px_rgba(15,23,42,0.42),inset_0_1px_0_white]'}`}>
@@ -5807,6 +5892,157 @@ function MatchPipelinePanel({ matches, messages, viewings, reviews, onSendMessag
         </div>
       )}
     </section>
+  );
+}
+
+function GlobalChatWidget({ matches, messages, profile, onSendMessage, routeTab }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [selectedMatchId, setSelectedMatchId] = useState(matches[0]?.id || '');
+  const [messageBody, setMessageBody] = useState('');
+  const currentUserId = profile.id || currentUser.id;
+
+  const conversations = useMemo(() => matches.map((match) => {
+    const sortedMessages = messages
+      .filter((message) => message.matchId === match.id)
+      .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+    const otherParticipantIndex = Math.max(0, match.participantIds?.findIndex((id) => id !== currentUserId) ?? 1);
+    const fallbackIndex = otherParticipantIndex >= 0 ? otherParticipantIndex : 1;
+    const title = match.participantNames?.[fallbackIndex] || match.participantNames?.find((name) => name !== profile.name) || 'RentEazy contact';
+    const type = match.participantTypes?.[fallbackIndex] || 'Member';
+    const lastMessage = sortedMessages[sortedMessages.length - 1];
+    const unreadCount = sortedMessages.filter((message) => message.authorId !== currentUserId).slice(-3).length;
+    return {
+      ...match,
+      title,
+      type,
+      sortedMessages,
+      lastMessage,
+      unreadCount,
+      latestAt: lastMessage?.createdAt || match.updatedAt || match.createdAt,
+    };
+  }).sort((a, b) => new Date(b.latestAt) - new Date(a.latestAt)), [currentUserId, matches, messages, profile.name]);
+
+  const selectedConversation = conversations.find((conversation) => conversation.id === selectedMatchId) || conversations[0];
+  const totalUnread = conversations.reduce((sum, conversation) => sum + conversation.unreadCount, 0);
+
+  useEffect(() => {
+    if (!selectedMatchId && conversations[0]?.id) setSelectedMatchId(conversations[0].id);
+  }, [conversations, selectedMatchId]);
+
+  const submitMessage = (event) => {
+    event.preventDefault();
+    const clean = messageBody.trim();
+    if (!clean || !selectedConversation) return;
+    onSendMessage(selectedConversation.id, clean);
+    setMessageBody('');
+  };
+
+  return (
+    <div className="fixed inset-x-0 bottom-0 z-[70] pointer-events-none md:inset-auto">
+      <button
+        type="button"
+        aria-label="Open messages"
+        onClick={() => setIsOpen((open) => !open)}
+        className={`pointer-events-auto fixed right-4 grid h-14 w-14 place-items-center rounded-full bg-[#092243] text-white shadow-[0_24px_56px_-26px_rgba(9,34,67,0.92)] ring-1 ring-white/35 transition hover:scale-105 active:scale-95 ${routeTab === 'Swipe' ? 'bottom-[13.75rem] md:bottom-5' : 'bottom-[5.9rem] md:bottom-5'}`}
+      >
+        <MessageCircle className="h-6 w-6" />
+        {totalUnread > 0 && (
+          <span className="absolute -right-1 -top-1 grid h-6 min-w-6 place-items-center rounded-full bg-[#2f7d32] px-1.5 text-[0.68rem] font-bold text-white ring-2 ring-white">
+            {Math.min(totalUnread, 9)}
+          </span>
+        )}
+      </button>
+
+      {isOpen && (
+        <section className={`pointer-events-auto fixed right-3 overflow-hidden rounded-[1.9rem] border border-white/76 bg-white shadow-[0_30px_90px_-38px_rgba(15,23,42,0.72)] ring-1 ring-black/5 ${routeTab === 'Swipe' ? 'bottom-[5.4rem] md:bottom-20' : 'bottom-[5.4rem] md:bottom-20'} left-3 max-h-[78dvh] md:left-auto md:w-[23.5rem]`}>
+          <div className="bg-[#092243] px-4 py-4 text-white">
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex min-w-0 items-center gap-3">
+                <img src="/images/renteazy-mark-2026-t.png" alt="RentEazy" className="h-9 w-auto shrink-0 object-contain" />
+                <div className="min-w-0">
+                  <p className="text-sm font-bold">Messages</p>
+                  <p className="truncate text-xs text-white/62">Open after a mutual match</p>
+                </div>
+              </div>
+              <button type="button" onClick={() => setIsOpen(false)} aria-label="Close messages" className="grid h-9 w-9 place-items-center rounded-full bg-white/10 text-white">
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
+
+          {!conversations.length ? (
+            <div className="p-5">
+              <div className="rounded-[1.45rem] bg-[#f3f7f4] p-5 text-center">
+                <MessageCircle className="mx-auto h-8 w-8 text-[#2f7d32]" />
+                <p className="mt-3 text-base font-bold text-slate-950">No conversations yet</p>
+                <p className="mt-2 text-sm leading-6 text-slate-500">Like a suitable card. Messaging opens when interest is accepted on both sides.</p>
+                <a href="/app/swipe" className="mt-4 inline-flex rounded-full bg-[#2f7d32] px-5 py-3 text-sm font-bold text-white">Open Swipe</a>
+              </div>
+            </div>
+          ) : !selectedConversation ? null : (
+            <div className="grid max-h-[calc(78dvh-4.6rem)] grid-rows-[auto_1fr_auto]">
+              <div className="border-b border-slate-100 bg-white px-3 py-2">
+                <div className="flex gap-2 overflow-x-auto pb-1">
+                  {conversations.map((conversation) => (
+                    <button
+                      key={conversation.id}
+                      type="button"
+                      onClick={() => setSelectedMatchId(conversation.id)}
+                      className={`flex min-w-[12.5rem] items-center gap-3 rounded-[1.1rem] px-3 py-2 text-left transition ${selectedConversation.id === conversation.id ? 'bg-[#edf8ee] ring-1 ring-[#c7e8ca]' : 'bg-slate-50 hover:bg-slate-100'}`}
+                    >
+                      <PeepAvatar seed={conversation.title} variant="bust" className="h-10 w-10" avatarBg="sky" ring="ring-1 ring-white" />
+                      <span className="min-w-0 flex-1">
+                        <span className="block truncate text-xs font-bold text-slate-950">{conversation.title}</span>
+                        <span className="block truncate text-[0.68rem] text-slate-500">{conversation.subjectTitle}</span>
+                      </span>
+                      {conversation.unreadCount > 0 && <span className="h-2 w-2 rounded-full bg-[#2f7d32]" />}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="min-h-0 overflow-y-auto bg-[#f6f8fb] px-4 py-4">
+                <div className="mb-4 flex items-center gap-3 rounded-[1.35rem] bg-white p-3 shadow-[0_12px_32px_-28px_rgba(15,23,42,0.5)]">
+                  <PeepAvatar seed={selectedConversation.title} variant="bust" className="h-12 w-12" avatarBg="mint" ring="ring-1 ring-[#d8efe0]" />
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-bold text-slate-950">{selectedConversation.title}</p>
+                    <p className="truncate text-xs text-slate-500">{selectedConversation.type} · {selectedConversation.score}% fit</p>
+                  </div>
+                  <span className="rounded-full bg-[#edf8ee] px-3 py-1 text-[0.68rem] font-bold text-[#215d27]">{selectedConversation.status.replace(/_/g, ' ')}</span>
+                </div>
+                <div className="space-y-3">
+                  {selectedConversation.sortedMessages.map((message) => {
+                    const mine = message.authorId === currentUserId;
+                    return (
+                      <div key={message.id} className={`flex ${mine ? 'justify-end' : 'justify-start'}`}>
+                        <div className={`max-w-[82%] rounded-[1.35rem] px-4 py-3 text-sm leading-6 shadow-[0_12px_30px_-28px_rgba(15,23,42,0.5)] ${mine ? 'rounded-br-md bg-[#2f7d32] text-white' : 'rounded-bl-md bg-white text-slate-800'}`}>
+                          <p>{message.body}</p>
+                          <p className={`mt-1 text-[0.64rem] ${mine ? 'text-white/62' : 'text-slate-400'}`}>
+                            {new Date(message.createdAt).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <form onSubmit={submitMessage} className="flex items-center gap-2 border-t border-slate-100 bg-white p-3">
+                <input
+                  value={messageBody}
+                  onChange={(event) => setMessageBody(event.target.value)}
+                  placeholder="Write a message"
+                  className="min-w-0 flex-1 rounded-full border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-hidden focus:border-[#2f7d32] focus:bg-white"
+                />
+                <button type="submit" className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-[#2f7d32] text-white shadow-[0_14px_28px_-20px_rgba(47,125,50,0.86)]" aria-label="Send message">
+                  <Send className="h-4 w-4" />
+                </button>
+              </form>
+            </div>
+          )}
+        </section>
+      )}
+    </div>
   );
 }
 
@@ -8729,7 +8965,7 @@ export default function App() {
                 <iconify-icon icon="solar:users-group-rounded-linear" class="text-3xl text-[#2670a8] mb-4 block"></iconify-icon>
                 <p className="font-['JetBrains_Mono',monospace] text-xs text-[#2670a8] mb-3 tracking-widest">TEAM PRICING</p>
                 <p className="text-lg font-normal leading-7 text-slate-800">Agencies and businesses pay per seat at the same base price as individuals, with automatic volume discounts from 5 seats upward.</p>
-                <p className="mt-3 text-sm text-slate-500">Monthly from £4.99/seat · Yearly from £69.99/seat · 5+ seats: discounts apply</p>
+                <p className="mt-3 text-sm text-slate-500">Monthly from £4.99/seat · Yearly £99.99/seat · 5+ seats: discounts apply</p>
               </div>
             </div>
           </div>
@@ -8771,6 +9007,39 @@ export default function App() {
         </section>
 
         <section id="pricing" className="max-w-7xl mx-auto px-6 py-20">
+          {/* ── FOUNDING MEMBER OFFER — first 1,000 who go yearly lock £69.99/yr for life ── */}
+          <div className="relative overflow-hidden rounded-[2.5rem] border border-[#25672a] bg-linear-to-br from-[#0c376b] via-[#0d2e57] to-[#06182f] p-8 md:p-10 mb-12 shadow-[0_30px_70px_-40px_rgba(9,34,67,0.7)]">
+            <BorderBeam size={220} duration={11} borderWidth={2} colorFrom="#52a832" colorTo="#9bd383" />
+            <div className="relative grid lg:grid-cols-[1.3fr_1fr] gap-8 items-center">
+              <div>
+                <div className="inline-flex items-center gap-2 rounded-full bg-[#52a832]/18 border border-[#52a832]/40 px-3.5 py-1.5">
+                  <span className="relative flex h-2 w-2"><span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#9bd383] opacity-60"></span><span className="relative inline-flex h-2 w-2 rounded-full bg-[#9bd383]"></span></span>
+                  <span className="font-['JetBrains_Mono',monospace] text-[10px] tracking-[0.14em] text-[#9bd383]">FOUNDING MEMBERS · FIRST 1,000</span>
+                </div>
+                <h3 className="mt-5 font-['Bricolage_Grotesque_Variable',Inter,sans-serif] text-3xl md:text-[2.6rem] font-normal leading-[1.05] tracking-tight text-white">
+                  Lock <span className="text-[#9bd383]">£69.99/year</span> — for life.
+                </h3>
+                <p className="mt-4 max-w-xl text-base leading-7 font-light text-white/70">
+                  Be one of the first 1,000 members to commit to a yearly plan and your price is frozen at £69.99/year — not the £99.99 standard — for as long as you stay. Start free; switch to founding whenever you’re ready.
+                </p>
+                <a href="/signup?offer=founding-yearly&plan=yearly" className="mt-7 inline-flex items-center gap-2 rounded-full border border-[#74c656]/40 bg-linear-to-b from-[#52a832] to-[#2f7d32] px-7 py-3.5 text-sm font-medium text-white shadow-[0_12px_28px_rgba(47,125,50,0.36)]">
+                  Claim your founding price — go yearly
+                  <iconify-icon icon="solar:arrow-right-linear" class="text-base"></iconify-icon>
+                </a>
+                <p className="mt-3 font-['JetBrains_Mono',monospace] text-[10px] tracking-[0.12em] text-white/40">FIRST 1,000 YEARLY MEMBERS · YOUR RATE NEVER RISES WHILE YOU STAY</p>
+              </div>
+              <div className="rounded-4xl bg-white/[0.06] border border-white/12 p-7 text-center backdrop-blur-sm">
+                <p className="font-['JetBrains_Mono',monospace] text-[10px] tracking-[0.16em] text-white/45">YOUR FOUNDING RATE</p>
+                <div className="mt-3 flex items-end justify-center gap-2.5">
+                  <span className="text-2xl font-normal text-white/35 line-through leading-none">£99.99</span>
+                  <span className="font-['Bricolage_Grotesque_Variable',Inter,sans-serif] text-6xl font-normal text-white leading-none">£69.99</span>
+                </div>
+                <p className="mt-2 text-sm text-white/55">per year · locked forever</p>
+                <div className="mt-5 h-px bg-white/10"></div>
+                <p className="mt-5 text-sm font-light leading-6 text-white/65">Commit yearly now and your rate never changes. Lock it while you’re in the first 1,000.</p>
+              </div>
+            </div>
+          </div>
           <div className="max-w-3xl mb-10">
             <div className="inline-flex items-center gap-2 rounded-full bg-[#fef9c3] border border-[#fef08a] px-3.5 py-1.5 mb-5">
               <span className="text-sm">⚡</span>
