@@ -19,6 +19,8 @@ This folder is the app UI lane.
 - `screens/ProfileScreen.jsx`
 - `screens/BillingScreen.jsx`
 - `components/AppBottomNav.jsx`
+- `components/swipe/InteractiveMatchCard.jsx`
+- `components/swipe/DemoCardVisual.jsx`
 
 ## Stable Props
 
@@ -68,3 +70,9 @@ Handlers are stateful and Codex-owned:
 
 Restyle markup/classes/motion in `src/app/**` only.
 Do not change handler names, prop meanings, state keys, preview gating, ranking, auth, or backend files.
+
+## Swipe Component Notes
+
+`SwipeScreen` receives `rankedSwipeCards`, `remainingSwipes`, `handleSwipeAction`, `requireAccount`, and `openUpsell` from the container.
+The visual deck is now `components/swipe/InteractiveMatchCard.jsx`, which uses `components/swipe/DemoCardVisual.jsx`.
+The old landing/demo swipe helpers may still exist in `src/App.jsx`; the `/app/swipe` route uses the extracted component above.

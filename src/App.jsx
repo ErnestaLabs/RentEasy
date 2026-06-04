@@ -21,6 +21,7 @@ import LikesScreen from '@/app/screens/LikesScreen';
 import PostScreen from '@/app/screens/PostScreen';
 import ProfileScreen from '@/app/screens/ProfileScreen';
 import SwipeScreen from '@/app/screens/SwipeScreen';
+import SwipeInteractiveMatchCard from '@/app/components/swipe/InteractiveMatchCard';
 // Code-split the VSL: Remotion is ~400KB and sits below the fold, so it must
 // not block the hero paint. Loads lazily when the user scrolls toward it.
 const VSLPlayer = React.lazy(() => import('@/components/vsl/VSLPlayer'));
@@ -7767,7 +7768,7 @@ function RentEazyAppContainer({ isPreviewVisitor = false }) {
     FeedTimelineCard,
     GenUpsellCard,
     GroupsPanel,
-    InteractiveMatchCard,
+    InteractiveMatchCard: SwipeInteractiveMatchCard,
     LikesSocialInbox,
     MiniShopPanel,
     PeepAvatar,
