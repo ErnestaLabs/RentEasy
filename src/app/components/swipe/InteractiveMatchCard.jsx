@@ -156,12 +156,14 @@ export default function InteractiveMatchCard({ cards = [], canSwipe = true, onSw
       <section className="relative h-[100dvh] min-h-[42rem] overflow-hidden bg-[#050506] text-white md:h-[calc(100vh-2rem)] md:min-h-[45rem] md:rounded-[2.15rem] md:border md:border-white/10 md:shadow-[0_34px_84px_-48px_rgba(0,0,0,0.9)]">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(47,125,50,0.26),transparent_34%),linear-gradient(180deg,rgba(255,255,255,0.08),transparent_18%,rgba(0,0,0,0.92)_100%)]" />
         <div className="absolute inset-x-0 top-0 z-30 flex items-center justify-between px-4 pt-4 md:px-5 md:pt-5">
-          <div>
-            <p className="text-[0.72rem] font-bold uppercase tracking-[0.16em] text-white/52">RentEazy Match</p>
-            <p className="mt-1 text-sm font-semibold text-white">{feedback}</p>
+          <div className="pl-12 md:pl-12">
+            <p className="flex items-center gap-1.5 font-['JetBrains_Mono',monospace] text-[10px] font-medium uppercase tracking-[0.16em] text-[#9bd383]">
+              <span className="h-1.5 w-1.5 rounded-full bg-[#52a832]" />RentEazy Match
+            </p>
+            <p className="mt-1.5 text-sm font-semibold text-white">{feedback}</p>
           </div>
           <div className="flex items-center gap-2">
-            <span className="rounded-full border border-white/10 bg-white/10 px-3 py-1.5 text-xs font-bold text-white/82 backdrop-blur-xl">{visibleIndex + 1}/{totalCards}</span>
+            <span className="rounded-full border border-white/10 bg-white/10 px-3 py-1.5 font-['JetBrains_Mono',monospace] text-[11px] font-medium text-white/82 backdrop-blur-xl">{visibleIndex + 1}/{totalCards}</span>
             <button type="button" onClick={() => swipe('superlike')} className="grid h-10 w-10 place-items-center rounded-full border border-white/10 bg-white/10 text-[#62a8ff] backdrop-blur-xl" aria-label="Priority signal">
               <Sparkles className="h-4 w-4" />
             </button>
