@@ -102,6 +102,49 @@ export default function RoleStory({ profile = 'tenant' }) {
         </div>
       </section>
 
+      {/* ── 4.5 · PROFILE PREVIEW — how reputation reads, on the real avatar
+           system. Honest: a product preview with sample data, NOT testimonials,
+           NO invented ratings. Shows the proof a member adds → what you see. ── */}
+      {rc.proofCards && (
+        <section className="max-w-7xl mx-auto px-6 pb-12">
+          <div className="max-w-3xl">
+            <p className="font-['JetBrains_Mono',monospace] text-[11px] tracking-[0.16em]" style={{ color: rc.accent }}>
+              WHAT A PROFILE LOOKS LIKE
+            </p>
+            <h2 className={`${display} mt-2 text-3xl md:text-4xl font-normal leading-[1.1] tracking-tight text-slate-950`}>
+              {rc.proofCards.heading}
+            </h2>
+            <p className="mt-3 text-base font-light leading-7 text-slate-600">{rc.proofCards.sub}</p>
+          </div>
+          <div className="mt-8 grid gap-5 sm:grid-cols-3">
+            {rc.proofCards.cards.map((c) => (
+              <div key={c.name} className="overflow-hidden rounded-4xl border border-white bg-white shadow-[0_18px_44px_-30px_rgba(15,23,42,0.4)]">
+                <div className="flex items-center gap-4 px-5 pt-5">
+                  <span
+                    className="grid h-20 w-20 shrink-0 place-items-center overflow-hidden rounded-full"
+                    style={{ backgroundColor: `${rc.accent}14`, boxShadow: `inset 0 0 0 2px ${rc.accent}33` }}
+                  >
+                    <img src={`/open-peeps/bust/peep-${c.avatar}.png`} alt="" aria-hidden="true" className="h-[88%] w-[88%] object-contain object-bottom" loading="lazy" />
+                  </span>
+                  <div className="min-w-0">
+                    <p className="truncate text-base font-semibold text-slate-900">{c.name}</p>
+                    <p className="mt-0.5 text-xs text-slate-500">{c.role}</p>
+                  </div>
+                </div>
+                <div className="mt-4 flex flex-wrap gap-1.5 px-5 pb-5">
+                  {c.chips.map((chip) => (
+                    <span key={chip} className="inline-flex items-center gap-1 rounded-full border border-[#d5ecd7] bg-[#f1f9f1] px-2.5 py-1 text-[11px] font-medium text-[#2f7d32]">
+                      <span style={{ color: rc.accent }}>✓</span>{chip}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+          <p className="mt-4 font-['JetBrains_Mono',monospace] text-[10px] tracking-[0.12em] text-slate-400">PROFILE PREVIEW · REPUTATION IS EARNED BY ADDING PROOF — NEVER GIVEN</p>
+        </section>
+      )}
+
       {/* ── 5 · OBJECTION — handle the reflex doubt ─────────────────────── */}
       {rc.objection && (
         <section className="max-w-3xl mx-auto px-6 pb-12">

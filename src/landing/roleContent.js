@@ -29,6 +29,17 @@ export const ROLE_CONTENT = {
       q: '“Great. Another rental site.”',
       a: 'Not quite. A landlord or agent only reaches you once they’ve liked your profile — both sides match before anyone messages. Free to post, free to swipe, no premium wall. And your profile travels with you, so you never start from zero again.',
     },
+    // Social proof = the reputation system made visible. Illustrative sample
+    // profiles (Open Peeps avatars) of who you'd match with — never fake reviews.
+    proofCards: {
+      heading: 'See who you’re dealing with — before anyone reaches out.',
+      sub: 'Every landlord and agent shows the proof they’ve added. Reputation is on the profile, not a leap of faith.',
+      cards: [
+        { avatar: 14, name: 'Sofia', role: 'Landlord · Hackney', rep: '4.9', chips: ['ID verified', 'No agency fees'] },
+        { avatar: 71, name: 'Marcus', role: 'Agent · E8', rep: '4.7', chips: ['Redress member', 'Replies fast'] },
+        { avatar: 33, name: 'Priya', role: 'Landlord · Bow', rep: '5.0', chips: ['Pet friendly', 'Reviews on file'] },
+      ],
+    },
     mechanism: ['Create your free profile — no premium wall, and your reputation travels with you', 'Swipe scored homes that fit your brief', 'Match when both sides like → viewing flow begins'],
     proof: 'stats',
     cta: 'Start matching — it’s free',
@@ -59,6 +70,15 @@ export const ROLE_CONTENT = {
       q: '“Another platform deciding for me?”',
       a: 'No. You set the standards. You see budgets and move dates up front. You choose who gets the keys — RentEazy just brings you people who already match. Free to list, no per-let placement fee.',
     },
+    proofCards: {
+      heading: 'A tenant’s profile, before you say hello.',
+      sub: 'Budget, move date, and the proof they’ve added — on the profile, before you spend a viewing.',
+      cards: [
+        { avatar: 7, name: 'Amara', role: 'Tenant · budget £2,000', rep: '4.8', chips: ['Move-ready', 'References added'] },
+        { avatar: 24, name: 'Tom & Jess', role: 'Tenants · £2,400', rep: '4.9', chips: ['Income verified', 'Long-term'] },
+        { avatar: 49, name: 'Daniel', role: 'Tenant · £1,650', rep: '4.7', chips: ['ID verified', 'No pets'] },
+      ],
+    },
     mechanism: ['List your property — free', 'Receive matched tenants with budgets & move dates set', 'Match → meet the right person → fill faster'],
     proof: 'stats',
     cta: 'List your property — free',
@@ -88,6 +108,15 @@ export const ROLE_CONTENT = {
     objection: {
       q: '“How is this not another guru platform?”',
       a: 'No course, no hype. Sourcers and operators earn reputation by adding proof — completed deals, track record, Companies House, redress registration on their own profile — visible before you message. You see who delivers. You still run your own diligence.',
+    },
+    proofCards: {
+      heading: 'Reputation on every profile — added, not claimed.',
+      sub: 'Sourcers and operators show the proof themselves. You see it before you message; you still run your own numbers.',
+      cards: [
+        { avatar: 9, name: 'Reema', role: 'Sourcer · East London', rep: '4.9', chips: ['Companies House', 'Redress + AML'] },
+        { avatar: 38, name: 'Olu', role: 'Operator · HMO', rep: '4.8', chips: ['Deals on record', 'ICO registered'] },
+        { avatar: 62, name: 'Greg', role: 'Sourcer · BTL', rep: '5.0', chips: ['Track record public', 'ID verified'] },
+      ],
     },
     mechanism: ['Set your criteria & strategy — free', 'Discover matched deals and credible sourcers', 'Build relationships with people who deliver'],
     proof: 'stats',
