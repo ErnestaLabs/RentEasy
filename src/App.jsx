@@ -3927,7 +3927,7 @@ function SignupBridge() {
               <button disabled={status === 'submitting'} className="mt-6 inline-flex w-full items-center justify-center rounded-full bg-[#2f7d32] px-5 py-3 text-sm text-white disabled:opacity-60">
                 {status === 'submitting' ? 'Opening RentEazy...' : mode === 'register' ? 'Create account and open Feed' : 'Sign in and open Feed'}
               </button>
-              <a href={appFeedUrl} className="mt-3 inline-flex w-full items-center justify-center rounded-full border border-slate-200 bg-white px-5 py-3 text-sm text-slate-600">Browse Feed first</a>
+              <a href={appFeedUrl} className="mt-3 inline-flex w-full items-center justify-center rounded-full border border-slate-200 bg-white px-5 py-3 text-sm text-slate-600">Preview the Feed</a>
             </form>
           </div>
         </div>
@@ -5899,6 +5899,7 @@ function GlobalChatWidget({ matches, messages, profile, onSendMessage, routeTab 
   const [isOpen, setIsOpen] = useState(false);
   const [selectedMatchId, setSelectedMatchId] = useState(matches[0]?.id || '');
   const [messageBody, setMessageBody] = useState('');
+  const [showConversationList, setShowConversationList] = useState(false);
   const currentUserId = profile.id || currentUser.id;
 
   const conversations = useMemo(() => matches.map((match) => {
@@ -5929,6 +5930,15 @@ function GlobalChatWidget({ matches, messages, profile, onSendMessage, routeTab 
     if (!selectedMatchId && conversations[0]?.id) setSelectedMatchId(conversations[0].id);
   }, [conversations, selectedMatchId]);
 
+  useEffect(() => {
+    if (!isOpen || typeof document === 'undefined') return undefined;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [isOpen]);
+
   const submitMessage = (event) => {
     event.preventDefault();
     const clean = messageBody.trim();
@@ -5937,107 +5947,143 @@ function GlobalChatWidget({ matches, messages, profile, onSendMessage, routeTab 
     setMessageBody('');
   };
 
+  const ConversationButton = ({ conversation, compact = false }) => (
+    <button
+      type="button"
+      onClick={() => {
+        setSelectedMatchId(conversation.id);
+        setShowConversationList(false);
+      }}
+      className={`flex w-full items-center gap-3 rounded-2xl text-left transition ${selectedConversation?.id === conversation.id ? 'bg-[#edf8ee] text-slate-950 ring-1 ring-[#c7e8ca]' : 'text-slate-600 hover:bg-slate-100'} ${compact ? 'p-3' : 'p-2.5'}`}
+    >
+      <PeepAvatar seed={conversation.title} variant="bust" className={compact ? 'h-12 w-12' : 'h-10 w-10'} avatarBg={selectedConversation?.id === conversation.id ? 'mint' : 'sky'} ring="ring-1 ring-white" />
+      <span className="min-w-0 flex-1">
+        <span className="block truncate text-sm font-bold">{conversation.title}</span>
+        <span className="block truncate text-xs text-slate-500">{conversation.lastMessage?.body || conversation.subjectTitle}</span>
+      </span>
+      {conversation.unreadCount > 0 && <span className="grid h-5 min-w-5 place-items-center rounded-full bg-[#2f7d32] px-1 text-[0.62rem] font-bold text-white">{Math.min(conversation.unreadCount, 9)}</span>}
+    </button>
+  );
+
   return (
-    <div className="fixed inset-x-0 bottom-0 z-[70] pointer-events-none md:inset-auto">
-      <button
-        type="button"
-        aria-label="Open messages"
-        onClick={() => setIsOpen((open) => !open)}
-        className={`pointer-events-auto fixed right-4 grid h-14 w-14 place-items-center rounded-full bg-[#092243] text-white shadow-[0_24px_56px_-26px_rgba(9,34,67,0.92)] ring-1 ring-white/35 transition hover:scale-105 active:scale-95 ${routeTab === 'Swipe' ? 'bottom-[13.75rem] md:bottom-5' : 'bottom-[5.9rem] md:bottom-5'}`}
-      >
-        <MessageCircle className="h-6 w-6" />
-        {totalUnread > 0 && (
-          <span className="absolute -right-1 -top-1 grid h-6 min-w-6 place-items-center rounded-full bg-[#2f7d32] px-1.5 text-[0.68rem] font-bold text-white ring-2 ring-white">
-            {Math.min(totalUnread, 9)}
-          </span>
-        )}
-      </button>
+    <div className="fixed inset-0 z-[90] pointer-events-none md:inset-auto">
+      {!isOpen && (
+        <button
+          type="button"
+          aria-label="Open messages"
+          onClick={() => setIsOpen(true)}
+          className={`pointer-events-auto fixed right-4 grid h-[3.75rem] w-[3.75rem] place-items-center rounded-full bg-[#092243] text-white shadow-[0_24px_56px_-26px_rgba(9,34,67,0.92)] ring-1 ring-white/35 transition hover:scale-105 active:scale-95 ${routeTab === 'Swipe' ? 'bottom-[13.75rem] md:bottom-5' : 'bottom-[5.9rem] md:bottom-5'}`}
+        >
+          <MessageCircle className="h-6 w-6" />
+          {totalUnread > 0 && (
+            <span className="absolute -right-1 -top-1 grid h-6 min-w-6 place-items-center rounded-full bg-[#2f7d32] px-1.5 text-[0.68rem] font-bold text-white ring-2 ring-white">
+              {Math.min(totalUnread, 9)}
+            </span>
+          )}
+        </button>
+      )}
 
       {isOpen && (
-        <section className={`pointer-events-auto fixed right-3 overflow-hidden rounded-[1.9rem] border border-white/76 bg-white shadow-[0_30px_90px_-38px_rgba(15,23,42,0.72)] ring-1 ring-black/5 ${routeTab === 'Swipe' ? 'bottom-[5.4rem] md:bottom-20' : 'bottom-[5.4rem] md:bottom-20'} left-3 max-h-[78dvh] md:left-auto md:w-[23.5rem]`}>
-          <div className="bg-[#092243] px-4 py-4 text-white">
+        <section className="pointer-events-auto fixed inset-0 flex flex-col overflow-hidden bg-white text-slate-950 md:inset-auto md:right-5 md:bottom-5 md:h-[500px] md:w-[500px] md:rounded-[1.8rem] md:border md:border-white/80 md:shadow-[0_34px_90px_-38px_rgba(15,23,42,0.78)] md:ring-1 md:ring-black/5">
+          <div className="bg-[#092243] px-4 pb-4 pt-[max(1rem,env(safe-area-inset-top))] text-white md:pt-4">
             <div className="flex items-center justify-between gap-3">
               <div className="flex min-w-0 items-center gap-3">
-                <img src="/images/renteazy-mark-2026-t.png" alt="RentEazy" className="h-9 w-auto shrink-0 object-contain" />
+                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-white shadow-[0_10px_28px_-18px_rgba(0,0,0,0.7)]">
+                  <img src="/images/renteazy-mark-2026-t.png" alt="RentEazy" className="h-7 w-auto object-contain" />
+                </span>
                 <div className="min-w-0">
-                  <p className="text-sm font-bold">Messages</p>
-                  <p className="truncate text-xs text-white/62">Open after a mutual match</p>
+                  <p className="truncate text-sm font-bold">{selectedConversation?.title || 'Messages'}</p>
+                  <p className="truncate text-xs text-white/62">{selectedConversation ? `${selectedConversation.subjectTitle} · ${selectedConversation.score}% fit` : 'Open after a mutual match'}</p>
                 </div>
               </div>
-              <button type="button" onClick={() => setIsOpen(false)} aria-label="Close messages" className="grid h-9 w-9 place-items-center rounded-full bg-white/10 text-white">
-                <X className="h-4 w-4" />
-              </button>
+              <div className="flex items-center gap-2">
+                {conversations.length > 1 && (
+                  <button type="button" onClick={() => setShowConversationList(true)} className="grid h-9 w-9 place-items-center rounded-full bg-white/10 text-white md:hidden" aria-label="Show conversations">
+                    <MessageCircle className="h-4 w-4" />
+                  </button>
+                )}
+                <button type="button" onClick={() => setIsOpen(false)} aria-label="Close messages" className="grid h-9 w-9 place-items-center rounded-full bg-white/10 text-white">
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
             </div>
           </div>
 
           {!conversations.length ? (
-            <div className="p-5">
-              <div className="rounded-[1.45rem] bg-[#f3f7f4] p-5 text-center">
-                <MessageCircle className="mx-auto h-8 w-8 text-[#2f7d32]" />
+            <div className="grid flex-1 place-items-center bg-[#f6f8fb] p-6">
+              <div className="max-w-xs rounded-[1.45rem] bg-white p-6 text-center shadow-[0_18px_44px_-36px_rgba(15,23,42,0.58)]">
+                <MessageCircle className="mx-auto h-9 w-9 text-[#2f7d32]" />
                 <p className="mt-3 text-base font-bold text-slate-950">No conversations yet</p>
                 <p className="mt-2 text-sm leading-6 text-slate-500">Like a suitable card. Messaging opens when interest is accepted on both sides.</p>
                 <a href="/app/swipe" className="mt-4 inline-flex rounded-full bg-[#2f7d32] px-5 py-3 text-sm font-bold text-white">Open Swipe</a>
               </div>
             </div>
           ) : !selectedConversation ? null : (
-            <div className="grid max-h-[calc(78dvh-4.6rem)] grid-rows-[auto_1fr_auto]">
-              <div className="border-b border-slate-100 bg-white px-3 py-2">
-                <div className="flex gap-2 overflow-x-auto pb-1">
+            <div className="relative grid min-h-0 flex-1 md:grid-cols-[168px_1fr]">
+              <aside className="hidden min-h-0 border-r border-slate-100 bg-white p-2 md:block">
+                <div className="mb-2 px-2 py-2">
+                  <p className="text-xs font-bold uppercase tracking-[0.12em] text-slate-400">Chats</p>
+                </div>
+                <div className="max-h-[398px] space-y-1 overflow-y-auto pr-1">
                   {conversations.map((conversation) => (
-                    <button
-                      key={conversation.id}
-                      type="button"
-                      onClick={() => setSelectedMatchId(conversation.id)}
-                      className={`flex min-w-[12.5rem] items-center gap-3 rounded-[1.1rem] px-3 py-2 text-left transition ${selectedConversation.id === conversation.id ? 'bg-[#edf8ee] ring-1 ring-[#c7e8ca]' : 'bg-slate-50 hover:bg-slate-100'}`}
-                    >
-                      <PeepAvatar seed={conversation.title} variant="bust" className="h-10 w-10" avatarBg="sky" ring="ring-1 ring-white" />
-                      <span className="min-w-0 flex-1">
-                        <span className="block truncate text-xs font-bold text-slate-950">{conversation.title}</span>
-                        <span className="block truncate text-[0.68rem] text-slate-500">{conversation.subjectTitle}</span>
-                      </span>
-                      {conversation.unreadCount > 0 && <span className="h-2 w-2 rounded-full bg-[#2f7d32]" />}
-                    </button>
+                    <ConversationButton key={conversation.id} conversation={conversation} />
                   ))}
                 </div>
-              </div>
+              </aside>
 
-              <div className="min-h-0 overflow-y-auto bg-[#f6f8fb] px-4 py-4">
-                <div className="mb-4 flex items-center gap-3 rounded-[1.35rem] bg-white p-3 shadow-[0_12px_32px_-28px_rgba(15,23,42,0.5)]">
-                  <PeepAvatar seed={selectedConversation.title} variant="bust" className="h-12 w-12" avatarBg="mint" ring="ring-1 ring-[#d8efe0]" />
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-bold text-slate-950">{selectedConversation.title}</p>
-                    <p className="truncate text-xs text-slate-500">{selectedConversation.type} · {selectedConversation.score}% fit</p>
+              {showConversationList && (
+                <div className="absolute inset-0 z-20 bg-white p-4 md:hidden">
+                  <div className="mb-4 flex items-center justify-between">
+                    <p className="text-lg font-bold text-slate-950">Messages</p>
+                    <button type="button" onClick={() => setShowConversationList(false)} className="grid h-10 w-10 place-items-center rounded-full bg-slate-100 text-slate-700" aria-label="Close conversations">
+                      <X className="h-4 w-4" />
+                    </button>
                   </div>
-                  <span className="rounded-full bg-[#edf8ee] px-3 py-1 text-[0.68rem] font-bold text-[#215d27]">{selectedConversation.status.replace(/_/g, ' ')}</span>
+                  <div className="space-y-2">
+                    {conversations.map((conversation) => <ConversationButton key={conversation.id} conversation={conversation} compact />)}
+                  </div>
                 </div>
-                <div className="space-y-3">
-                  {selectedConversation.sortedMessages.map((message) => {
-                    const mine = message.authorId === currentUserId;
-                    return (
-                      <div key={message.id} className={`flex ${mine ? 'justify-end' : 'justify-start'}`}>
-                        <div className={`max-w-[82%] rounded-[1.35rem] px-4 py-3 text-sm leading-6 shadow-[0_12px_30px_-28px_rgba(15,23,42,0.5)] ${mine ? 'rounded-br-md bg-[#2f7d32] text-white' : 'rounded-bl-md bg-white text-slate-800'}`}>
-                          <p>{message.body}</p>
-                          <p className={`mt-1 text-[0.64rem] ${mine ? 'text-white/62' : 'text-slate-400'}`}>
-                            {new Date(message.createdAt).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
-                          </p>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
+              )}
 
-              <form onSubmit={submitMessage} className="flex items-center gap-2 border-t border-slate-100 bg-white p-3">
-                <input
-                  value={messageBody}
-                  onChange={(event) => setMessageBody(event.target.value)}
-                  placeholder="Write a message"
-                  className="min-w-0 flex-1 rounded-full border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-hidden focus:border-[#2f7d32] focus:bg-white"
-                />
-                <button type="submit" className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-[#2f7d32] text-white shadow-[0_14px_28px_-20px_rgba(47,125,50,0.86)]" aria-label="Send message">
-                  <Send className="h-4 w-4" />
-                </button>
-              </form>
+              <div className="grid min-h-0 grid-rows-[1fr_auto] bg-[#f6f8fb]">
+                <div className="min-h-0 overflow-y-auto px-4 py-4">
+                  <div className="mb-4 flex items-center gap-3 rounded-[1.35rem] bg-white p-3 shadow-[0_12px_32px_-28px_rgba(15,23,42,0.5)] md:hidden">
+                    <PeepAvatar seed={selectedConversation.title} variant="bust" className="h-12 w-12" avatarBg="mint" ring="ring-1 ring-[#d8efe0]" />
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-bold text-slate-950">{selectedConversation.title}</p>
+                      <p className="truncate text-xs text-slate-500">{selectedConversation.type} · {selectedConversation.score}% fit</p>
+                    </div>
+                    <span className="rounded-full bg-[#edf8ee] px-3 py-1 text-[0.68rem] font-bold text-[#215d27]">{selectedConversation.status.replace(/_/g, ' ')}</span>
+                  </div>
+                  <div className="space-y-3">
+                    {selectedConversation.sortedMessages.map((message) => {
+                      const mine = message.authorId === currentUserId;
+                      return (
+                        <div key={message.id} className={`flex ${mine ? 'justify-end' : 'justify-start'}`}>
+                          <div className={`max-w-[82%] rounded-[1.35rem] px-4 py-3 text-sm leading-6 shadow-[0_12px_30px_-28px_rgba(15,23,42,0.5)] ${mine ? 'rounded-br-md bg-[#2f7d32] text-white' : 'rounded-bl-md bg-white text-slate-800'}`}>
+                            <p>{message.body}</p>
+                            <p className={`mt-1 text-[0.64rem] ${mine ? 'text-white/62' : 'text-slate-400'}`}>
+                              {new Date(message.createdAt).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                            </p>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                <form onSubmit={submitMessage} className="flex items-center gap-2 border-t border-slate-100 bg-white p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] md:pb-3">
+                  <input
+                    value={messageBody}
+                    onChange={(event) => setMessageBody(event.target.value)}
+                    placeholder="Write a message"
+                    className="min-w-0 flex-1 rounded-full border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-hidden focus:border-[#2f7d32] focus:bg-white"
+                  />
+                  <button type="submit" className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-[#2f7d32] text-white shadow-[0_14px_28px_-20px_rgba(47,125,50,0.86)]" aria-label="Send message">
+                    <Send className="h-4 w-4" />
+                  </button>
+                </form>
+              </div>
             </div>
           )}
         </section>
@@ -7581,7 +7627,7 @@ function RentEazyAppShell() {
   ];
 
   return (
-    <div className={`${routeTab === 'Feed' ? 'min-h-screen bg-white pb-24' : 'min-h-screen bg-[#f7f9fa] pb-24'} text-slate-900 antialiased`} style={{ fontFamily: 'Poppins, Inter, sans-serif' }}>
+    <div className={`${routeTab === 'Feed' ? 'min-h-screen bg-white pb-24' : routeTab === 'Swipe' ? 'min-h-screen bg-[#050506] pb-0' : 'min-h-screen bg-[#f7f9fa] pb-24'} text-slate-900 antialiased`} style={{ fontFamily: 'Poppins, Inter, sans-serif' }}>
       {clerkEnabled && <ClerkSessionBridge setProfile={setProfile} />}
       {(sharePost || (routeTab === 'Post' && newPost)) && (
         <ShareEverywhereModal post={sharePost || newPost} onClose={() => setSharePost(null)} onShared={trackShare} />
@@ -7610,7 +7656,8 @@ function RentEazyAppShell() {
         onMatch={matchFeedCard}
         onSignal={recordFeedSignal}
       />
-      {routeTab !== 'Feed' && <header className="sticky top-0 z-40 px-3 pt-3">
+      <GlobalChatWidget matches={matches} messages={matchMessages} profile={profile} onSendMessage={sendMatchMessage} routeTab={routeTab} />
+      {routeTab !== 'Feed' && routeTab !== 'Swipe' && <header className="sticky top-0 z-40 px-3 pt-3">
         <div className={`mx-auto flex items-center justify-between gap-2 rounded-[1.45rem] border border-white/80 bg-white/78 px-3 py-2 shadow-[0_18px_48px_-34px_rgba(15,23,42,0.55),inset_0_1px_0_rgba(255,255,255,0.96)] backdrop-blur-2xl ${routeTab === 'Feed' ? 'max-w-2xl' : routeTab === 'Swipe' ? 'max-w-xl' : 'max-w-6xl'}`}>
           <BrandLogo compact />
           {routeTab === 'Feed' && (
@@ -7635,7 +7682,7 @@ function RentEazyAppShell() {
         </div>
       </header>}
 
-      <main className={`mx-auto grid ${routeTab === 'Feed' ? 'max-w-[520px] gap-4 px-3 py-3 lg:max-w-7xl lg:grid-cols-[17rem_minmax(0,36rem)_20rem] lg:items-start lg:px-6 lg:py-5' : 'gap-6 px-4 py-5'} ${routeTab === 'Swipe' ? 'max-w-xl' : routeTab === 'Feed' ? '' : 'max-w-6xl lg:grid-cols-[1fr_20rem]'}`}>
+      <main className={`mx-auto grid ${routeTab === 'Feed' ? 'max-w-[520px] gap-4 px-3 py-3 lg:max-w-7xl lg:grid-cols-[17rem_minmax(0,36rem)_20rem] lg:items-start lg:px-6 lg:py-5' : routeTab === 'Swipe' ? 'max-w-[430px] gap-0 px-0 py-0 md:px-4 md:py-4' : 'gap-6 px-4 py-5'} ${routeTab === 'Swipe' ? '' : routeTab === 'Feed' ? '' : 'max-w-6xl lg:grid-cols-[1fr_20rem]'}`}>
         {routeTab === 'Feed' && (
           <aside className="sticky top-5 hidden space-y-4 lg:block">
             <div className="rounded-[1.65rem] border border-white/80 bg-white/88 p-4 shadow-[0_18px_48px_-38px_rgba(15,23,42,0.48),inset_0_1px_0_rgba(255,255,255,0.96)] backdrop-blur-xl">
@@ -7824,23 +7871,19 @@ function RentEazyAppShell() {
           )}
 
           {routeTab === 'Swipe' && (
-            <div className="min-h-[calc(100vh-8.5rem)]">
-              <div className="mb-3 flex items-center justify-between gap-3">
-                <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[#2670a8]">RentEazy Match</p>
-                <button type="button" onClick={() => openUpsell('extra-swipes-10')} className="rounded-full bg-[#092243] px-4 py-2 text-sm font-semibold text-white">{remainingSwipes} left</button>
+            <div className="relative min-h-screen md:min-h-0">
+              <div className="fixed left-4 top-4 z-[45] md:absolute md:left-5 md:top-5">
+                <a href="/app/feed" className="grid h-10 w-10 place-items-center rounded-full border border-white/10 bg-white/10 text-white backdrop-blur-xl" aria-label="Back to Feed">
+                  <ArrowDownLeft className="h-4 w-4" />
+                </a>
               </div>
-              {primaryContextualUpsell && (
-                <div className="mb-3">
-                  <GenUpsellCard
-                    card={primaryContextualUpsell}
-                    onSelectProduct={openUpsell}
-                    onDismiss={dismissUpsell}
-                    onSharePost={setSharePost}
-                    newPost={newPost}
-                    compact
-                  />
-                </div>
-              )}
+              <button
+                type="button"
+                onClick={() => openUpsell('extra-swipes-10')}
+                className="fixed right-[4.25rem] top-4 z-[45] rounded-full border border-white/10 bg-white/10 px-3 py-2 text-xs font-bold text-white backdrop-blur-xl md:absolute md:right-[4.25rem] md:top-5"
+              >
+                {remainingSwipes} swipes
+              </button>
               <InteractiveMatchCard cards={rankedSwipeCards} canSwipe={remainingSwipes > 0} onSwipeAction={handleSwipeAction} onBlocked={() => openUpsell('extra-swipes-10')} immersive />
             </div>
           )}
@@ -7869,7 +7912,6 @@ function RentEazyAppShell() {
                   newPost={newPost}
                 />
               )}
-              <MatchPipelinePanel matches={matches} messages={matchMessages} viewings={viewings} reviews={reviews} onSendMessage={sendMatchMessage} onRequestViewing={requestViewing} onSubmitReview={submitMatchReview} />
             </div>
           )}
 
@@ -8174,7 +8216,7 @@ export default function App() {
                 </a>
                 <p className="text-xs text-slate-400 font-light">No card required · Profile ready in 2 minutes · Upgrade anytime</p>
                 <div className="mt-1 flex items-center gap-5 text-sm text-slate-500">
-                  <a href={socialAppUrl} className="inline-flex items-center gap-1.5 hover:text-[#2f7d32] transition-colors duration-200"><iconify-icon icon="solar:feed-linear" class="text-base text-[#2670a8]"></iconify-icon>Browse Feed</a>
+                  <a href={socialAppUrl} className="inline-flex items-center gap-1.5 hover:text-[#2f7d32] transition-colors duration-200"><iconify-icon icon="solar:feed-linear" class="text-base text-[#2670a8]"></iconify-icon>Preview the Feed</a>
                   <span className="w-px h-4 bg-slate-200" aria-hidden="true"></span>
                   <a href={socialSignupUrl} className="inline-flex items-center gap-1.5 hover:text-[#2f7d32] transition-colors duration-200"><iconify-icon icon="solar:add-square-linear" class="text-base text-[#2f7d32]"></iconify-icon>List a Property</a>
                 </div>
@@ -8633,11 +8675,11 @@ export default function App() {
                   <span className="font-['JetBrains_Mono',monospace] text-[10px] tracking-[0.12em] text-[#9bd383]">FREE FEED</span>
                   <span className="font-['JetBrains_Mono',monospace] text-[10px] text-[#9bd383]/60">· {postTypes.length} POST TYPES</span>
                 </div>
-                <p className="text-xl md:text-2xl font-normal text-white leading-snug max-w-lg">Everyone gets a voice. Post homes, rooms, tenant briefs, investment deals, or area advice. No paywall, ever.</p>
+                <p className="text-xl md:text-2xl font-normal text-white leading-snug max-w-lg">Everyone gets a voice. Post homes, rooms, tenant briefs, investment deals, or area advice. No paywall — preview free, then create a profile to post, like, and match.</p>
               </div>
-              <a href={socialAppUrl} className="shrink-0 inline-flex items-center justify-center gap-2 rounded-full bg-white text-[#092243] px-5 py-3 text-sm font-medium hover:bg-[#f0fdf4] transition-colors">
-                <iconify-icon icon="solar:feed-bold" class="text-base text-[#2670a8]"></iconify-icon>
-                Browse Feed free
+              <a href={socialAppUrl} className="shrink-0 inline-flex items-center justify-center gap-2 rounded-full border border-white/20 bg-white/10 text-white/85 px-5 py-3 text-sm font-normal hover:bg-white/16 transition-colors">
+                <iconify-icon icon="solar:feed-linear" class="text-base text-[#9bd383]"></iconify-icon>
+                Preview the Feed
               </a>
             </div>
             <div className="-mx-6 md:-mx-8 overflow-visible">
@@ -9178,7 +9220,7 @@ export default function App() {
                   Start free — no card required
                   <iconify-icon icon="solar:arrow-right-linear" class="text-xl"></iconify-icon>
                 </a>
-                <a href={socialAppUrl} className="w-full sm:w-auto inline-flex items-center justify-center rounded-full px-7 py-4 bg-white/10 border border-white/18 text-white/78 text-sm font-normal transition-all duration-200 hover:bg-white/18 hover:text-white">Browse Free Feed first</a>
+                <a href={socialAppUrl} className="w-full sm:w-auto inline-flex items-center justify-center rounded-full px-7 py-4 bg-white/10 border border-white/18 text-white/78 text-sm font-normal transition-all duration-200 hover:bg-white/18 hover:text-white">Preview the Feed</a>
               </div>
               <p className="mt-4 text-xs text-white/32">No card required · Profile ready in 2 minutes · Free to post and swipe</p>
             </div>

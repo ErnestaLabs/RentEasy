@@ -25,7 +25,7 @@ export const PROFILES = {
       sub: 'Searching is exhausting — applications ignored, viewings gone before you can book. RentEazy flips it: swipe homes scored to your brief, and match when the landlord or agent likes you back. No more shouting into the void.',
       cta: 'Start matching — it’s free',
       ctaHref: '/signup?source=hero_tenant&profile=tenant&offer=match24h',
-      secondary: { label: 'Browse the Feed', href: '#feed' },
+      secondary: { label: 'Preview the Feed', href: '#feed' },
     },
     emphasis: ['match', 'vsl', 'how-it-works', 'swipe-ui', 'why-switch', 'be-early', 'pricing', 'faq'],
     // Honest positioning copy (safe to render now)
