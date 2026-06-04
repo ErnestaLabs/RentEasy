@@ -1,5 +1,6 @@
 import React from 'react';
 import { getRoleContent } from './roleContent.js';
+import { getProfile } from '@/profile/profiles';
 
 // Per-role narrative injected INTO the existing landing (Gen UI on the real
 // page — NOT touching the rotating-word hero or the demo). Sequence follows the
@@ -11,6 +12,7 @@ const display = "font-['Bricolage_Grotesque_Variable',Inter,sans-serif]";
 
 export default function RoleStory({ profile = 'tenant' }) {
   const rc = getRoleContent(profile);
+  const peep = getProfile(profile).peep;
 
   return (
     <div data-role-story={profile}>
@@ -52,19 +54,31 @@ export default function RoleStory({ profile = 'tenant' }) {
         </section>
       )}
 
-      {/* ── 3 · RELIEF / MECHANIC — the dream, in plain words ───────────── */}
+      {/* ── 3 · RELIEF / MECHANIC — the dream, with the matched person ──── */}
       <section className="max-w-5xl mx-auto px-6 pb-12">
-        <div className="relative overflow-hidden rounded-[2.5rem] bg-linear-to-br from-[#0d2e57] to-[#06182f] px-8 py-14 md:px-14 text-center shadow-[0_30px_70px_-45px_rgba(9,34,67,0.65)]">
+        <div className="relative overflow-hidden rounded-[2.5rem] bg-linear-to-br from-[#0d2e57] to-[#06182f] px-8 py-14 md:px-14 shadow-[0_30px_70px_-45px_rgba(9,34,67,0.65)]">
           <div
-            className="pointer-events-none absolute -top-24 left-1/2 h-64 w-64 -translate-x-1/2 rounded-full blur-[6rem] opacity-40"
+            className="pointer-events-none absolute -top-24 right-10 h-72 w-72 rounded-full blur-[6rem] opacity-45"
             style={{ background: rc.accent }}
           />
-          <h2 className={`${display} relative text-3xl md:text-[2.5rem] font-normal leading-[1.1] tracking-tight text-white`}>
-            {rc.dream.heading}
-          </h2>
-          <p className="relative mx-auto mt-5 max-w-2xl text-base md:text-lg leading-8 font-light text-white/70">
-            {rc.dream.sub}
-          </p>
+          <div className="relative flex flex-col items-center gap-8 md:flex-row md:items-end md:text-left">
+            <div className="md:flex-1 text-center md:text-left">
+              <h2 className={`${display} text-3xl md:text-[2.5rem] font-normal leading-[1.1] tracking-tight text-white`}>
+                {rc.dream.heading}
+              </h2>
+              <p className="mt-5 max-w-xl text-base md:text-lg leading-8 font-light text-white/70">
+                {rc.dream.sub}
+              </p>
+            </div>
+            {peep && (
+              <img
+                src={peep}
+                alt=""
+                aria-hidden="true"
+                className="h-52 w-auto shrink-0 object-contain object-bottom md:h-64 [filter:brightness(0)_invert(1)]"
+              />
+            )}
+          </div>
         </div>
       </section>
 
