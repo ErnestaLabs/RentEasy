@@ -104,7 +104,7 @@ export default function RoleStory({ profile = 'tenant' }) {
           </div>
           <div className="mt-8 grid gap-5 sm:grid-cols-3">
             {rc.proofCards.cards.map((c) => (
-              <div key={c.name} className="overflow-hidden rounded-4xl border border-white bg-white shadow-[0_18px_44px_-30px_rgba(15,23,42,0.4)]">
+              <div key={c.avatar} className="overflow-hidden rounded-4xl border border-white bg-white shadow-[0_18px_44px_-30px_rgba(15,23,42,0.4)]">
                 <div className="flex items-center gap-4 px-5 pt-5">
                   <span
                     className="grid h-20 w-20 shrink-0 place-items-center overflow-hidden rounded-full"
@@ -113,8 +113,7 @@ export default function RoleStory({ profile = 'tenant' }) {
                     <img src={`/open-peeps/bust/peep-${c.avatar}.png`} alt="" aria-hidden="true" className="h-[88%] w-[88%] object-contain object-bottom" loading="lazy" />
                   </span>
                   <div className="min-w-0">
-                    <p className="truncate text-base font-semibold text-slate-900">{c.name}</p>
-                    <p className="mt-0.5 text-xs text-slate-500">{c.role}</p>
+                    <p className="text-sm font-semibold leading-snug text-slate-900">{c.role}</p>
                   </div>
                 </div>
                 <div className="mt-4 flex flex-wrap gap-1.5 px-5 pb-5">
