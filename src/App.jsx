@@ -4277,7 +4277,8 @@ function ProfileEditor({ profile, setProfile, answers, setAnswers }) {
   return (
     <div id="profile-editor" className="grid gap-5 lg:grid-cols-[1fr_22rem]">
       <div className="rounded-4xl border border-white bg-white/86 p-6 shadow-[0_18px_44px_-34px_rgba(15,23,42,0.45),inset_0_1px_0_white]">
-        <h1 className="text-4xl font-semibold tracking-tight text-slate-950">Your market profile</h1>
+        <p className="font-['JetBrains_Mono',monospace] text-xs text-[#2670a8]">MARKET PROFILE</p>
+        <h1 className="mt-2 font-['Bricolage_Grotesque_Variable',Inter,sans-serif] text-4xl font-semibold tracking-tight text-slate-950">Your market profile</h1>
         <p className="mt-3 text-slate-600">This is how RentEazy understands your role, area, timing, and intent.</p>
         <div className="mt-6 grid gap-3 sm:grid-cols-2">
           <label className="text-sm text-slate-600">Name<input value={profile.name} onChange={(event) => setProfile((current) => ({ ...current, name: event.target.value }))} className="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 outline-hidden focus:border-[#2f7d32]" /></label>
@@ -4654,14 +4655,15 @@ function SocialKitProfilePage({ profile, posts, likedIds, savedIds, matches, rep
 
   return (
     <section className="overflow-hidden rounded-[2rem] bg-white shadow-[0_24px_70px_-52px_rgba(15,23,42,0.62)] ring-1 ring-white">
-      <div className="relative min-h-[18rem] overflow-hidden bg-[#e1f6f4] px-6 pb-6 pt-5">
-        <div className="absolute -right-20 -top-28 h-72 w-72 rotate-45 rounded-[4rem] border border-[#dceee9]" />
-        <div className="absolute -bottom-24 -left-24 h-72 w-72 rotate-45 rounded-[4rem] bg-white/48" />
+      <div className="relative min-h-[18rem] overflow-hidden bg-linear-to-br from-[#092243] via-[#0d2e57] to-[#06182f] px-6 pb-6 pt-5">
+        <div className="absolute -right-20 -top-28 h-72 w-72 rotate-45 rounded-[4rem] border border-white/12" />
+        <div className="absolute -bottom-24 -left-24 h-72 w-72 rotate-45 rounded-[4rem] bg-white/[0.04]" />
+        <div className="absolute -right-10 top-16 h-40 w-40 rounded-full bg-[#52a832]/20 blur-3xl" />
         <div className="relative z-10 flex items-center justify-between">
-          <a href="/app/feed" className="grid h-10 w-10 place-items-center rounded-full bg-white/80 text-[#050506] shadow-[0_12px_28px_-20px_rgba(15,23,42,0.5)]">
+          <a href="/app/feed" className="grid h-10 w-10 place-items-center rounded-full bg-white/15 text-white ring-1 ring-white/20 backdrop-blur-md transition hover:bg-white/25">
             <ArrowDownLeft className="h-4 w-4" />
           </a>
-          <button type="button" className="grid h-10 w-10 place-items-center rounded-full bg-white/80 text-[#050506] shadow-[0_12px_28px_-20px_rgba(15,23,42,0.5)]">
+          <button type="button" className="grid h-10 w-10 place-items-center rounded-full bg-white/15 text-white ring-1 ring-white/20 backdrop-blur-md transition hover:bg-white/25">
             <Bookmark className="h-4 w-4" />
           </button>
         </div>
@@ -4672,11 +4674,11 @@ function SocialKitProfilePage({ profile, posts, likedIds, savedIds, matches, rep
             avatarIndex={profile.avatarIndex}
             avatarBg={profile.avatarBg || 'mist'}
             className="mx-auto h-28 w-28 rounded-[2rem]"
-            ring="ring-8 ring-white/80"
+            ring="ring-8 ring-white/15"
             imageClassName={(profile.avatarVariant || 'standing') === 'bust' ? '' : 'object-contain p-1'}
           />
-          <h1 className="mt-4 text-2xl font-bold tracking-tight text-[#050506]">{profile.name || 'RentEazy member'}</h1>
-          <p className="mt-1 text-sm font-semibold text-[#6d7f85]">@{(profile.name || 'renteazy').toLowerCase().replace(/[^a-z0-9]+/g, '') || 'renteazy'} · {displayRole(profile.role)}</p>
+          <h1 className="mt-4 font-['Bricolage_Grotesque_Variable',Inter,sans-serif] text-2xl font-semibold tracking-tight text-white">{profile.name || 'RentEazy member'}</h1>
+          <p className="mt-1 text-sm font-medium text-white/65">@{(profile.name || 'renteazy').toLowerCase().replace(/[^a-z0-9]+/g, '') || 'renteazy'} · {displayRole(profile.role)}</p>
         </div>
       </div>
 
@@ -4687,26 +4689,26 @@ function SocialKitProfilePage({ profile, posts, likedIds, savedIds, matches, rep
           [matches.length, 'Matches'],
         ].map(([value, label]) => (
           <div key={label}>
-            <p className="text-2xl font-bold text-[#050506]">{value}</p>
-            <p className="mt-1 text-xs font-semibold text-slate-400">{label}</p>
+            <p className="font-['Bricolage_Grotesque_Variable',Inter,sans-serif] text-2xl font-semibold text-[#092243]">{value}</p>
+            <p className="mt-1 text-xs font-semibold tracking-wide text-slate-400">{label}</p>
           </div>
         ))}
       </div>
 
-      <div className="mx-6 rounded-[1.55rem] bg-[#f4f7f8] p-3">
+      <div className="mx-6 rounded-[1.55rem] bg-linear-to-br from-[#edf8ee] to-[#e3f2ff] p-3.5 ring-1 ring-[#d5ecd7]">
         <div className="flex items-center justify-between gap-3">
-          <div>
-            <p className="text-sm font-bold text-[#050506]">{strength.score}% profile strength</p>
+          <div className="min-w-0">
+            <p className="text-sm font-bold text-[#092243]">{strength.score}% profile strength</p>
             <p className="mt-1 line-clamp-1 text-xs text-slate-500">{strength.suggestions.slice(0, 2).join(' · ') || 'Ready for matching'}</p>
           </div>
-          <a href="#profile-editor" className="rounded-full bg-[#050506] px-4 py-2 text-xs font-bold text-white">Edit</a>
+          <a href="#profile-editor" className="shrink-0 rounded-full bg-[#092243] px-4 py-2 text-xs font-bold text-white shadow-[0_12px_26px_-16px_rgba(9,34,67,0.8)] transition hover:bg-[#0d2e57]">Edit</a>
         </div>
       </div>
 
       <div className="px-6 pb-6 pt-5">
         <div className="mb-4 flex items-center justify-center gap-2">
-          <button type="button" className="rounded-full bg-[#050506] px-5 py-2 text-xs font-bold text-white">Photos</button>
-          <button type="button" className="rounded-full bg-[#f4f7f8] px-5 py-2 text-xs font-bold text-slate-500">Saved</button>
+          <button type="button" className="rounded-full bg-[#092243] px-5 py-2 text-xs font-bold text-white shadow-[0_12px_26px_-18px_rgba(9,34,67,0.75)]">Photos</button>
+          <button type="button" className="rounded-full bg-[#f4f7f8] px-5 py-2 text-xs font-bold text-slate-500 transition hover:text-[#092243]">Saved</button>
         </div>
         <div className="grid grid-cols-2 gap-3">
           {gallery.map((post, index) => (
@@ -4856,7 +4858,7 @@ function DailyReturnPanel({ profile, lifecycleTasks, reputationProfile, onComple
         <div className="flex items-start justify-between gap-4">
           <div>
             <p className="font-['JetBrains_Mono',monospace] text-xs text-[#8fd0ff]">WHY OPEN TODAY</p>
-            <h2 className="mt-2 text-3xl font-semibold tracking-tight">Your rental world moved.</h2>
+            <h2 className="mt-2 font-['Bricolage_Grotesque_Variable',Inter,sans-serif] text-3xl font-semibold tracking-tight">Your rental world moved.</h2>
             <p className="mt-2 max-w-2xl text-sm leading-6 text-white/68">RentEazy gives every role a reason to check in without forcing a long form or fake urgency.</p>
           </div>
           <div className="shrink-0 rounded-2xl bg-white/12 px-4 py-3 text-center ring-1 ring-white/12">
@@ -5791,7 +5793,7 @@ function ReputationScoreCard({ reputationProfile }) {
         <div className="flex items-start justify-between gap-4">
           <div>
             <p className="font-['JetBrains_Mono',monospace] text-xs text-[#8fd0ff]">RENTEAZY REPUTATION SCORE</p>
-            <h2 className="mt-2 text-4xl font-semibold tracking-tight">{profile.score}</h2>
+            <h2 className="mt-2 font-['Bricolage_Grotesque_Variable',Inter,sans-serif] text-5xl font-semibold tracking-tight">{profile.score}</h2>
             <p className="mt-1 text-sm text-white/68">{profile.tier} tier · built from behaviour, not payment</p>
           </div>
           <div className="flex h-14 w-14 items-center justify-center rounded-full bg-white/12 ring-1 ring-white/14">
@@ -6151,12 +6153,17 @@ function TrustReputationPanel({ reports, comments, profile }) {
 
   return (
     <div className="rounded-3xl border border-white bg-white/86 p-4 shadow-[0_14px_34px_-28px_rgba(15,23,42,0.45)]">
-      <p className="font-['JetBrains_Mono',monospace] text-xs text-[#2670a8]">REPUTATION</p>
-      <h2 className="mt-2 text-2xl font-normal tracking-tight text-slate-950">Trust is behavioural</h2>
+      <div className="flex items-center justify-between gap-3">
+        <div>
+          <p className="font-['JetBrains_Mono',monospace] text-xs text-[#2670a8]">REPUTATION</p>
+          <h2 className="mt-2 font-['Bricolage_Grotesque_Variable',Inter,sans-serif] text-2xl font-normal tracking-tight text-slate-950">Trust is behavioural</h2>
+        </div>
+        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-[#edf8ee] text-[#2f7d32] ring-1 ring-[#d5ecd7]"><ShieldCheck className="h-5 w-5" /></span>
+      </div>
       <div className="mt-4 grid grid-cols-3 gap-2 text-center text-xs">
-        <div className="rounded-2xl bg-slate-50 p-3"><p className="text-xl text-slate-950">{verifiedActions}</p><p className="text-slate-500">Useful replies</p></div>
-        <div className="rounded-2xl bg-slate-50 p-3"><p className="text-xl text-slate-950">{reports.length}</p><p className="text-slate-500">Reports</p></div>
-        <div className="rounded-2xl bg-slate-50 p-3"><p className="text-xl text-slate-950">0</p><p className="text-slate-500">Verified feedback</p></div>
+        <div className="rounded-2xl bg-[#edf8ee] p-3 ring-1 ring-[#d5ecd7]"><p className="text-xl font-semibold text-[#215d27]">{verifiedActions}</p><p className="mt-0.5 text-slate-500">Useful replies</p></div>
+        <div className={`rounded-2xl p-3 ring-1 ${reports.length ? 'bg-[#fff1f0] ring-[#ffd6d2]' : 'bg-slate-50 ring-slate-100'}`}><p className={`text-xl font-semibold ${reports.length ? 'text-[#b42318]' : 'text-slate-950'}`}>{reports.length}</p><p className="mt-0.5 text-slate-500">Reports</p></div>
+        <div className="rounded-2xl bg-[#edf7ff] p-3 ring-1 ring-[#cfe6ff]"><p className="text-xl font-semibold text-[#154f79]">0</p><p className="mt-0.5 text-slate-500">Verified feedback</p></div>
       </div>
       <p className="mt-3 text-xs leading-5 text-slate-500">Paid visibility does not change trust, fit, referencing, approval, or reputation.</p>
     </div>
