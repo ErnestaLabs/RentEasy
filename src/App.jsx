@@ -5387,20 +5387,37 @@ function UsefulNotificationsPanel({ notifications, onMarkRead }) {
     <section className="rounded-[1.75rem] border border-white bg-white/92 p-5 shadow-[0_18px_44px_-34px_rgba(15,23,42,0.45),inset_0_1px_0_white]">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <p className="font-['JetBrains_Mono',monospace] text-xs text-[#2670a8]">USEFUL NOTIFICATIONS</p>
-          <h2 className="mt-2 text-2xl font-normal tracking-tight text-slate-950">Only when it reduces uncertainty</h2>
+          <p className="font-['JetBrains_Mono',monospace] text-[11px] tracking-[0.12em] text-[#2670a8]">USEFUL NOTIFICATIONS</p>
+          <h2 className="mt-2 font-['Bricolage_Grotesque_Variable',Inter,sans-serif] text-2xl font-normal tracking-tight text-slate-950">Only when it reduces uncertainty</h2>
         </div>
-        <span className="rounded-full bg-[#edf8ee] px-3 py-1 text-xs text-[#215d27]">{unreadCount} unread</span>
+        {unreadCount > 0 && (
+          <span className="shrink-0 rounded-full bg-[#2f7d32] px-3 py-1 text-xs font-semibold text-white shadow-[0_8px_20px_-12px_rgba(47,125,50,0.8)]">{unreadCount} new</span>
+        )}
       </div>
       <div className="mt-4 space-y-2">
         {notifications.slice(0, 4).map((notification) => (
-          <article key={notification.id} className={`rounded-2xl p-3 ${notification.read ? 'bg-slate-50' : 'bg-[#edf7ff]'}`}>
-            <div className="flex items-start justify-between gap-3">
-              <div>
-                <p className="text-sm font-medium text-slate-950">{notification.title}</p>
+          <article
+            key={notification.id}
+            className={`relative overflow-hidden rounded-2xl p-3.5 transition ${notification.read ? 'bg-slate-50/80' : 'bg-[#eef6ff] ring-1 ring-[#cfe6ff]'}`}
+          >
+            {!notification.read && <span className="absolute inset-y-2 left-0 w-1 rounded-full bg-[#2670a8]" />}
+            <div className={`flex items-start justify-between gap-3 ${notification.read ? '' : 'pl-2'}`}>
+              <div className="min-w-0">
+                <p className={`flex items-center gap-2 text-sm font-semibold ${notification.read ? 'text-slate-700' : 'text-slate-950'}`}>
+                  {!notification.read && <span className="inline-block h-1.5 w-1.5 shrink-0 rounded-full bg-[#2670a8]" />}
+                  <span className="truncate">{notification.title}</span>
+                </p>
                 <p className="mt-1 text-xs leading-5 text-slate-500">{notification.body}</p>
               </div>
-              {!notification.read && <button type="button" onClick={() => onMarkRead(notification.id)} className="shrink-0 rounded-full bg-white px-3 py-1 text-xs text-[#154f79]">Read</button>}
+              {!notification.read && (
+                <button
+                  type="button"
+                  onClick={() => onMarkRead(notification.id)}
+                  className="shrink-0 rounded-full bg-white px-3 py-1.5 text-xs font-semibold text-[#154f79] shadow-[0_6px_16px_-10px_rgba(15,79,121,0.7)] transition hover:bg-[#154f79] hover:text-white"
+                >
+                  Mark read
+                </button>
+              )}
             </div>
           </article>
         ))}
