@@ -6363,29 +6363,24 @@ function buildContextualUpsells({ routeTab, activeFeedTab, remainingSwipes, newP
     });
   }
 
-  if (newPost && ['Feed', 'Post'].includes(routeTab)) {
-    cards.push({
-      id: 'post-bump-small',
-      priority: 92,
-      eyebrow: 'Fresh post',
-      title: 'This is the right time to bump it.',
-      body: 'New posts have the best context. Give it a small labelled visibility lift while it is warm.',
-      trigger: 'Shown after creating a post.',
-      cta: 'Boost from 29p',
-      icon: Megaphone,
-      tone: 'green',
-      secondaryAction: 'share',
-    });
-  }
+  // The just-posted boost+share moment is owned by the FeedScreen banner at the
+  // top of the feed (the right position, immediately after returning from the
+  // composer). We deliberately do NOT also emit a high-priority post-bump card
+  // here: `newPost` is sticky for the whole session, so a card keyed on it would
+  // duplicate that banner and dominate the Feed slot for every later visit.
 
-  if (!newPost && warmPost && routeTab === 'Feed' && activeFeedTab !== 'Perks' && activeFeedTab !== 'Groups') {
+  // Post-traction card: a DIFFERENT, later moment — an older post of yours has
+  // picked up real activity, so a bump can reach more suitable people. Guard it
+  // off the freshly-created post (banner's job) rather than off `newPost`, which
+  // never clears and would kill this card for the rest of the session.
+  if (warmPost && warmPost.id !== newPost?.id && routeTab === 'Feed' && activeFeedTab !== 'Perks' && activeFeedTab !== 'Groups') {
     cards.push({
       id: 'post-bump-small',
       priority: 54,
       eyebrow: 'Post traction',
-      title: 'Your post has activity.',
-      body: 'A small bump can reach more suitable people while the signal is fresh.',
-      trigger: 'Shown when one of your posts has real activity.',
+      title: 'Your post is getting activity.',
+      body: 'A small labelled bump reaches more suitable people while the signal is still fresh.',
+      trigger: 'Shown when one of your earlier posts has real engagement.',
       cta: 'Boost from 29p',
       icon: Megaphone,
       tone: 'blue',
