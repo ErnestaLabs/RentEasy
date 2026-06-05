@@ -6421,6 +6421,24 @@ function buildContextualUpsells({ routeTab, activeFeedTab, remainingSwipes, newP
     });
   }
 
+  // Match-milestone moment: once a mutual match exists, the logical next offer
+  // is keeping the match + viewing trail — not a generic upsell. Fills the
+  // Profile/Likes slot that otherwise sits empty for an active member.
+  if (['Profile', 'Likes'].includes(routeTab) && matches.length > 0) {
+    cards.push({
+      id: 'protect-basic',
+      priority: routeTab === 'Likes' ? 64 : 68,
+      eyebrow: matches.length > 1 ? `${matches.length} matches` : 'You have a match',
+      title: 'Keep your match and viewing trail.',
+      body: 'Protect Basic saves your match, message, and viewing records so your reputation has receipts later.',
+      trigger: 'Shown once you have at least one mutual match.',
+      cta: 'Protect for 99p/mo',
+      icon: ShieldCheck,
+      tone: 'navy',
+      freeAlternative: 'Records stay visible in-app for free',
+    });
+  }
+
   if (routeTab === 'Feed' && businessRoles.includes(profile.role) && ['Agents', 'Landlords', 'Operators', 'Sourcers', 'Investors', 'For You'].includes(activeFeedTab)) {
     cards.push({
       id: 'sponsored-post-starter',
@@ -6490,7 +6508,7 @@ function GenUpsellCard({ card, onSelectProduct, onDismiss, onSharePost, newPost,
           <div className="flex items-start justify-between gap-2">
             <div>
               <p className={`inline-flex rounded-full px-2.5 py-1 text-[0.68rem] font-semibold uppercase tracking-[0.08em] ring-1 ${tone.chip}`}>{card.eyebrow}</p>
-              <h2 className={`${compact ? 'mt-2 text-lg' : 'mt-3 text-xl'} font-semibold leading-tight tracking-tight`}>{card.title}</h2>
+              <h2 className={`${compact ? 'mt-2 text-lg' : 'mt-3 text-xl'} font-['Bricolage_Grotesque_Variable',Inter,sans-serif] font-semibold leading-tight tracking-tight`}>{card.title}</h2>
             </div>
             <button type="button" onClick={() => onDismiss(card.id)} className={`shrink-0 rounded-full px-2.5 py-1 text-xs ring-1 ${tone.ghost}`}>Not now</button>
           </div>
