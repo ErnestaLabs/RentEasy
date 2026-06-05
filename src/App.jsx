@@ -7857,7 +7857,7 @@ function RentEazyAppContainer({ isPreviewVisitor = false }) {
         </div>
       </header>}
 
-      <main className={`mx-auto grid ${routeTab === 'Feed' ? 'max-w-[520px] gap-4 px-3 py-3 lg:max-w-7xl lg:grid-cols-[17rem_minmax(0,36rem)_20rem] lg:items-start lg:px-6 lg:py-5' : routeTab === 'Swipe' ? 'max-w-[430px] gap-0 px-0 py-0 md:px-4 md:py-4' : 'gap-6 px-4 py-5'} ${routeTab === 'Swipe' ? '' : routeTab === 'Feed' ? '' : 'max-w-6xl lg:grid-cols-[1fr_20rem]'}`}>
+      <main className={`mx-auto grid ${routeTab === 'Feed' ? 'max-w-[520px] gap-4 px-3 py-3 lg:max-w-7xl lg:grid-cols-[17rem_minmax(0,36rem)_20rem] lg:items-start lg:px-6 lg:py-5' : routeTab === 'Swipe' ? 'max-w-[430px] gap-0 px-0 py-0 md:max-w-[27rem] md:px-4 md:py-8 lg:py-10' : 'gap-6 px-4 py-5'} ${routeTab === 'Swipe' ? '' : routeTab === 'Feed' ? '' : 'max-w-6xl lg:grid-cols-[1fr_20rem]'}`}>
         {routeTab === 'Feed' && (
           <FeedScreen
             activeFeedTab={activeFeedTab}
