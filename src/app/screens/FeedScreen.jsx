@@ -86,17 +86,17 @@ export default function FeedScreen({
       <section className="min-w-0">
         <div className="sticky top-0 z-40 -mx-3 space-y-4 bg-white/96 px-6 pb-4 pt-5 backdrop-blur-xl lg:hidden">
           <div className="flex items-center justify-between gap-3">
-            <a href="/app/feed" className="flex items-baseline gap-0.5 text-[1.35rem] font-bold tracking-tight text-[#050506]">
+            <a href="/app/feed" className="flex items-baseline gap-0.5 text-[1.35rem] font-bold tracking-tight text-[#092243]">
               Rent<span className="text-[#2f7d32]">Eazy</span>
             </a>
             <div className="flex items-center gap-2">
-              <button type="button" onClick={() => setActiveFeedTab('Groups')} className="grid h-10 w-10 place-items-center rounded-full bg-[#f3f6f8] text-[#050506]"><Users className="h-4 w-4" /></button>
-              <a href="/app/post" className="grid h-10 w-10 place-items-center rounded-full bg-[#050506] text-white shadow-[0_16px_34px_-22px_rgba(0,0,0,0.75)]"><PlusCircle className="h-4 w-4" /></a>
-              <a href="/app/swipe" className="grid h-10 w-10 place-items-center rounded-full bg-[#bff4ef] text-[#050506]"><Flame className="h-4 w-4" /></a>
+              <button type="button" onClick={() => setActiveFeedTab('Groups')} className="grid h-10 w-10 place-items-center rounded-full bg-[#eef3f8] text-[#092243]"><Users className="h-4 w-4" /></button>
+              <a href="/app/post" className="grid h-10 w-10 place-items-center rounded-full bg-[#2f7d32] text-white shadow-[0_16px_34px_-22px_rgba(47,125,50,0.72)]"><PlusCircle className="h-4 w-4" /></a>
+              <a href="/app/swipe" className="grid h-10 w-10 place-items-center rounded-full bg-[#eef3f8] text-[#092243]"><Flame className="h-4 w-4" /></a>
             </div>
           </div>
           <div>
-            <h1 className="text-[2.7rem] font-bold leading-none tracking-tight text-[#050506]">Feed</h1>
+            <h1 className="text-[2.7rem] font-bold leading-none tracking-tight text-[#092243]">Feed</h1>
             <p className="mt-1 text-sm font-medium text-slate-400">{activeFeedTab}</p>
           </div>
           <SocialStoryRail posts={posts} groups={groups} onSelectTab={setActiveFeedTab} />
@@ -117,7 +117,7 @@ export default function FeedScreen({
           <div className="-mx-6 overflow-x-auto px-6 [scrollbar-width:none]">
             <div className="flex min-w-max gap-2 pb-1">
               {feedTabs.map((tab) => (
-                <button key={tab} onClick={() => setActiveFeedTab(tab)} className={`rounded-full px-4 py-2 text-sm font-bold transition ${activeFeedTab === tab ? 'bg-[#050506] text-white shadow-[0_14px_28px_-20px_rgba(0,0,0,0.7)]' : 'bg-[#f4f7f8] text-slate-500'}`}>{tab}</button>
+                <button key={tab} onClick={() => setActiveFeedTab(tab)} className={`rounded-full px-4 py-2 text-sm font-bold transition ${activeFeedTab === tab ? 'bg-[#092243] text-white shadow-[0_14px_28px_-20px_rgba(9,34,67,0.65)]' : 'bg-[#f4f7f8] text-slate-500'}`}>{tab}</button>
               ))}
             </div>
           </div>
