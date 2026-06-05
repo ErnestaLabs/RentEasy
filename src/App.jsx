@@ -5468,30 +5468,34 @@ function PerksRail({ partnerOffers, profile, onOpenOffer, compact = false }) {
   const offers = (matching.length ? matching : partnerOffers).slice(0, compact ? 3 : partnerOffers.length);
 
   return (
-    <section className="rounded-[1.75rem] border border-white bg-white/92 p-4 shadow-[0_18px_44px_-34px_rgba(15,23,42,0.45),inset_0_1px_0_white]">
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <p className="font-['JetBrains_Mono',monospace] text-xs text-[#2670a8]">PERKS</p>
-          <h2 className="mt-2 text-2xl font-normal tracking-tight text-slate-950">Useful when the timing is right</h2>
-          <p className="mt-1 text-sm leading-6 text-slate-500">Partner offers appear when they fit the move, listing, stay, deal, or portfolio moment.</p>
+    <section className="space-y-5">
+      {!compact && (
+        <div className="relative overflow-hidden rounded-[2rem] bg-linear-to-br from-[#0d2e57] to-[#06182f] p-6 text-white shadow-[0_30px_70px_-44px_rgba(9,34,67,0.9)] md:p-8">
+          <div className="pointer-events-none absolute -top-20 right-0 h-56 w-56 rounded-full bg-[#52a832]/22 blur-[70px]" />
+          <p className="relative font-['JetBrains_Mono',monospace] text-[11px] tracking-[0.16em] text-[#9bd383]">PERKS · TIMED FOR YOUR MOVE</p>
+          <h2 className="relative mt-2 font-['Bricolage_Grotesque_Variable',Inter,sans-serif] text-3xl font-normal leading-tight tracking-tight md:text-4xl">Rewards that land when they’re useful.</h2>
+          <p className="relative mt-3 max-w-xl text-sm font-light leading-7 text-white/65 md:text-base">No spam, no clutter. A partner offer only shows when it fits the moment — a move, a listing, a stay, a deal. Every one is labelled and capped.</p>
         </div>
-        <Gift className="mt-1 h-5 w-5 text-[#2f7d32]" />
-      </div>
-      <div className="mt-4 grid gap-3">
+      )}
+      <div className={compact ? 'grid gap-3' : 'grid gap-4 sm:grid-cols-2'}>
         {offers.map((offer) => (
-          <button key={offer.id} type="button" onClick={() => onOpenOffer(offer)} className="rounded-3xl border border-slate-200 bg-white p-4 text-left transition hover:border-[#2f7d32]">
-            <div className="flex items-start justify-between gap-3">
-              <div className="min-w-0">
-                <p className="text-xs text-[#2670a8]">{offer.category} · {offer.sponsoredStatus}</p>
-                <h3 className="mt-1 text-base font-semibold text-slate-950">{offer.title}</h3>
-              </div>
-              <span className="shrink-0 rounded-full bg-[#edf8ee] px-3 py-1 text-xs text-[#215d27]">{offer.cta}</span>
+          <button key={offer.id} type="button" onClick={() => onOpenOffer(offer)} className="group flex flex-col rounded-4xl border border-white bg-white/90 p-5 text-left shadow-[0_18px_44px_-32px_rgba(15,23,42,0.4)] transition hover:-translate-y-0.5 hover:shadow-[0_26px_54px_-32px_rgba(15,23,42,0.5)]">
+            <div className="flex items-center justify-between gap-3">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-[#edf8ee] px-3 py-1 font-['JetBrains_Mono',monospace] text-[10px] tracking-[0.08em] text-[#2f7d32]"><Gift className="h-3 w-3" />{offer.category}</span>
+              {offer.sponsoredStatus && <span className="rounded-full bg-[#fff7ed] px-2.5 py-0.5 text-[10px] font-medium text-[#9a3412]">{offer.sponsoredStatus}</span>}
             </div>
-            <p className="mt-2 text-sm leading-6 text-slate-600">{offer.description}</p>
-            <p className="mt-2 text-xs text-slate-400">{offer.reward}</p>
+            <h3 className="mt-3 font-['Bricolage_Grotesque_Variable',Inter,sans-serif] text-xl font-normal leading-tight tracking-tight text-slate-950">{offer.title}</h3>
+            <p className="mt-2 flex-1 text-sm leading-6 text-slate-600">{offer.description}</p>
+            {offer.reward && <p className="mt-3 text-sm font-semibold text-[#2f7d32]">{offer.reward}</p>}
+            <span className="mt-4 inline-flex items-center justify-center gap-1.5 rounded-full bg-[#092243] px-5 py-2.5 text-sm font-medium text-white transition group-hover:bg-[#0c2e5a]">{offer.cta} <span className="transition group-hover:translate-x-0.5">→</span></span>
           </button>
         ))}
       </div>
+      {offers.length === 0 && (
+        <div className="rounded-4xl border border-dashed border-slate-200 bg-white/60 p-8 text-center">
+          <p className="text-sm text-slate-500">No perks right now — they’ll appear the moment one actually fits your move.</p>
+        </div>
+      )}
     </section>
   );
 }
