@@ -6470,7 +6470,7 @@ function BillingPanel({ onSelectProduct, purchases, boosts, wallet }) {
     <div className="space-y-5">
       <section className="overflow-hidden rounded-[2rem] bg-[#092243] p-6 text-white shadow-[0_28px_70px_-46px_rgba(9,34,67,0.95)]">
         <p className="font-['JetBrains_Mono',monospace] text-xs text-[#8fd0ff]">BILLING</p>
-        <h1 className="mt-3 text-4xl font-semibold leading-[0.96] tracking-tight">Plans, boosts, credits, and Protect.</h1>
+        <h1 className="mt-3 font-['Bricolage_Grotesque_Variable',Inter,sans-serif] text-4xl font-normal leading-[0.98] tracking-tight">Plans, boosts, credits, and Protect.</h1>
         <p className="mt-4 max-w-2xl text-sm leading-7 text-white/68">Start free, keep useful activity flowing, and upgrade only when you want less friction or labelled business reach. Paid visibility never replaces suitability or trust.</p>
         <div className="mt-5 grid gap-2 sm:grid-cols-3">
           {[
@@ -6508,7 +6508,7 @@ function MicroUpsellModal({ product, onClose, onConfirm, billingEnabled = false 
         <div className="flex items-start justify-between gap-4">
           <div>
             <p className="font-['JetBrains_Mono',monospace] text-xs text-[#2670a8]">{product.category.toUpperCase()}</p>
-            <h2 className="mt-2 text-3xl font-normal tracking-tight text-slate-950">{product.name}</h2>
+            <h2 className="mt-2 font-['Bricolage_Grotesque_Variable',Inter,sans-serif] text-3xl font-normal tracking-tight text-slate-950">{product.name}</h2>
             <p className="mt-2 text-sm leading-6 text-slate-600">{product.description}</p>
           </div>
           <button type="button" onClick={onClose} className="h-10 w-10 rounded-full border border-slate-200 text-slate-500">×</button>
