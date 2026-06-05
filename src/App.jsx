@@ -567,7 +567,7 @@ const productLadder = [
     note: 'Then £9.99/month',
     desc: 'For tenants, buddies, landlords, and solo agents.',
     cta: 'Start for £4.99',
-    href: '#match',
+    href: '/signup?source=pricing&plan=individual-monthly&offer=first-month-499',
     features: ['See who liked you', 'Swipe-based matching', 'Advanced filters', 'Daily picks', 'Superlikes included', 'Better visibility', 'Match scores', 'Profile/listing insights'],
   },
   {
@@ -575,7 +575,7 @@ const productLadder = [
     price: '£0',
     desc: 'For everyone. Start here.',
     cta: 'Join Free',
-    href: socialSignupUrl,
+    href: '/signup?source=pricing&plan=free',
     features: ['Create profile', 'Browse Feed', 'Post to Feed', 'Basic swipes', 'Basic likes', 'Blurred Who Liked You', 'Basic filters', 'Follow and save'],
   },
   {
@@ -584,7 +584,7 @@ const productLadder = [
     note: 'Volume discounts for teams',
     desc: 'Volume discounts for larger teams.',
     cta: 'Get Team Yearly',
-    href: '#pricing',
+    href: '/signup?source=pricing&plan=business-yearly',
     features: ['Yearly seat access', 'Shared business profile', 'Team seat management', 'Advanced filters', 'Superlikes included', 'Boost access', 'Volume discounts'],
   },
   {
@@ -593,7 +593,7 @@ const productLadder = [
     note: 'Then £9.99/month per seat',
     desc: 'For agencies, teams, and multi-seat operators.',
     cta: 'Add Seats',
-    href: '#partners',
+    href: '/signup?source=pricing&plan=business-monthly&offer=first-month-499',
     features: ['Staff seats', 'Shared business profile', 'Advanced filters', 'Who liked you', 'Screened demand', 'Landlord/property discovery', 'Superlikes included', 'Boost access', 'Profile/listing insights'],
   },
   {
@@ -602,7 +602,7 @@ const productLadder = [
     note: 'Protect Plus at £2.99/month',
     desc: 'For everyone.',
     cta: 'Add Protect',
-    href: '#pricing',
+    href: '/signup?source=pricing&plan=protect',
     features: ['Neutral timestamped record', 'Match/viewing history', 'Agreed terms trail', 'Dispute notes', 'Basic export', 'Protect Plus option'],
   },
 ];
