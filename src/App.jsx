@@ -4429,15 +4429,18 @@ function DailySwipePanel({ usageLimit, onBuyMore }) {
   const resetTime = new Date(usageLimit.resetsAt).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
 
   return (
-    <div className="overflow-hidden rounded-[1.6rem] bg-[#092243] p-4 text-white shadow-[0_22px_52px_-34px_rgba(9,34,67,0.95)]">
+    <div className="overflow-hidden rounded-[1.6rem] bg-[#092243] p-5 text-white shadow-[0_22px_52px_-34px_rgba(9,34,67,0.95)]">
       <div className="flex items-center justify-between gap-4">
         <div>
-          <p className="font-['JetBrains_Mono',monospace] text-xs text-[#8fd0ff]">DAILY SWIPES</p>
-          <p className="mt-2 text-3xl font-semibold tracking-tight">{remaining} left today</p>
-          <p className="mt-1 text-sm text-white/68">Reset at {resetTime}</p>
+          <p className="font-['JetBrains_Mono',monospace] text-[10px] tracking-[0.14em] text-[#8fd0ff]">DAILY SWIPES</p>
+          <p className="mt-2 font-['Bricolage_Grotesque_Variable',Inter,sans-serif] text-3xl font-normal tracking-tight">{remaining} <span className="text-base text-white/60">left today</span></p>
         </div>
-        <button type="button" onClick={() => onBuyMore('extra-swipes-10')} className="shrink-0 rounded-full bg-[#8bdc65] px-4 py-3 text-sm font-semibold text-[#092243]">+10 for 9p</button>
+        <button type="button" onClick={() => onBuyMore('extra-swipes-10')} className="shrink-0 rounded-full bg-[#8bdc65] px-4 py-2.5 text-sm font-semibold text-[#092243] transition hover:bg-[#9bea75]">+10 · 9p</button>
       </div>
+      <div className="mt-4 h-1.5 overflow-hidden rounded-full bg-white/12">
+        <div className="h-full rounded-full bg-linear-to-r from-[#8bdc65] to-[#5bc4ff]" style={{ width: `${usageLimit.allowance ? (remaining / usageLimit.allowance) * 100 : 0}%` }} />
+      </div>
+      <p className="mt-2 text-xs text-white/55">Resets at {resetTime} · keep your streak going</p>
     </div>
   );
 }
