@@ -6170,6 +6170,19 @@ function TrustReputationPanel({ reports, comments, profile }) {
   );
 }
 
+const microProductIcons = {
+  'Extra swipes': Flame,
+  'Reveal likes': Heart,
+  Superlikes: Star,
+  Rewinds: RotateCcw,
+  'Mini Boost': ArrowUp,
+  'Post Boost': ArrowUp,
+  Profile: BadgeCheck,
+  'Business starter': Megaphone,
+  Protect: ShieldCheck,
+  Credits: Gift,
+};
+
 function MiniShopPanel({ onSelectProduct, compact = false }) {
   const products = compact ? microProducts.slice(0, 4) : microProducts;
 
@@ -6179,15 +6192,21 @@ function MiniShopPanel({ onSelectProduct, compact = false }) {
       <h2 className="mt-2 font-['Bricolage_Grotesque_Variable',Inter,sans-serif] text-2xl font-normal tracking-tight text-slate-950">Boosts and extras</h2>
       <p className="mt-2 text-sm leading-6 text-slate-600">Small paid extras are clearly priced. Credits can keep low-cost actions simple and transparent.</p>
       <div className="mt-4 grid gap-2">
-        {products.map((product) => (
-          <button key={product.id} type="button" onClick={() => onSelectProduct(product.id)} className="flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-left hover:border-[#2f7d32]">
-            <span>
-              <span className="block text-sm font-medium text-slate-950">{product.name}</span>
-              <span className="block text-xs text-slate-500">{product.description}</span>
+        {products.map((product) => {
+          const Icon = microProductIcons[product.category] || Sparkles;
+          return (
+          <button key={product.id} type="button" onClick={() => onSelectProduct(product.id)} className="group flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-3 py-3 text-left transition hover:border-[#2f7d32] hover:bg-[#fbfdfb]">
+            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-[#edf8ee] text-[#2f7d32] ring-1 ring-[#d5ecd7] transition group-hover:bg-[#2f7d32] group-hover:text-white">
+              <Icon className="h-[1.15rem] w-[1.15rem]" />
             </span>
-            <span className="shrink-0 rounded-full bg-[#edf8ee] px-3 py-1 text-xs text-[#215d27]">{product.price}</span>
+            <span className="min-w-0 flex-1">
+              <span className="block truncate text-sm font-semibold text-slate-950">{product.name}</span>
+              <span className="block truncate text-xs text-slate-500">{product.description}</span>
+            </span>
+            <span className="shrink-0 rounded-full bg-[#edf8ee] px-3 py-1 text-xs font-semibold text-[#215d27] ring-1 ring-[#d5ecd7]">{product.price}</span>
           </button>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
