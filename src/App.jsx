@@ -4110,7 +4110,7 @@ function ShareEverywhereModal({ post, onClose, onShared }) {
         <div className="flex items-start justify-between gap-4">
           <div>
             <p className="font-['JetBrains_Mono',monospace] text-xs text-[#2670a8]">SHARE EVERYWHERE</p>
-            <h2 className="mt-2 text-2xl font-normal tracking-tight text-slate-950">Want more people to see this?</h2>
+            <h2 className="mt-2 font-['Bricolage_Grotesque_Variable',Inter,sans-serif] text-2xl font-normal tracking-tight text-slate-950">Want more people to see this?</h2>
             <p className="mt-2 text-sm leading-6 text-slate-600">Share your post and get 5 extra swipes today.</p>
           </div>
           <button type="button" onClick={onClose} className="h-10 w-10 rounded-full border border-slate-200 text-slate-500">×</button>
@@ -4160,7 +4160,7 @@ function ReportModal({ post, onClose, onReport }) {
         <div className="flex items-start justify-between gap-4">
           <div>
             <p className="font-['JetBrains_Mono',monospace] text-xs text-[#ef4444]">REPORT</p>
-            <h2 className="mt-2 text-2xl font-normal tracking-tight text-slate-950">Report this post</h2>
+            <h2 className="mt-2 font-['Bricolage_Grotesque_Variable',Inter,sans-serif] text-2xl font-normal tracking-tight text-slate-950">Report this post</h2>
             <p className="mt-2 text-sm leading-6 text-slate-600">Reports are saved for review. Use this when something looks unsafe, fake, or misleading.</p>
           </div>
           <button type="button" onClick={onClose} className="h-10 w-10 rounded-full border border-slate-200 text-slate-500">×</button>
@@ -4193,7 +4193,7 @@ function CommentModal({ post, comments, onClose, onComment }) {
         <div className="flex items-start justify-between gap-4">
           <div>
             <p className="font-['JetBrains_Mono',monospace] text-xs text-[#2670a8]">COMMENTS</p>
-            <h2 className="mt-2 text-2xl font-normal tracking-tight text-slate-950">{post.title}</h2>
+            <h2 className="mt-2 font-['Bricolage_Grotesque_Variable',Inter,sans-serif] text-2xl font-normal tracking-tight text-slate-950">{post.title}</h2>
           </div>
           <button type="button" onClick={onClose} className="h-10 w-10 rounded-full border border-slate-200 text-slate-500">×</button>
         </div>
@@ -4251,7 +4251,7 @@ function ProgressiveQuestionsPanel({ profile, answers, setAnswers }) {
   return (
     <div className="rounded-[1.75rem] border border-[#d5ecd7] bg-[#edf8ee] p-5 shadow-[0_18px_44px_-34px_rgba(15,23,42,0.35)]">
       <p className="font-['JetBrains_Mono',monospace] text-xs text-[#215d27]">BETTER MATCHES</p>
-      <h2 className="mt-2 text-2xl font-normal tracking-tight text-slate-950">Want better matches?</h2>
+      <h2 className="mt-2 font-['Bricolage_Grotesque_Variable',Inter,sans-serif] text-2xl font-normal tracking-tight text-slate-950">Want better matches?</h2>
       <p className="mt-2 text-sm leading-6 text-[#215d27]">Answer 3 quick questions.</p>
       <div className="mt-4 space-y-3">
         {visibleQuestions.map((question) => (
@@ -4452,7 +4452,7 @@ function DailyPicksPanel({ picks }) {
       <div className="flex items-center justify-between gap-3">
         <div>
           <p className="font-['JetBrains_Mono',monospace] text-xs text-[#2670a8]">DAILY PICKS</p>
-          <h2 className="mt-2 text-2xl font-normal tracking-tight text-slate-950">Fresh cards for today</h2>
+          <h2 className="mt-2 font-['Bricolage_Grotesque_Variable',Inter,sans-serif] text-2xl font-normal tracking-tight text-slate-950">Fresh cards for today</h2>
         </div>
         <span className="rounded-full bg-[#edf8ee] px-3 py-1 text-xs text-[#215d27]">{picks.length} picks</span>
       </div>
@@ -4491,7 +4491,7 @@ function MissionPanel({ posts, shares, likedIds, savedIds, answers, onSelectProd
       <div className="flex items-start justify-between gap-4">
         <div>
           <p className="font-['JetBrains_Mono',monospace] text-xs text-[#2670a8]">TODAY</p>
-          <h2 className="mt-2 text-2xl font-normal tracking-tight text-slate-950">{completed} / {missions.length} launch loops</h2>
+          <h2 className="mt-2 font-['Bricolage_Grotesque_Variable',Inter,sans-serif] text-2xl font-normal tracking-tight text-slate-950">{completed} / {missions.length} launch loops</h2>
           <p className="mt-1 text-sm text-slate-500">Useful actions unlock better matching and more reach.</p>
         </div>
         <button type="button" onClick={() => onSelectProduct('extra-swipes-10')} className="shrink-0 rounded-full bg-[#edf8ee] px-3 py-1 text-xs text-[#215d27]">+ swipes</button>
@@ -4919,7 +4919,7 @@ function RecommendationLoopPanel({ insights, onOpenOffer }) {
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="font-['JetBrains_Mono',monospace] text-xs text-[#2670a8]">RECOMMENDATION LOOP</p>
-          <h2 className="mt-2 text-2xl font-normal tracking-tight text-slate-950">What RentEazy learned</h2>
+          <h2 className="mt-2 font-['Bricolage_Grotesque_Variable',Inter,sans-serif] text-2xl font-normal tracking-tight text-slate-950">What RentEazy learned</h2>
           <p className="mt-1 text-sm leading-6 text-slate-500">Your actions change Feed rank, swipe priority, and relevant perks. No fake scarcity, no hidden trust boosts.</p>
         </div>
         <Sparkles className="mt-1 h-5 w-5 text-[#2f7d32]" />
@@ -5009,7 +5009,7 @@ function ReferralLoopPanel({ profile, referrals, onCreateReferral }) {
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="font-['JetBrains_Mono',monospace] text-xs text-[#2670a8]">INVITE LOOP</p>
-          <h2 className="mt-2 text-2xl font-normal tracking-tight text-slate-950">Bring the right side of the market in</h2>
+          <h2 className="mt-2 font-['Bricolage_Grotesque_Variable',Inter,sans-serif] text-2xl font-normal tracking-tight text-slate-950">Bring the right side of the market in</h2>
           <p className="mt-1 text-sm leading-6 text-slate-500">Useful invites improve liquidity: buddies bring buddies, landlords bring supply, sourcers bring deals, investors bring criteria.</p>
         </div>
         <UserPlus className="mt-1 h-5 w-5 text-[#2f7d32]" />
@@ -5065,7 +5065,7 @@ function ResidentModePanel({ residentProfiles, maintenanceRequests, rentRecords,
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="font-['JetBrains_Mono',monospace] text-xs text-[#2670a8]">RESIDENT MODE</p>
-          <h2 className="mt-2 text-2xl font-normal tracking-tight text-slate-950">Stay useful after move-in</h2>
+          <h2 className="mt-2 font-['Bricolage_Grotesque_Variable',Inter,sans-serif] text-2xl font-normal tracking-tight text-slate-950">Stay useful after move-in</h2>
           <p className="mt-1 text-sm leading-6 text-slate-500">Maintenance, rent history, lease reminders, and local records keep reputation growing between searches.</p>
         </div>
         <ShieldCheck className="mt-1 h-5 w-5 text-[#2f7d32]" />
@@ -5133,7 +5133,7 @@ function LandlordModePanel({ properties, posts, onAddProperty }) {
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="font-['JetBrains_Mono',monospace] text-xs text-[#2670a8]">LANDLORD MODE</p>
-          <h2 className="mt-2 text-2xl font-normal tracking-tight text-slate-950">Demand before vacancy</h2>
+          <h2 className="mt-2 font-['Bricolage_Grotesque_Variable',Inter,sans-serif] text-2xl font-normal tracking-tight text-slate-950">Demand before vacancy</h2>
           <p className="mt-1 text-sm leading-6 text-slate-500">Properties connect to tenant demand, agent routes, operator offers, and investor interest.</p>
         </div>
         <Home className="mt-1 h-5 w-5 text-[#2f7d32]" />
@@ -5185,7 +5185,7 @@ function ProfessionalModePanel({ profile, professionalProfiles, posts, groups })
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="font-['JetBrains_Mono',monospace] text-xs text-[#2670a8]">PROFESSIONAL MODE</p>
-          <h2 className="mt-2 text-2xl font-normal tracking-tight text-slate-950">Pipeline, status, and market signal</h2>
+          <h2 className="mt-2 font-['Bricolage_Grotesque_Variable',Inter,sans-serif] text-2xl font-normal tracking-tight text-slate-950">Pipeline, status, and market signal</h2>
           <p className="mt-1 text-sm leading-6 text-slate-500">Agents, sourcers, investors, and operators get reputation, followership, deal flow, and response metrics.</p>
         </div>
         <BadgeCheck className="mt-1 h-5 w-5 text-[#2f7d32]" />
@@ -5229,7 +5229,7 @@ function TenantDemandPipelinePanel({ signals, properties, introductions, onShort
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="font-['JetBrains_Mono',monospace] text-xs text-[#2670a8]">TENANT DEMAND PIPELINE</p>
-          <h2 className="mt-2 text-2xl font-normal tracking-tight text-slate-950">Demand landlords can act on</h2>
+          <h2 className="mt-2 font-['Bricolage_Grotesque_Variable',Inter,sans-serif] text-2xl font-normal tracking-tight text-slate-950">Demand landlords can act on</h2>
           <p className="mt-1 text-sm leading-6 text-slate-500">Looking posts, buddy-up posts, and market signals become shortlists for landlord, agent, and operator workflows.</p>
         </div>
         <Users className="mt-1 h-5 w-5 text-[#2f7d32]" />
@@ -5281,7 +5281,7 @@ function DealTrackingPanel({ posts, watchlist, onWatchDeal, onUpdateDealStatus }
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="font-['JetBrains_Mono',monospace] text-xs text-[#2670a8]">DEAL WATCHLIST</p>
-          <h2 className="mt-2 text-2xl font-normal tracking-tight text-slate-950">Follow the money signals</h2>
+          <h2 className="mt-2 font-['Bricolage_Grotesque_Variable',Inter,sans-serif] text-2xl font-normal tracking-tight text-slate-950">Follow the money signals</h2>
           <p className="mt-1 text-sm leading-6 text-slate-500">Investors, sourcers, and operators can watch briefs, deals, landlord opportunities, and operator offers.</p>
         </div>
         <Bookmark className="mt-1 h-5 w-5 text-[#2f7d32]" />
@@ -5342,7 +5342,7 @@ function OperatorSignalsPanel({ signals, onAddSignal }) {
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="font-['JetBrains_Mono',monospace] text-xs text-[#2670a8]">OPERATOR SIGNALS</p>
-          <h2 className="mt-2 text-2xl font-normal tracking-tight text-slate-950">Portfolio demand map</h2>
+          <h2 className="mt-2 font-['Bricolage_Grotesque_Variable',Inter,sans-serif] text-2xl font-normal tracking-tight text-slate-950">Portfolio demand map</h2>
           <p className="mt-1 text-sm leading-6 text-slate-500">Operators can publish areas, property needs, and model signals without turning the app into a dashboard.</p>
         </div>
         <Compass className="mt-1 h-5 w-5 text-[#2f7d32]" />
@@ -5447,7 +5447,7 @@ function GroupsPanel({ groups, memberships, onJoinGroup, onCreateGroup, compact 
       <div className="flex items-start justify-between gap-4">
         <div>
           <p className="font-['JetBrains_Mono',monospace] text-xs text-[#2670a8]">GROUPS</p>
-          <h2 className="mt-2 text-2xl font-normal tracking-tight text-slate-950">Find your rental people</h2>
+          <h2 className="mt-2 font-['Bricolage_Grotesque_Variable',Inter,sans-serif] text-2xl font-normal tracking-tight text-slate-950">Find your rental people</h2>
           <p className="mt-1 text-sm leading-6 text-slate-500">Area communities, role networks, and deal rooms keep the Feed alive between searches.</p>
         </div>
         <button type="button" onClick={() => setCreating((value) => !value)} className="shrink-0 rounded-full bg-[#092243] px-4 py-2 text-sm text-white">Create group</button>
@@ -5705,7 +5705,7 @@ function RoleLanesPanel({ profile, onSelectTab }) {
       <div className="flex items-center justify-between gap-3">
         <div>
           <p className="font-['JetBrains_Mono',monospace] text-xs text-[#2670a8]">MARKET LANES</p>
-          <h2 className="mt-2 text-2xl font-normal tracking-tight text-slate-950">Whole-market Feed</h2>
+          <h2 className="mt-2 font-['Bricolage_Grotesque_Variable',Inter,sans-serif] text-2xl font-normal tracking-tight text-slate-950">Whole-market Feed</h2>
           <p className="mt-1 text-sm text-slate-500">Role-aware, but never one-sided.</p>
         </div>
         <a href="/app/profile" className="rounded-full bg-[#edf7ff] px-3 py-1 text-xs text-[#154f79]">Change role</a>
@@ -5743,7 +5743,7 @@ function TractionPanel({ posts, likedIds, savedIds, shares, comments, onBoost })
       <div className="flex items-center justify-between gap-3">
         <div>
           <p className="font-['JetBrains_Mono',monospace] text-xs text-[#2670a8]">TRACTION</p>
-          <h2 className="mt-2 text-2xl font-normal tracking-tight text-slate-950">Your signals</h2>
+          <h2 className="mt-2 font-['Bricolage_Grotesque_Variable',Inter,sans-serif] text-2xl font-normal tracking-tight text-slate-950">Your signals</h2>
         </div>
         <button type="button" onClick={() => onBoost('post-bump-small')} className="rounded-full bg-[#092243] px-4 py-2 text-sm text-white">Boost from 29p</button>
       </div>
@@ -5769,7 +5769,7 @@ function AdsInventoryPanel({ onBoost }) {
   return (
     <div className="rounded-3xl border border-[#d5ecd7] bg-[#edf8ee] p-4 text-[#215d27] shadow-[0_14px_34px_-28px_rgba(15,23,42,0.35)]">
       <p className="font-['JetBrains_Mono',monospace] text-xs">RENTEAZY ADS</p>
-      <h2 className="mt-2 text-2xl font-normal tracking-tight text-slate-950">Reach rental intent</h2>
+      <h2 className="mt-2 font-['Bricolage_Grotesque_Variable',Inter,sans-serif] text-2xl font-normal tracking-tight text-slate-950">Reach rental intent</h2>
       <div className="mt-4 space-y-2">
         {inventory.map(([title, body]) => (
           <div key={title} className="rounded-2xl bg-white/72 p-3">
@@ -5849,7 +5849,7 @@ function MatchPipelinePanel({ matches, messages, viewings, reviews, onSendMessag
     return (
       <section className="rounded-[1.75rem] border border-white bg-white/92 p-5 shadow-[0_18px_44px_-34px_rgba(15,23,42,0.45),inset_0_1px_0_white]">
         <p className="font-['JetBrains_Mono',monospace] text-xs text-[#2670a8]">MATCH PIPELINE</p>
-        <h2 className="mt-2 text-2xl font-normal tracking-tight text-slate-950">No mutual matches yet</h2>
+        <h2 className="mt-2 font-['Bricolage_Grotesque_Variable',Inter,sans-serif] text-2xl font-normal tracking-tight text-slate-950">No mutual matches yet</h2>
         <p className="mt-2 text-sm leading-6 text-slate-600">Like or Superlike a suitable swipe card. Chat opens only after a mutual match.</p>
         <a href="/app/swipe" className="mt-4 inline-flex rounded-full bg-[#2f7d32] px-5 py-3 text-sm text-white">Open Swipe</a>
       </section>
@@ -5892,7 +5892,7 @@ function MatchPipelinePanel({ matches, messages, viewings, reviews, onSendMessag
       <div className="flex items-start justify-between gap-4">
         <div>
           <p className="font-['JetBrains_Mono',monospace] text-xs text-[#2670a8]">MATCH PIPELINE</p>
-          <h2 className="mt-2 text-2xl font-normal tracking-tight text-slate-950">Match → Chat → Viewing → Review</h2>
+          <h2 className="mt-2 font-['Bricolage_Grotesque_Variable',Inter,sans-serif] text-2xl font-normal tracking-tight text-slate-950">Match → Chat → Viewing → Review</h2>
           <p className="mt-1 text-sm leading-6 text-slate-500">Messages open only after mutual interest. Viewings and feedback build reputation.</p>
         </div>
         <span className="rounded-full bg-[#edf8ee] px-3 py-1 text-xs text-[#215d27]">{matches.length} active</span>
@@ -6176,7 +6176,7 @@ function MiniShopPanel({ onSelectProduct, compact = false }) {
   return (
     <div className="rounded-[1.75rem] border border-white bg-white/86 p-5 shadow-[0_18px_44px_-34px_rgba(15,23,42,0.45),inset_0_1px_0_white]">
       <p className="font-['JetBrains_Mono',monospace] text-xs text-[#2670a8]">PERKS</p>
-      <h2 className="mt-2 text-2xl font-normal tracking-tight text-slate-950">Boosts and extras</h2>
+      <h2 className="mt-2 font-['Bricolage_Grotesque_Variable',Inter,sans-serif] text-2xl font-normal tracking-tight text-slate-950">Boosts and extras</h2>
       <p className="mt-2 text-sm leading-6 text-slate-600">Small paid extras are clearly priced. Credits can keep low-cost actions simple and transparent.</p>
       <div className="mt-4 grid gap-2">
         {products.map((product) => (
@@ -6200,7 +6200,7 @@ function ClerkBillingSurface() {
     return (
       <div className="rounded-[1.75rem] border border-[#d5ecd7] bg-[#edf8ee] p-5 text-[#215d27]">
         <p className="font-['JetBrains_Mono',monospace] text-xs">BILLING</p>
-        <h2 className="mt-2 text-2xl font-normal tracking-tight text-slate-950">Sign in to manage plans.</h2>
+        <h2 className="mt-2 font-['Bricolage_Grotesque_Variable',Inter,sans-serif] text-2xl font-normal tracking-tight text-slate-950">Sign in to manage plans.</h2>
           <p className="mt-2 text-sm leading-6">Plans, seats, paid extras, and billing are handled securely inside your RentEazy account.</p>
         <SignInButton mode="modal" fallbackRedirectUrl="/app/billing">
           <button type="button" className="mt-4 inline-flex w-full items-center justify-center rounded-full bg-[#2f7d32] px-5 py-3 text-sm text-white">Sign in</button>
@@ -6517,7 +6517,7 @@ function BillingPanel({ onSelectProduct, purchases, boosts, wallet }) {
       ) : (
         <div className="rounded-[1.75rem] border border-[#fed7aa] bg-[#fff7ed] p-5 text-[#9a3412]">
           <p className="font-['JetBrains_Mono',monospace] text-xs">BILLING SETUP</p>
-          <h2 className="mt-2 text-2xl font-normal tracking-tight text-slate-950">Billing is ready to connect.</h2>
+          <h2 className="mt-2 font-['Bricolage_Grotesque_Variable',Inter,sans-serif] text-2xl font-normal tracking-tight text-slate-950">Billing is ready to connect.</h2>
           <p className="mt-2 text-sm leading-6">Connect billing products before taking live payments. Until then, this screen only previews the offer flow.</p>
         </div>
       )}
@@ -6568,7 +6568,7 @@ function BoostPerformanceCard({ boosts, onBoost }) {
   return (
     <div className="rounded-[1.75rem] border border-white bg-white/86 p-5 shadow-[0_18px_44px_-34px_rgba(15,23,42,0.45),inset_0_1px_0_white]">
       <p className="font-['JetBrains_Mono',monospace] text-xs text-[#2670a8]">BOOSTS</p>
-      <h2 className="mt-2 text-2xl font-normal tracking-tight text-slate-950">{activeBoosts.length} active</h2>
+      <h2 className="mt-2 font-['Bricolage_Grotesque_Variable',Inter,sans-serif] text-2xl font-normal tracking-tight text-slate-950">{activeBoosts.length} active</h2>
       <div className="mt-4 grid grid-cols-2 gap-2 text-sm">
         {Object.entries(totals).map(([key, value]) => (
           <div key={key} className="rounded-2xl bg-slate-50 p-3">
@@ -6586,7 +6586,7 @@ function ModerationQueueCard({ reports }) {
   return (
     <div className="rounded-[1.75rem] border border-white bg-white/86 p-5 shadow-[0_18px_44px_-34px_rgba(15,23,42,0.45),inset_0_1px_0_white]">
       <p className="font-['JetBrains_Mono',monospace] text-xs text-[#ef4444]">MODERATION</p>
-      <h2 className="mt-2 text-2xl font-normal tracking-tight text-slate-950">{reports.length} reports</h2>
+      <h2 className="mt-2 font-['Bricolage_Grotesque_Variable',Inter,sans-serif] text-2xl font-normal tracking-tight text-slate-950">{reports.length} reports</h2>
       <p className="mt-2 text-sm leading-6 text-slate-600">Reports are queued for review. Sponsored posts use the same report flow.</p>
     </div>
   );
