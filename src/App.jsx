@@ -4561,7 +4561,7 @@ function LikesSocialInbox({ posts, likedIds, savedIds, matches, matchMessages, p
   const hiddenLikeCount = Math.max(0, likedIds.length + matches.length - 1);
 
   return (
-    <section className="overflow-hidden rounded-[2rem] border border-white bg-white shadow-[0_24px_70px_-50px_rgba(15,23,42,0.62)]">
+    <section className="max-w-full overflow-hidden rounded-[2rem] border border-white bg-white shadow-[0_24px_70px_-50px_rgba(15,23,42,0.62)]">
       <div className="flex items-center gap-3 border-b border-slate-100 p-4 sm:p-5">
         <PeepAvatar
           seed={`${profile.id}-${profile.name}-${profile.role}`}
@@ -4576,13 +4576,13 @@ function LikesSocialInbox({ posts, likedIds, savedIds, matches, matchMessages, p
           <h1 className="font-['Bricolage_Grotesque_Variable',Inter,sans-serif] text-2xl font-normal tracking-tight text-slate-950">Likes</h1>
           <p className="truncate text-sm text-slate-500">Matches, saved posts, and useful threads in one place.</p>
         </div>
-        <button type="button" onClick={() => onSelectProduct('reveal-like-1')} className="rounded-full bg-[#092243] px-4 py-2 text-sm font-semibold text-white">Unlock</button>
+        <button type="button" onClick={() => onSelectProduct('reveal-like-1')} className="shrink-0 rounded-full bg-[#092243] px-3 py-2 text-xs font-semibold text-white sm:px-4 sm:text-sm">Unlock</button>
       </div>
 
       <div className="p-4 sm:p-5">
-        <div className="flex items-center gap-2 rounded-full bg-[#f3f6f8] px-4 py-3 text-sm text-slate-500">
+        <div className="flex min-w-0 items-center gap-2 rounded-full bg-[#f3f6f8] px-4 py-3 text-sm text-slate-500">
           <Search className="h-4 w-4" />
-          <span>Search matches, saved posts, people</span>
+          <span className="min-w-0 truncate">Search matches, saved posts, people</span>
         </div>
         <div className="mt-3 flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none]">
           {['All', 'Matches', 'Liked', 'Saved', 'Viewing'].map((chip, index) => (
@@ -4632,7 +4632,7 @@ function LikesSocialInbox({ posts, likedIds, savedIds, matches, matchMessages, p
               <span className="line-clamp-1 block text-sm text-slate-500">{row.subtitle}</span>
               <span className="mt-1 block text-xs text-slate-400">{row.meta}</span>
             </span>
-            <span className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-semibold ${row.kind === 'match' ? 'bg-[#edf8ee] text-[#215d27]' : 'bg-[#f3f6f8] text-slate-500'}`}>{row.badge}</span>
+            <span className={`max-w-[4.25rem] shrink-0 truncate rounded-full px-2.5 py-1 text-xs font-semibold ${row.kind === 'match' ? 'bg-[#edf8ee] text-[#215d27]' : 'bg-[#f3f6f8] text-slate-500'}`}>{row.badge}</span>
           </button>
         ))}
 
@@ -7133,6 +7133,23 @@ function RentEazyAppContainer({ isPreviewVisitor = false }) {
   const recommendedOfferIds = new Set((activeRecommendationInsights?.perkRecommendations || []).map((offer) => offer.offerId));
   const sortedPartnerOffers = useMemo(() => [...partnerOffers].sort((a, b) => Number(recommendedOfferIds.has(b.id)) - Number(recommendedOfferIds.has(a.id))), [partnerOffers, activeRecommendationInsights]);
   const dailyPicks = rankedSwipeCards.slice(0, 3);
+  const previewLockedRoute = isPreviewVisitor ? {
+    Likes: {
+      action: 'likes',
+      title: 'Create an account to see your rental activity',
+      body: 'Likes, saved posts, matches, messages, and viewing threads are available after signup so the app can keep your real history together.',
+    },
+    Profile: {
+      action: 'profile',
+      title: 'Create an account to build your RentEazy profile',
+      body: 'Your role, avatar, match answers, reputation progress, and resident records belong to your account.',
+    },
+    Billing: {
+      action: 'billing',
+      title: 'Create an account to manage RentEazy plans and perks',
+      body: 'Free Feed and preview browsing stay open. Account-only plans, credits, boosts, and Protect records appear after signup.',
+    },
+  }[routeTab] : null;
 
   useEffect(() => {
     const seedById = new Map(allSeededFeedPosts.map((post) => [post.id, post]));
@@ -7902,14 +7919,8 @@ function RentEazyAppContainer({ isPreviewVisitor = false }) {
       />
       {!isPreviewVisitor && <GlobalChatWidget matches={matches} messages={matchMessages} profile={profile} onSendMessage={sendMatchMessage} routeTab={routeTab} />}
       {routeTab !== 'Feed' && routeTab !== 'Swipe' && <header className="sticky top-0 z-40 px-3 pt-3">
-        <div className={`mx-auto flex items-center justify-between gap-2 rounded-[1.45rem] border border-white/80 bg-white/78 px-3 py-2 shadow-[0_18px_48px_-34px_rgba(15,23,42,0.55),inset_0_1px_0_rgba(255,255,255,0.96)] backdrop-blur-2xl ${routeTab === 'Feed' ? 'max-w-2xl' : routeTab === 'Swipe' ? 'max-w-xl' : 'max-w-6xl'}`}>
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-2 rounded-[1.45rem] border border-white/80 bg-white/78 px-3 py-2 shadow-[0_18px_48px_-34px_rgba(15,23,42,0.55),inset_0_1px_0_rgba(255,255,255,0.96)] backdrop-blur-2xl">
           <BrandLogo compact />
-          {routeTab === 'Feed' && (
-            <button type="button" onClick={() => setActiveFeedTab('For You')} className="flex min-w-0 flex-1 items-center gap-2 rounded-full bg-[#f7faf9] px-3 py-2 text-left text-xs text-slate-500 ring-1 ring-black/5 sm:max-w-xs">
-              <Search className="h-4 w-4 shrink-0 text-slate-400" />
-              <span className="truncate">Search areas, posts, groups</span>
-            </button>
-          )}
           <nav className="hidden items-center gap-2 md:flex">
             {navItems.map(([label, href, Icon]) => (
               <a key={label} href={href} className={`inline-flex items-center gap-2 rounded-full px-3 py-2 text-sm ${routeTab === label ? 'bg-[#092243] text-white shadow-[0_12px_24px_-18px_rgba(9,34,67,0.75)]' : 'text-slate-600 hover:bg-slate-50'}`}>
@@ -7919,7 +7930,9 @@ function RentEazyAppContainer({ isPreviewVisitor = false }) {
             ))}
           </nav>
           <div className="flex items-center gap-2">
-            <a href="/app/profile" className="hidden rounded-full bg-[#edf7ff] px-3 py-1.5 text-xs text-[#154f79] sm:inline-flex">{displayRole(profile.role)}</a>
+            {isPreviewVisitor
+              ? <a href="/signup" className="hidden rounded-full bg-[#edf8ee] px-3 py-1.5 text-xs font-semibold text-[#215d27] sm:inline-flex">Sign up</a>
+              : <a href="/app/profile" className="hidden rounded-full bg-[#edf7ff] px-3 py-1.5 text-xs text-[#154f79] sm:inline-flex">{displayRole(profile.role)}</a>}
             <span className={`hidden rounded-full px-3 py-1.5 text-xs lg:inline-flex ${backendStatus === 'connected' ? 'bg-[#edf8ee] text-[#215d27]' : backendStatus === 'checking' ? 'bg-[#edf7ff] text-[#154f79]' : 'bg-[#fff7ed] text-[#9a3412]'}`}>{backendStatus === 'connected' ? 'API connected' : backendStatus === 'checking' ? 'API checking' : 'Offline mode'}</span>
             {clerkEnabled ? <ClerkAccountControls /> : <button className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-slate-600 ring-1 ring-black/5"><Bell className="h-4 w-4" /></button>}
           </div>
@@ -7964,184 +7977,13 @@ function RentEazyAppContainer({ isPreviewVisitor = false }) {
             visibleFeedItems={visibleFeedItems}
           />
         )}
-        {false && routeTab === 'Feed' && (
-          <aside className="sticky top-5 hidden space-y-4 lg:block">
-            <div className="rounded-[1.65rem] border border-white/80 bg-white/88 p-4 shadow-[0_18px_48px_-38px_rgba(15,23,42,0.48),inset_0_1px_0_rgba(255,255,255,0.96)] backdrop-blur-xl">
-              <a href="/app/feed" className="flex items-baseline gap-0.5 text-2xl font-bold tracking-tight text-[#092243]">
-                Rent<span className="text-[#2f7d32]">Eazy</span>
-              </a>
-              <p className="mt-1 text-xs font-medium text-slate-400">EasyPeazy</p>
-              <nav className="mt-5 space-y-1.5">
-                {navItems.map(([label, href, Icon]) => (
-                  <a key={label} href={href} className={`flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-semibold transition ${routeTab === label ? 'bg-[#092243] text-white shadow-[0_12px_28px_-18px_rgba(9,34,67,0.7)]' : 'text-slate-600 hover:bg-slate-50'}`}>
-                    <Icon className="h-4 w-4" />
-                    {label}
-                  </a>
-                ))}
-              </nav>
-              <a href="/app/post" className="mt-5 flex items-center justify-center gap-2 rounded-full bg-[#2f7d32] px-4 py-3 text-sm font-semibold text-white shadow-[0_16px_34px_-22px_rgba(47,125,50,0.72)]">
-                <PlusCircle className="h-4 w-4" />
-                Post to Feed
-              </a>
-            </div>
-
-            <div className="rounded-[1.65rem] border border-white/80 bg-white/78 p-4 shadow-[0_18px_48px_-40px_rgba(15,23,42,0.42)] backdrop-blur-xl">
-              <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[#2670a8]">Market rooms</p>
-              <div className="mt-3 space-y-2">
-                {['East London Renters', 'London Landlords', 'Operators & Hosts'].map((groupName) => (
-                  <button key={groupName} type="button" onClick={() => setActiveFeedTab('Groups')} className="flex w-full items-center justify-between rounded-2xl bg-white px-3 py-2 text-left text-sm text-slate-700 ring-1 ring-black/5">
-                    <span className="truncate">{groupName}</span>
-                    <Users className="h-4 w-4 text-slate-400" />
-                  </button>
-                ))}
-              </div>
-            </div>
-          </aside>
-        )}
-        {routeTab !== 'Feed' && <section className="min-w-0">
-          {routeTab === 'Feed' && (
-            <>
-              <div className="sticky top-0 z-40 -mx-3 space-y-4 bg-white/96 px-6 pb-4 pt-5 backdrop-blur-xl lg:hidden">
-                <div className="flex items-center justify-between gap-3">
-                  <a href="/app/feed" className="flex items-baseline gap-0.5 text-[1.35rem] font-bold tracking-tight text-[#050506]">
-                    Rent<span className="text-[#2f7d32]">Eazy</span>
-                  </a>
-                  <div className="flex items-center gap-2">
-                    <button type="button" onClick={() => setActiveFeedTab('Groups')} className="grid h-10 w-10 place-items-center rounded-full bg-[#f3f6f8] text-[#050506]"><Users className="h-4 w-4" /></button>
-                    <a href="/app/post" className="grid h-10 w-10 place-items-center rounded-full bg-[#050506] text-white shadow-[0_16px_34px_-22px_rgba(0,0,0,0.75)]"><PlusCircle className="h-4 w-4" /></a>
-                    <a href="/app/swipe" className="grid h-10 w-10 place-items-center rounded-full bg-[#bff4ef] text-[#050506]"><Flame className="h-4 w-4" /></a>
-                  </div>
-                </div>
-                <div>
-                  <h1 className="text-[2.7rem] font-bold leading-none tracking-tight text-[#050506]">Feed</h1>
-                  <p className="mt-1 text-sm font-medium text-slate-400">{activeFeedTab}</p>
-                </div>
-                <SocialStoryRail posts={posts} groups={groups} onSelectTab={setActiveFeedTab} />
-                <a href="/app/post" className="flex items-center gap-3 rounded-[1.55rem] bg-[#f4f7f8] px-3 py-3">
-                  <PeepAvatar
-                    seed={`${profile.id}-${profile.name}-${profile.role}`}
-                    variant={profile.avatarVariant || 'bust'}
-                    avatarIndex={profile.avatarIndex}
-                    avatarBg={profile.avatarBg || 'mist'}
-                    className="h-10 w-10"
-                    imageClassName={(profile.avatarVariant || 'bust') === 'bust' ? '' : 'object-contain p-1'}
-                  />
-                  <span className="min-w-0">
-                    <span className="block truncate text-sm font-bold text-slate-950">Post into RentEazy</span>
-                    <span className="block truncate text-xs font-medium text-slate-400">Listings, questions, updates</span>
-                  </span>
-                </a>
-                <div className="-mx-6 overflow-x-auto px-6 [scrollbar-width:none]">
-                  <div className="flex min-w-max gap-2 pb-1">
-                  {feedTabs.map((tab) => (
-                    <button key={tab} onClick={() => setActiveFeedTab(tab)} className={`rounded-full px-4 py-2 text-sm font-bold transition ${activeFeedTab === tab ? 'bg-[#050506] text-white shadow-[0_14px_28px_-20px_rgba(0,0,0,0.7)]' : 'bg-[#f4f7f8] text-slate-500'}`}>{tab}</button>
-                  ))}
-                  </div>
-                </div>
-              </div>
-              <div className="hidden lg:block">
-                <SocialHomeHeader profile={profile} usageLimit={usageLimit} groups={groups} memberships={groupMemberships} posts={posts} onSelectTab={setActiveFeedTab} />
-                <div className="mb-4 rounded-[1.6rem] border border-white/80 bg-white/88 p-4 shadow-[0_18px_48px_-38px_rgba(15,23,42,0.42),inset_0_1px_0_rgba(255,255,255,0.96)] backdrop-blur-xl">
-                  <a href="/app/post" className="flex items-center gap-3">
-                    <PeepAvatar
-                      seed={`${profile.id}-${profile.name}-${profile.role}`}
-                      variant={profile.avatarVariant || 'bust'}
-                      avatarIndex={profile.avatarIndex}
-                      avatarBg={profile.avatarBg || 'mist'}
-                      className="h-11 w-11"
-                      imageClassName={(profile.avatarVariant || 'bust') === 'bust' ? '' : 'object-contain p-1'}
-                    />
-                    <span className="min-w-0 flex-1">
-                      <span className="block truncate text-sm font-semibold text-slate-950">What are you looking for, offering, or sharing?</span>
-                      <span className="block truncate text-xs text-slate-500">Post into the rental-market network</span>
-                    </span>
-                    <span className="rounded-full bg-[#092243] px-4 py-2 text-sm font-semibold text-white">Post</span>
-                  </a>
-                </div>
-                <div className="sticky top-5 z-30 -mx-1 mb-4 overflow-x-auto px-1 [scrollbar-width:none]">
-                  <div className="flex min-w-max gap-2 pb-1">
-                    {feedTabs.map((tab) => (
-                      <button key={tab} onClick={() => setActiveFeedTab(tab)} className={`rounded-full px-4 py-2 text-sm font-semibold transition ${activeFeedTab === tab ? 'bg-[#092243] text-white shadow-[0_14px_28px_-20px_rgba(9,34,67,0.65)]' : 'bg-white text-slate-600 shadow-[0_10px_24px_-22px_rgba(15,23,42,0.45)] ring-1 ring-white/80'}`}>{tab}</button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-              {newPost && (
-                <div className="mt-4 rounded-3xl border border-[#d5ecd7] bg-[#edf8ee] p-4">
-                  <p className="text-sm font-medium text-[#215d27]">Want more people to see this?</p>
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    <button onClick={() => setSharePost(newPost)} className="rounded-full bg-[#2f7d32] px-4 py-2 text-sm text-white">Share Everywhere</button>
-                    <button onClick={() => openUpsell('post-bump-small')} className="rounded-full bg-[#092243] px-4 py-2 text-sm text-white">Boost post from 29p</button>
-                  </div>
-                </div>
-              )}
-              {openedOfferId && (
-                <div className="mt-4 rounded-3xl border border-[#d5ecd7] bg-[#edf8ee] px-4 py-3 text-sm text-[#215d27]">
-                  Perk opened. RentEazy records the signal so future offers can be more relevant.
-                </div>
-              )}
-              {isPreviewVisitor && (
-                <div className="mt-4">
-                  <FeedPreviewBanner onSignup={() => requireAccount('continue')} />
-                </div>
-              )}
-              <div className="space-y-4 pb-4">
-                {activeFeedTab === 'Groups' ? (
-                  <GroupsPanel groups={groups} memberships={groupMemberships} onJoinGroup={joinGroup} onCreateGroup={createGroup} />
-                ) : activeFeedTab === 'Perks' ? (
-                  <PerksRail partnerOffers={sortedPartnerOffers} profile={profile} onOpenOffer={openPartnerOffer} />
-                ) : (
-                  visibleFeedItems.map((item, index) => {
-                    const post = item.post;
-                    const lockedPreviewCard = isPreviewVisitor && index >= 2;
-                    return (
-                    <React.Fragment key={item.streamId}>
-                      <div className="relative">
-                        <div className={lockedPreviewCard ? 'pointer-events-none select-none blur-[2.5px]' : ''}>
-                      <FeedTimelineCard
-                        post={post}
-                        ranking={{ ...item.ranking, sequence: item.sequence, rewardSpike: item.rewardSpike }}
-                        card={item.card}
-                        liked={likedIds.includes(post.id)}
-                        saved={savedIds.includes(post.id)}
-                        followed={followedIds.includes(post.authorId)}
-                        commentCount={post.commentCount + comments.filter((comment) => comment.postId === post.id).length}
-                        onOpen={() => guardedOpenFeedItem(index)}
-                        onLike={guardedToggleLike}
-                        onSave={guardedToggleSave}
-                        onFollow={guardedToggleFollow}
-                        onShare={guardedShare}
-                        onComment={guardedComment}
-                        onReport={guardedReport}
-                      />
-                        </div>
-                        {lockedPreviewCard && (
-                          <button
-                            type="button"
-                            onClick={() => requireAccount('continue')}
-                            className="absolute inset-0 grid place-items-center rounded-[2.1rem] bg-[#092243]/28 p-5 text-center backdrop-blur-[1px]"
-                          >
-                            <span className="rounded-[1.5rem] bg-white px-5 py-4 text-sm font-bold text-[#092243] shadow-[0_24px_60px_-36px_rgba(15,23,42,0.72)]">
-                              Create a free account to keep browsing and interact
-                            </span>
-                          </button>
-                        )}
-                      </div>
-                      {primaryContextualUpsell && !isPreviewVisitor && index === 3 && (
-                        <GenUpsellCard
-                          card={primaryContextualUpsell}
-                          onSelectProduct={openUpsell}
-                          onDismiss={dismissUpsell}
-                          onSharePost={setSharePost}
-                          newPost={newPost}
-                        />
-                      )}
-                    </React.Fragment>
-                    );
-                  })
-                )}
-              </div>
-            </>
+        {routeTab !== 'Feed' && <section className="min-w-0 overflow-x-hidden">
+          {previewLockedRoute && (
+            <PreviewRouteGate
+              action={previewLockedRoute.action}
+              title={previewLockedRoute.title}
+              body={previewLockedRoute.body}
+            />
           )}
 
           {routeTab === 'Post' && (
@@ -8171,7 +8013,7 @@ function RentEazyAppContainer({ isPreviewVisitor = false }) {
             />
           )}
 
-          {routeTab === 'Likes' && (
+          {!previewLockedRoute && routeTab === 'Likes' && (
             <LikesScreen
               components={appScreenComponents}
               dismissUpsell={dismissUpsell}
@@ -8190,7 +8032,7 @@ function RentEazyAppContainer({ isPreviewVisitor = false }) {
             />
           )}
 
-          {routeTab === 'Profile' && (
+          {!previewLockedRoute && routeTab === 'Profile' && (
             <ProfileScreen
               answers={answers}
               comments={comments}
@@ -8218,7 +8060,7 @@ function RentEazyAppContainer({ isPreviewVisitor = false }) {
             />
           )}
 
-          {routeTab === 'Billing' && (
+          {!previewLockedRoute && routeTab === 'Billing' && (
             <BillingScreen boosts={boosts} components={appScreenComponents} openUpsell={openUpsell} purchases={purchases} wallet={wallet} />
           )}
         </section>}
@@ -8360,7 +8202,7 @@ function LegalPage({ kind }) {
 
 function ClerkRentEazyAppContainer() {
   const { isLoaded, isSignedIn } = useUser();
-  return <RentEazyAppContainer isPreviewVisitor={isLoaded && !isSignedIn} />;
+  return <RentEazyAppContainer isPreviewVisitor={!isLoaded || !isSignedIn} />;
 }
 
 export default function App() {
@@ -8368,7 +8210,8 @@ export default function App() {
   const pathname = typeof window === 'undefined' ? '/' : window.location.pathname;
 
   if (pathname.startsWith('/app')) {
-    return clerkEnabled ? <ClerkRentEazyAppContainer /> : <RentEazyAppContainer isPreviewVisitor />;
+    const hasLocalApiSession = Boolean(getStoredJson('renteazy-api-token', ''));
+    return clerkEnabled ? <ClerkRentEazyAppContainer /> : <RentEazyAppContainer isPreviewVisitor={!hasLocalApiSession} />;
   }
 
   if (pathname.startsWith('/signup') || pathname.startsWith('/waitlist')) {
@@ -8411,8 +8254,8 @@ export default function App() {
                 ))}
               </div>
               <div className="flex items-center gap-2">
-                <a href="#feed" className="hidden sm:inline-flex items-center justify-center rounded-full px-4 py-2 text-xs text-slate-700 bg-white/78 border border-slate-200 shadow-[0_1px_2px_rgba(15,23,42,0.04),inset_0_1px_0_white] hover:bg-white hover:text-[#2f7d32] transition-all duration-300">Browse Feed</a>
-                <a href="#match" className="inline-flex items-center justify-center whitespace-nowrap rounded-full px-4 py-2 text-xs text-white bg-linear-to-b from-[#52a832] to-[#2f7d32] border border-[#25672a] shadow-[0_5px_14px_rgba(47,125,50,0.28),inset_0_1px_0_rgba(255,255,255,0.35)] hover:from-[#64bd44] hover:to-[#3b8d3d] transition-all duration-300">Start Matching</a>
+                <a href={socialAppUrl} className="hidden sm:inline-flex items-center justify-center rounded-full px-4 py-2 text-xs text-slate-700 bg-white/78 border border-slate-200 shadow-[0_1px_2px_rgba(15,23,42,0.04),inset_0_1px_0_white] hover:bg-white hover:text-[#2f7d32] transition-all duration-300">Browse Feed</a>
+                <a href="/signup?source=nav_primary&offer=match24h" className="inline-flex items-center justify-center whitespace-nowrap rounded-full px-4 py-2 text-xs text-white bg-linear-to-b from-[#52a832] to-[#2f7d32] border border-[#25672a] shadow-[0_5px_14px_rgba(47,125,50,0.28),inset_0_1px_0_rgba(255,255,255,0.35)] hover:from-[#64bd44] hover:to-[#3b8d3d] transition-all duration-300">Start Matching</a>
               </div>
             </div>
           </div>
@@ -8483,7 +8326,7 @@ export default function App() {
                 <div className="mt-1 flex items-center gap-5 text-sm text-slate-500">
                   <a href={socialAppUrl} className="inline-flex items-center gap-1.5 hover:text-[#2f7d32] transition-colors duration-200"><iconify-icon icon="solar:feed-linear" class="text-base text-[#2670a8]"></iconify-icon>Preview the Feed</a>
                   <span className="w-px h-4 bg-slate-200" aria-hidden="true"></span>
-                  <a href={socialSignupUrl} className="inline-flex items-center gap-1.5 hover:text-[#2f7d32] transition-colors duration-200"><iconify-icon icon="solar:add-square-linear" class="text-base text-[#2f7d32]"></iconify-icon>List a Property</a>
+                  <a href="/signup?source=hero_list_property" className="inline-flex items-center gap-1.5 hover:text-[#2f7d32] transition-colors duration-200"><iconify-icon icon="solar:add-square-linear" class="text-base text-[#2f7d32]"></iconify-icon>List a Property</a>
                 </div>
                 <a href="#why-switch" className="mt-2 inline-flex items-center gap-1 text-xs text-slate-400 hover:text-[#2f7d32] transition-colors duration-200">
                   <iconify-icon icon="solar:arrow-down-linear" class="text-xs"></iconify-icon>

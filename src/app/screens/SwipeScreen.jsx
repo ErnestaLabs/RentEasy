@@ -18,13 +18,15 @@ export default function SwipeScreen({
           <ArrowDownLeft className="h-4 w-4" />
         </a>
       </div>
-      <button
-        type="button"
-        onClick={() => openUpsell('extra-swipes-10')}
-        className="fixed right-[4.25rem] top-4 z-[45] rounded-full border border-white/10 bg-white/10 px-3 py-2 text-xs font-bold text-white backdrop-blur-xl md:absolute md:right-[4.25rem] md:top-5"
-      >
-        {remainingSwipes} swipes
-      </button>
+      {!isPreviewVisitor && (
+        <button
+          type="button"
+          onClick={() => openUpsell('extra-swipes-10')}
+          className="fixed right-[4.25rem] top-4 z-[45] rounded-full border border-white/10 bg-white/10 px-3 py-2 text-xs font-bold text-white backdrop-blur-xl md:absolute md:right-[4.25rem] md:top-5"
+        >
+          {remainingSwipes} swipes
+        </button>
+      )}
       {isPreviewVisitor && (
         <div className="fixed inset-x-4 bottom-[7.25rem] z-[46] rounded-[1.5rem] bg-white p-4 text-center shadow-[0_24px_70px_-40px_rgba(0,0,0,0.82)] md:absolute md:bottom-24">
           <p className="text-sm font-bold text-[#092243]">Create a free account to start matching.</p>
