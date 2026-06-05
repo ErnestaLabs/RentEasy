@@ -707,7 +707,6 @@ const feedTabs = [
   'Investors',
   'Advice',
   'Groups',
-  'Perks',
   'Following',
 ];
 
@@ -7050,7 +7049,7 @@ function AppSupportSidebar({
  */
 function RentEazyAppContainer({ isPreviewVisitor = false }) {
   const path = typeof window === 'undefined' ? '/app/feed' : window.location.pathname;
-  const routeTab = path.includes('/billing') ? 'Billing' : path.includes('/post') ? 'Post' : path.includes('/likes') ? 'Likes' : path.includes('/profile') ? 'Profile' : path.includes('/swipe') ? 'Swipe' : 'Feed';
+  const routeTab = path.includes('/billing') ? 'Billing' : path.includes('/perks') ? 'Perks' : path.includes('/post') ? 'Post' : path.includes('/likes') ? 'Likes' : path.includes('/profile') ? 'Profile' : path.includes('/swipe') ? 'Swipe' : 'Feed';
   const [activeFeedTab, setActiveFeedTab] = useStoredState('renteazy-feed-tab', 'For You');
   const [posts, setPosts] = useStoredState('renteazy-feed-posts', allSeededFeedPosts);
   const [likedIds, setLikedIds] = useStoredState('renteazy-liked-posts', []);
@@ -7855,6 +7854,7 @@ function RentEazyAppContainer({ isPreviewVisitor = false }) {
     ['Feed', '/app/feed', Home],
     ['Swipe', '/app/swipe', Flame],
     ['Likes', '/app/likes', Heart],
+    ['Perks', '/app/perks', Gift],
     ['Post', '/app/post', PlusCircle],
     ['Profile', '/app/profile', UserRound],
   ];
@@ -8001,6 +8001,17 @@ function RentEazyAppContainer({ isPreviewVisitor = false }) {
             />
           )}
 
+          {routeTab === 'Perks' && (
+            <div className="space-y-4">
+              {openedOfferId && (
+                <div className="rounded-3xl border border-[#d5ecd7] bg-[#edf8ee] px-4 py-3 text-sm text-[#215d27]">
+                  Perk opened. RentEazy records the signal so future offers can be more relevant.
+                </div>
+              )}
+              <PerksRail partnerOffers={sortedPartnerOffers} profile={profile} onOpenOffer={openPartnerOffer} />
+            </div>
+          )}
+
           {routeTab === 'Swipe' && (
             <SwipeScreen
               components={appScreenComponents}
@@ -8083,7 +8094,7 @@ function RentEazyAppContainer({ isPreviewVisitor = false }) {
           <MiniShopPanel onSelectProduct={openUpsell} compact />
         </aside>}
 
-        {routeTab !== 'Feed' && routeTab !== 'Swipe' && routeTab !== 'Profile' && (
+        {routeTab !== 'Feed' && routeTab !== 'Swipe' && routeTab !== 'Profile' && routeTab !== 'Perks' && (
           <AppSupportSidebar
             routeTab={routeTab}
             wallet={wallet}

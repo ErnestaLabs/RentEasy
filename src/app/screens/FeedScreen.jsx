@@ -116,16 +116,9 @@ export default function FeedScreen({
           </a>
           <div className="-mx-6 overflow-x-auto px-6 [scrollbar-width:none]">
             <div className="flex min-w-max gap-2 pb-1">
-              {feedTabs.map((tab) => {
-                const active = activeFeedTab === tab;
-                const isPerks = tab === 'Perks';
-                return (
-                  <button key={tab} onClick={() => setActiveFeedTab(tab)} className={`inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-bold transition ${active ? 'bg-[#050506] text-white shadow-[0_14px_28px_-20px_rgba(0,0,0,0.7)]' : isPerks ? 'bg-[#edf8ee] text-[#2f7d32]' : 'bg-[#f4f7f8] text-slate-500'}`}>
-                    {isPerks && <Gift className="h-3.5 w-3.5" />}
-                    {tab}
-                  </button>
-                );
-              })}
+              {feedTabs.map((tab) => (
+                <button key={tab} onClick={() => setActiveFeedTab(tab)} className={`rounded-full px-4 py-2 text-sm font-bold transition ${activeFeedTab === tab ? 'bg-[#050506] text-white shadow-[0_14px_28px_-20px_rgba(0,0,0,0.7)]' : 'bg-[#f4f7f8] text-slate-500'}`}>{tab}</button>
+              ))}
             </div>
           </div>
         </div>
@@ -151,16 +144,9 @@ export default function FeedScreen({
           </div>
           <div className="sticky top-5 z-30 -mx-1 mb-4 overflow-x-auto px-1 [scrollbar-width:none]">
             <div className="flex min-w-max gap-2 pb-1">
-              {feedTabs.map((tab) => {
-                const active = activeFeedTab === tab;
-                const isPerks = tab === 'Perks';
-                return (
-                  <button key={tab} onClick={() => setActiveFeedTab(tab)} className={`inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-semibold transition ${active ? 'bg-[#092243] text-white shadow-[0_14px_28px_-20px_rgba(9,34,67,0.65)]' : isPerks ? 'bg-[#edf8ee] text-[#2f7d32] ring-1 ring-[#bfe6c3]' : 'bg-white text-slate-600 shadow-[0_10px_24px_-22px_rgba(15,23,42,0.45)] ring-1 ring-white/80'}`}>
-                    {isPerks && <Gift className="h-3.5 w-3.5" />}
-                    {tab}
-                  </button>
-                );
-              })}
+              {feedTabs.map((tab) => (
+                <button key={tab} onClick={() => setActiveFeedTab(tab)} className={`rounded-full px-4 py-2 text-sm font-semibold transition ${activeFeedTab === tab ? 'bg-[#092243] text-white shadow-[0_14px_28px_-20px_rgba(9,34,67,0.65)]' : 'bg-white text-slate-600 shadow-[0_10px_24px_-22px_rgba(15,23,42,0.45)] ring-1 ring-white/80'}`}>{tab}</button>
+              ))}
             </div>
           </div>
         </div>
@@ -245,10 +231,10 @@ export default function FeedScreen({
                           <p className="font-['JetBrains_Mono',monospace] text-[10px] tracking-[0.16em] text-[#2f7d32]">PERKS · TIMED FOR YOUR MOVE</p>
                           <h3 className="mt-1 font-['Bricolage_Grotesque_Variable',Inter,sans-serif] text-lg font-normal leading-tight tracking-tight text-[#092243]">Member rewards, only when they fit.</h3>
                         </div>
-                        <button type="button" onClick={() => setActiveFeedTab('Perks')} className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-[#092243] px-4 py-2 text-xs font-semibold text-white transition hover:bg-[#0c2e5a]">
+                        <a href="/app/perks" className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-[#092243] px-4 py-2 text-xs font-semibold text-white transition hover:bg-[#0c2e5a]">
                           <Gift className="h-3.5 w-3.5" />
                           See all perks
-                        </button>
+                        </a>
                       </div>
                       <div className="mt-4">
                         <PerksRail partnerOffers={sortedPartnerOffers} profile={profile} onOpenOffer={openPartnerOffer} compact />
