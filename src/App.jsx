@@ -4222,18 +4222,17 @@ function ProfileStrengthCard({ profile, answers }) {
     <div className="rounded-[1.75rem] border border-white bg-white/86 p-5 shadow-[0_18px_44px_-34px_rgba(15,23,42,0.45),inset_0_1px_0_white]">
       <div className="flex items-center justify-between gap-4">
         <div>
-          <p className="font-['JetBrains_Mono',monospace] text-xs text-[#2670a8]">MATCH PROFILE</p>
-          <h2 className="mt-2 text-2xl font-normal tracking-tight text-slate-950">{strength.score}% ready</h2>
+          <p className="font-['JetBrains_Mono',monospace] text-[11px] tracking-[0.14em] text-[#2670a8]">MATCH PROFILE</p>
+          <h2 className="mt-2 font-['Bricolage_Grotesque_Variable',Inter,sans-serif] text-[1.7rem] font-normal leading-tight tracking-tight text-slate-950">{strength.score}% ready</h2>
         </div>
-        <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#edf8ee] text-lg text-[#215d27]">{strength.score}</div>
-      </div>
-      <div className="mt-4 h-2 overflow-hidden rounded-full bg-slate-100">
-        <div className="h-full rounded-full bg-linear-to-r from-[#2f7d32] to-[#2670a8]" style={{ width: `${strength.score}%` }}></div>
+        <div className="grid h-16 w-16 shrink-0 place-items-center rounded-full" style={{ background: `conic-gradient(#52a832 ${strength.score * 3.6}deg, #e6edf3 0deg)` }}>
+          <div className="grid h-12 w-12 place-items-center rounded-full bg-white text-sm font-bold text-[#092243]">{strength.score}<span className="text-[10px] text-slate-400">%</span></div>
+        </div>
       </div>
       <p className="mt-4 text-sm leading-6 text-slate-600">Answer a few more questions to improve your matches.</p>
       {strength.suggestions.length > 0 && (
         <div className="mt-3 flex flex-wrap gap-2">
-          {strength.suggestions.map((item) => <span key={item} className="rounded-full bg-slate-50 px-3 py-1 text-xs text-slate-500">{item}</span>)}
+          {strength.suggestions.map((item) => <span key={item} className="rounded-full border border-[#cde7f8] bg-[#edf7ff] px-3 py-1 text-xs font-medium text-[#154f79]">{item}</span>)}
         </div>
       )}
     </div>
