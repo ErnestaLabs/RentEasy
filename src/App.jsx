@@ -7192,6 +7192,13 @@ function RentEazyAppContainer({ isPreviewVisitor = false }) {
       body: 'Free Feed and preview browsing stay open. Account-only plans, credits, boosts, and Protect records appear after signup.',
     },
   }[routeTab] : null;
+  // Preview must look like the real app, not a different app made of locked
+  // "Create account" cards. We render the real Likes/Profile/Billing screens in
+  // preview too; each already carries its own in-context signup CTA, so the
+  // conversion ask survives without blanking the whole screen. previewLockedRoute
+  // is retained (referenced below) as a kill-switch — flip previewGateActive to
+  // restore the full-screen gate.
+  const previewGateActive = false && previewLockedRoute;
 
   useEffect(() => {
     const seedById = new Map(allSeededFeedPosts.map((post) => [post.id, post]));
@@ -8021,7 +8028,7 @@ function RentEazyAppContainer({ isPreviewVisitor = false }) {
           />
         )}
         {routeTab !== 'Feed' && <section className="min-w-0 overflow-x-hidden">
-          {previewLockedRoute && (
+          {previewGateActive && (
             <PreviewRouteGate
               action={previewLockedRoute.action}
               title={previewLockedRoute.title}
@@ -8067,7 +8074,7 @@ function RentEazyAppContainer({ isPreviewVisitor = false }) {
             />
           )}
 
-          {!previewLockedRoute && routeTab === 'Likes' && (
+          {!previewGateActive && routeTab === 'Likes' && (
             <LikesScreen
               components={appScreenComponents}
               dismissUpsell={dismissUpsell}
@@ -8086,7 +8093,7 @@ function RentEazyAppContainer({ isPreviewVisitor = false }) {
             />
           )}
 
-          {!previewLockedRoute && routeTab === 'Profile' && (
+          {!previewGateActive && routeTab === 'Profile' && (
             <ProfileScreen
               answers={answers}
               comments={comments}
@@ -8114,7 +8121,7 @@ function RentEazyAppContainer({ isPreviewVisitor = false }) {
             />
           )}
 
-          {!previewLockedRoute && routeTab === 'Billing' && (
+          {!previewGateActive && routeTab === 'Billing' && (
             <BillingScreen boosts={boosts} components={appScreenComponents} openUpsell={openUpsell} purchases={purchases} wallet={wallet} />
           )}
         </section>}
