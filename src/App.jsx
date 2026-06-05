@@ -6998,13 +6998,13 @@ function AppSupportSidebar({
 }) {
   return (
     <aside className="sticky top-5 hidden max-h-[calc(100vh-2.5rem)] space-y-3 overflow-y-auto pr-1 lg:block [scrollbar-width:none]">
-      <div className="rounded-[1.75rem] bg-[#050506] p-5 text-white shadow-[0_26px_70px_-48px_rgba(0,0,0,0.82)]">
+      <div className="rounded-[1.75rem] bg-[#092243] p-5 text-white shadow-[0_26px_70px_-48px_rgba(9,34,67,0.82)]">
         <div className="flex items-start justify-between gap-3">
           <div>
             <p className="text-xs font-bold uppercase tracking-[0.08em] text-white/38">{routeTab}</p>
             <h2 className="mt-2 text-2xl font-bold tracking-tight">Your day</h2>
           </div>
-          <span className="rounded-full bg-[#bff4ef] px-3 py-1.5 text-xs font-bold text-[#050506]">{wallet.balance} credits</span>
+          <span className="rounded-full bg-[#8bdc65] px-3 py-1.5 text-xs font-bold text-[#092243]">{wallet.balance} credits</span>
         </div>
         <div className="mt-4 grid grid-cols-2 gap-2 text-sm">
           {[
