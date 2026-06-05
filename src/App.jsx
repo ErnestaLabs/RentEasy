@@ -4569,7 +4569,7 @@ function LikesSocialInbox({ posts, likedIds, savedIds, matches, matchMessages, p
           imageClassName={(profile.avatarVariant || 'standing') === 'bust' ? '' : 'object-contain p-1'}
         />
         <div className="min-w-0 flex-1">
-          <h1 className="text-2xl font-semibold tracking-tight text-slate-950">Likes</h1>
+          <h1 className="font-['Bricolage_Grotesque_Variable',Inter,sans-serif] text-2xl font-normal tracking-tight text-slate-950">Likes</h1>
           <p className="truncate text-sm text-slate-500">Matches, saved posts, and useful threads in one place.</p>
         </div>
         <button type="button" onClick={() => onSelectProduct('reveal-like-1')} className="rounded-full bg-[#092243] px-4 py-2 text-sm font-semibold text-white">Unlock</button>
@@ -4588,15 +4588,21 @@ function LikesSocialInbox({ posts, likedIds, savedIds, matches, matchMessages, p
       </div>
 
       <div className="divide-y divide-slate-100">
-        <div className="flex items-center gap-3 px-4 py-4 sm:px-5">
-          <div className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-[#ffe9f0] text-[#d91d52]">
-            <Heart className="h-6 w-6" />
+        <div className="px-4 py-4 sm:px-5">
+          <div className="overflow-hidden rounded-[1.6rem] bg-linear-to-br from-[#0d2e57] to-[#06182f] p-5 text-white shadow-[0_22px_52px_-36px_rgba(9,34,67,0.9)]">
+            <div className="flex items-center gap-4">
+              <div className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-[#ff3366]/20 text-[#ff7a9c] ring-1 ring-[#ff3366]/30">
+                <Heart className="h-6 w-6 fill-current" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="font-['Bricolage_Grotesque_Variable',Inter,sans-serif] text-xl font-normal leading-tight">{hiddenLikeCount ? `${hiddenLikeCount} ${hiddenLikeCount === 1 ? 'person likes' : 'people like'} you` : 'No hidden likes yet'}</p>
+                <p className="mt-0.5 text-sm text-white/60">{hiddenLikeCount ? 'See who — every like is real, nothing faked.' : 'Nothing is faked. Real likes appear here as they arrive.'}</p>
+              </div>
+            </div>
+            {hiddenLikeCount > 0 && (
+              <button type="button" onClick={() => onSelectProduct('reveal-like-1')} className="mt-4 w-full rounded-full bg-white px-5 py-3 text-sm font-semibold text-[#092243] transition hover:bg-[#f0fdf4]">Reveal who liked you</button>
+            )}
           </div>
-          <div className="min-w-0 flex-1">
-            <p className="font-semibold text-slate-950">Who liked you</p>
-            <p className="line-clamp-1 text-sm text-slate-500">{hiddenLikeCount ? `${hiddenLikeCount} real like${hiddenLikeCount === 1 ? '' : 's'} waiting` : 'No hidden likes yet. Nothing is faked.'}</p>
-          </div>
-          <button type="button" onClick={() => onSelectProduct('reveal-like-1')} className="rounded-full bg-[#edf7ff] px-3 py-2 text-xs font-semibold text-[#154f79]">Reveal</button>
         </div>
 
         {rows.map((row) => (
