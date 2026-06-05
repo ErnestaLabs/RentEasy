@@ -6633,8 +6633,8 @@ function FeedTimelineCard({ post, ranking, card, liked, saved, followed, comment
             {post.sponsoredStatus && <span className="rounded-full bg-[#fff7ed]/95 px-3 py-1.5 text-xs font-semibold text-[#9a3412]">{post.sponsoredStatus}</span>}
           </div>
           <div className="absolute inset-x-0 bottom-0 bg-linear-to-t from-black/74 via-black/18 to-transparent p-4 pt-20">
-            <h2 className="line-clamp-2 text-2xl font-semibold leading-tight tracking-tight text-white">{post.title}</h2>
-            <p className="mt-1 line-clamp-1 text-sm font-medium text-white/78">{schema.price || post.budget || post.area} · {post.postType}</p>
+            <h2 className="line-clamp-2 font-['Bricolage_Grotesque_Variable',Inter,sans-serif] text-2xl font-normal leading-tight tracking-tight text-white">{post.title}</h2>
+            <p className="mt-1 line-clamp-1 text-sm font-medium text-white/80">{schema.price || post.budget || post.area} · {post.postType}</p>
             <button type="button" onClick={stop(() => onOpen?.())} className="mt-3 rounded-full bg-white/16 px-3 py-1.5 text-xs font-semibold text-white ring-1 ring-white/20 backdrop-blur-md">View post</button>
           </div>
           <div className="absolute bottom-4 right-4 flex items-center gap-1 rounded-full bg-[#05070b]/88 p-1.5 text-white shadow-[0_18px_44px_-20px_rgba(0,0,0,0.9)] ring-1 ring-white/10 backdrop-blur-xl">
