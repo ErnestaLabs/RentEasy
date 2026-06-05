@@ -5489,38 +5489,81 @@ function GroupsPanel({ groups, memberships, onJoinGroup, onCreateGroup, compact 
   );
 }
 
+function PerkCard({ offer, onOpenOffer, recommended }) {
+  return (
+    <button type="button" onClick={() => onOpenOffer(offer)} className="group flex flex-col rounded-4xl border border-white bg-white/90 p-5 text-left shadow-[0_18px_44px_-32px_rgba(15,23,42,0.4)] transition hover:-translate-y-0.5 hover:shadow-[0_26px_54px_-32px_rgba(15,23,42,0.5)]">
+      <div className="flex items-center justify-between gap-3">
+        <span className="inline-flex items-center gap-1.5 rounded-full bg-[#edf8ee] px-3 py-1 font-['JetBrains_Mono',monospace] text-[10px] tracking-[0.08em] text-[#2f7d32]"><Gift className="h-3 w-3" />{offer.category}</span>
+        <div className="flex flex-wrap items-center justify-end gap-1.5">
+          {recommended && <span className="rounded-full bg-[#2f7d32] px-2.5 py-0.5 text-[10px] font-semibold text-white">For your profile</span>}
+          {offer.sponsoredStatus && <span className="rounded-full bg-[#fff7ed] px-2.5 py-0.5 text-[10px] font-medium text-[#9a3412]">{offer.sponsoredStatus}</span>}
+        </div>
+      </div>
+      <h3 className="mt-3 font-['Bricolage_Grotesque_Variable',Inter,sans-serif] text-xl font-normal leading-tight tracking-tight text-slate-950">{offer.title}</h3>
+      <p className="mt-2 flex-1 text-sm leading-6 text-slate-600">{offer.description}</p>
+      {offer.reward && <p className="mt-3 text-sm font-semibold text-[#2f7d32]">{offer.reward}</p>}
+      <span className="mt-4 inline-flex items-center justify-center gap-1.5 rounded-full bg-[#092243] px-5 py-2.5 text-sm font-medium text-white transition group-hover:bg-[#0c2e5a]">{offer.cta} <span className="transition group-hover:translate-x-0.5">→</span></span>
+    </button>
+  );
+}
+
 function PerksRail({ partnerOffers, profile, onOpenOffer, compact = false }) {
   const role = profile.role || 'General';
-  const matching = partnerOffers.filter((offer) => offer.eligibleRoles?.includes(role));
-  const offers = (matching.length ? matching : partnerOffers).slice(0, compact ? 3 : partnerOffers.length);
+  const isRecommended = (offer) => Boolean(offer.eligibleRoles?.includes(role));
+  // Always show every perk. Profile-matched ones surface first; the rest
+  // stay available whenever the member wants them.
+  const ordered = [...partnerOffers].sort((a, b) => Number(isRecommended(b)) - Number(isRecommended(a)));
 
-  return (
-    <section className="space-y-5">
-      {!compact && (
-        <div className="relative overflow-hidden rounded-[2rem] bg-linear-to-br from-[#0d2e57] to-[#06182f] p-6 text-white shadow-[0_30px_70px_-44px_rgba(9,34,67,0.9)] md:p-8">
-          <div className="pointer-events-none absolute -top-20 right-0 h-56 w-56 rounded-full bg-[#52a832]/22 blur-[70px]" />
-          <p className="relative font-['JetBrains_Mono',monospace] text-[11px] tracking-[0.16em] text-[#9bd383]">PERKS · TIMED FOR YOUR MOVE</p>
-          <h2 className="relative mt-2 font-['Bricolage_Grotesque_Variable',Inter,sans-serif] text-3xl font-normal leading-tight tracking-tight md:text-4xl">Rewards that land when they’re useful.</h2>
-          <p className="relative mt-3 max-w-xl text-sm font-light leading-7 text-white/65 md:text-base">No spam, no clutter. A partner offer only shows when it fits the moment — a move, a listing, a stay, a deal. Every one is labelled and capped.</p>
-        </div>
-      )}
-      <div className={compact ? 'grid gap-3' : 'grid gap-4 sm:grid-cols-2'}>
-        {offers.map((offer) => (
-          <button key={offer.id} type="button" onClick={() => onOpenOffer(offer)} className="group flex flex-col rounded-4xl border border-white bg-white/90 p-5 text-left shadow-[0_18px_44px_-32px_rgba(15,23,42,0.4)] transition hover:-translate-y-0.5 hover:shadow-[0_26px_54px_-32px_rgba(15,23,42,0.5)]">
-            <div className="flex items-center justify-between gap-3">
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-[#edf8ee] px-3 py-1 font-['JetBrains_Mono',monospace] text-[10px] tracking-[0.08em] text-[#2f7d32]"><Gift className="h-3 w-3" />{offer.category}</span>
-              {offer.sponsoredStatus && <span className="rounded-full bg-[#fff7ed] px-2.5 py-0.5 text-[10px] font-medium text-[#9a3412]">{offer.sponsoredStatus}</span>}
-            </div>
-            <h3 className="mt-3 font-['Bricolage_Grotesque_Variable',Inter,sans-serif] text-xl font-normal leading-tight tracking-tight text-slate-950">{offer.title}</h3>
-            <p className="mt-2 flex-1 text-sm leading-6 text-slate-600">{offer.description}</p>
-            {offer.reward && <p className="mt-3 text-sm font-semibold text-[#2f7d32]">{offer.reward}</p>}
-            <span className="mt-4 inline-flex items-center justify-center gap-1.5 rounded-full bg-[#092243] px-5 py-2.5 text-sm font-medium text-white transition group-hover:bg-[#0c2e5a]">{offer.cta} <span className="transition group-hover:translate-x-0.5">→</span></span>
-          </button>
+  if (compact) {
+    return (
+      <div className="grid gap-3">
+        {ordered.slice(0, 3).map((offer) => (
+          <PerkCard key={offer.id} offer={offer} onOpenOffer={onOpenOffer} recommended={isRecommended(offer)} />
         ))}
       </div>
-      {offers.length === 0 && (
+    );
+  }
+
+  const recommended = ordered.filter(isRecommended);
+  const others = ordered.filter((offer) => !isRecommended(offer));
+
+  return (
+    <section className="space-y-6">
+      <div className="relative overflow-hidden rounded-[2rem] bg-linear-to-br from-[#0d2e57] to-[#06182f] p-6 text-white shadow-[0_30px_70px_-44px_rgba(9,34,67,0.9)] md:p-8">
+        <div className="pointer-events-none absolute -top-20 right-0 h-56 w-56 rounded-full bg-[#52a832]/22 blur-[70px]" />
+        <p className="relative font-['JetBrains_Mono',monospace] text-[11px] tracking-[0.16em] text-[#9bd383]">PERKS · ALL IN ONE PLACE</p>
+        <h2 className="relative mt-2 font-['Bricolage_Grotesque_Variable',Inter,sans-serif] text-3xl font-normal leading-tight tracking-tight md:text-4xl">Every reward, in one place.</h2>
+        <p className="relative mt-3 max-w-xl text-sm font-light leading-7 text-white/65 md:text-base">We surface the perks that fit your profile first — the rest stay right here whenever you need them. Every offer is labelled and capped. No spam, no clutter.</p>
+      </div>
+
+      {recommended.length > 0 && (
+        <div className="space-y-3">
+          <div className="flex items-center justify-between gap-3">
+            <h3 className="font-['Bricolage_Grotesque_Variable',Inter,sans-serif] text-lg font-normal tracking-tight text-[#092243]">Recommended for your profile</h3>
+            <span className="rounded-full bg-[#edf8ee] px-3 py-1 font-['JetBrains_Mono',monospace] text-[10px] tracking-[0.08em] text-[#2f7d32]">{recommended.length}</span>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2">
+            {recommended.map((offer) => (
+              <PerkCard key={offer.id} offer={offer} onOpenOffer={onOpenOffer} recommended />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {others.length > 0 && (
+        <div className="space-y-3">
+          <h3 className="font-['Bricolage_Grotesque_Variable',Inter,sans-serif] text-lg font-normal tracking-tight text-[#092243]">{recommended.length ? 'More perks' : 'All perks'}</h3>
+          <div className="grid gap-4 sm:grid-cols-2">
+            {others.map((offer) => (
+              <PerkCard key={offer.id} offer={offer} onOpenOffer={onOpenOffer} recommended={false} />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {partnerOffers.length === 0 && (
         <div className="rounded-4xl border border-dashed border-slate-200 bg-white/60 p-8 text-center">
-          <p className="text-sm text-slate-500">No perks right now — they’ll appear the moment one actually fits your move.</p>
+          <p className="text-sm text-slate-500">No perks yet — partner rewards will appear here as they go live.</p>
         </div>
       )}
     </section>
