@@ -4031,11 +4031,11 @@ function ComposerPanel({ onCreatePost, compact = false, profile = currentUser })
               imageClassName={(profile.avatarVariant || 'bust') === 'bust' ? '' : 'object-contain p-1'}
             />
             <div>
-              <p className="text-sm font-bold text-[#050506]">{profile.name || currentUser.name}</p>
-              <p className="text-xs font-medium text-[#050506]/55">{profile.role || currentUser.role} · public post</p>
+              <p className="text-sm font-bold text-[#092243]">{profile.name || currentUser.name}</p>
+              <p className="text-xs font-medium text-[#092243]/55">{profile.role || currentUser.role} · public post</p>
             </div>
           </div>
-          <button className="rounded-full bg-[#050506] px-5 py-2.5 text-sm font-bold text-white">Post</button>
+          <span className="rounded-full bg-white/70 px-3 py-1.5 font-['JetBrains_Mono',monospace] text-[10px] tracking-[0.1em] text-[#215d27]">FREE TO POST</span>
         </div>
       </div>
       <div className="p-5">
