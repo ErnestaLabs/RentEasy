@@ -139,7 +139,7 @@ async function clerkUserFromToken(db, token) {
 
 async function currentUser(req, db) {
   const token = authToken(req);
-  return getUserFromToken(db, token) || await clerkUserFromToken(db, token) || db.users.find((user) => user.id === demoUserId);
+  return getUserFromToken(db, token) || await clerkUserFromToken(db, token) || null;
 }
 
 function compactState(db, userId = demoUserId) {
@@ -207,6 +207,101 @@ function compactState(db, userId = demoUserId) {
     reportReasons,
     roleOptions,
   };
+}
+
+function publicPreviewState(db) {
+  ensureCollections(db);
+  const profile = {
+    id: 'preview-visitor',
+    userId: 'preview-visitor',
+    name: 'Guest preview',
+    role: '',
+    area: '',
+    budget: '',
+    moveDate: '',
+    lookingFor: '',
+    avatarVariant: 'standing',
+    avatarIndex: 1,
+    avatarBg: 'mist',
+  };
+  const answers = {};
+  const feedRankings = rankFeedPosts(db, profile.id, {
+    profile,
+    answers,
+    followedIds: [],
+    likedIds: [],
+    savedIds: [],
+    hiddenPostIds: [],
+  });
+  const recommendationInsights = buildRecommendationInsights(db, profile.id, { profile, answers, feedRankings });
+  return {
+    user: null,
+    profile,
+    posts: db.posts,
+    likedIds: [],
+    savedIds: [],
+    followedIds: [],
+    hiddenPostIds: [],
+    comments: [],
+    shares: [],
+    reports: [],
+    answers,
+    questions: db.questions,
+    usageLimit: {
+      id: 'daily-swipes-preview',
+      userId: profile.id,
+      limitType: 'daily_swipes',
+      period: 'day',
+      used: 0,
+      allowance: 0,
+      resetsAt: new Date(Date.now() + 20 * 60 * 60 * 1000).toISOString(),
+    },
+    entitlements: [],
+    purchases: [],
+    boosts: [],
+    wallet: { id: 'wallet-preview', userId: profile.id, balance: 0, updatedAt: new Date().toISOString() },
+    appStreak: { id: 'streak-preview', userId: profile.id, streakType: 'daily_app_open', count: 0, lastActivityAt: null },
+    groups: db.groups,
+    groupMemberships: [],
+    partnerOffers: db.partnerOffers,
+    feedAds: db.feedAds,
+    feedRankings,
+    recommendationInsights,
+    behavioralEvents: [],
+    matches: [],
+    matchMessages: [],
+    viewings: [],
+    reviews: [],
+    reputationProfile: {
+      userId: profile.id,
+      score: 0,
+      tier: 'Not started',
+      completedEvents: [],
+      missingFields: ['Create an account', 'Choose a role', 'Answer match questions'],
+      suggestions: ['Create a free account to start building real RentEazy reputation.'],
+      updatedAt: new Date().toISOString(),
+    },
+    lifecycleTasks: [],
+    referrals: [],
+    residentProfiles: [],
+    maintenanceRequests: [],
+    rentRecords: [],
+    landlordProperties: [],
+    professionalProfiles: [],
+    tenantDemandSignals: db.tenantDemandSignals,
+    dealWatchlist: [],
+    operatorPortfolioSignals: [],
+    marketIntroductions: [],
+    notifications: [],
+    microProducts,
+    postTypes,
+    reportReasons,
+    roleOptions,
+  };
+}
+
+function errorStatus(result, fallbackStatus) {
+  return result?.error === 'auth_required' ? 401 : fallbackStatus;
 }
 
 function buildRecommendationInsights(db, userId, context = {}) {
@@ -643,6 +738,7 @@ const routes = {
     const state = await updateDb(async (db) => {
       ensureCollections(db);
       const user = await currentUser(req, db);
+      if (!user) return publicPreviewState(db);
       ensureDailyLimit(db, user.id);
       return compactState(db, user.id);
     });
@@ -692,6 +788,7 @@ const routes = {
     const body = await readBody(req);
     const result = await updateDb(async (db) => {
       const user = await currentUser(req, db);
+      if (!user) return { error: 'auth_required' };
       const profile = publicProfile(db, user.id);
       Object.assign(profile, {
         name: body.name ?? profile.name,
@@ -707,6 +804,7 @@ const routes = {
       });
       return profile;
     });
+    if (result.error === 'auth_required') return send(res, 401, result);
     send(res, 200, result);
   },
 
@@ -714,6 +812,7 @@ const routes = {
     const body = await readBody(req);
     const result = await updateDb(async (db) => {
       const user = await currentUser(req, db);
+      if (!user) return { error: 'auth_required' };
       for (const [questionId, value] of Object.entries(body.answers || {})) {
         let answer = db.answers.find((item) => item.userId === user.id && item.questionId === questionId);
         if (!answer) {
@@ -726,6 +825,7 @@ const routes = {
       }
       return compactState(db, user.id).answers;
     });
+    if (result.error === 'auth_required') return send(res, 401, result);
     send(res, 200, { answers: result });
   },
 
@@ -734,6 +834,7 @@ const routes = {
     const result = await updateDb(async (db) => {
       ensureCollections(db);
       const user = await currentUser(req, db);
+      if (!user) return { error: 'auth_required' };
       const profile = publicProfile(db, user.id);
       const post = {
         id: createId('post'),
@@ -762,7 +863,8 @@ const routes = {
       addNotification(db, user.id, 'post_created', 'Your post is live', 'Share it externally for 5 extra swipes today.');
       return post;
     });
-    if (result.error) return send(res, 400, result);
+    if (result.error === 'auth_required') return send(res, 401, result);
+    if (result.error) return send(res, errorStatus(result, 400), result);
     send(res, 201, result);
   },
 };
@@ -777,6 +879,7 @@ async function handleDynamic(req, res, method, pathname) {
     const result = await updateDb(async (writeableDb) => {
       ensureCollections(writeableDb);
       const writeUser = await currentUser(req, writeableDb);
+      if (!writeUser) return { error: 'auth_required' };
       const post = writeableDb.posts.find((item) => item.id === postId);
       if (!post) return { error: 'post_not_found' };
 
@@ -821,7 +924,7 @@ async function handleDynamic(req, res, method, pathname) {
 
       return compactState(writeableDb, writeUser.id);
     });
-    if (result.error) return send(res, 400, result);
+    if (result.error) return send(res, errorStatus(result, 400), result);
     return send(res, 200, result);
   }
 
@@ -830,6 +933,7 @@ async function handleDynamic(req, res, method, pathname) {
     const result = await updateDb(async (writeableDb) => {
       ensureCollections(writeableDb);
       const writeUser = await currentUser(req, writeableDb);
+      if (!writeUser) return { error: 'auth_required' };
       const followingId = String(body.followingId || '');
       const existing = writeableDb.follows.find((item) => item.followerId === writeUser.id && item.followingId === followingId);
       if (existing) writeableDb.follows = writeableDb.follows.filter((item) => item !== existing);
@@ -837,6 +941,7 @@ async function handleDynamic(req, res, method, pathname) {
       writeableDb.behavioralEvents.unshift({ id: createId('event'), userId: writeUser.id, eventType: existing ? 'unfollowed' : 'followed', targetType: body.followingType || 'account', targetId: followingId, metadata: {}, createdAt: new Date().toISOString() });
       return compactState(writeableDb, writeUser.id);
     });
+    if (result.error) return send(res, errorStatus(result, 400), result);
     return send(res, 200, result);
   }
 
@@ -845,6 +950,7 @@ async function handleDynamic(req, res, method, pathname) {
     const result = await updateDb(async (writeableDb) => {
       ensureCollections(writeableDb);
       const writeUser = await currentUser(req, writeableDb);
+      if (!writeUser) return { error: 'auth_required' };
       const limit = ensureDailyLimit(writeableDb, writeUser.id);
       if (limit.used >= limit.allowance) return { error: 'daily_swipes_used', limit };
       limit.used += 1;
@@ -857,7 +963,7 @@ async function handleDynamic(req, res, method, pathname) {
       }
       return compactState(writeableDb, writeUser.id);
     });
-    if (result.error) return send(res, 429, result);
+    if (result.error) return send(res, errorStatus(result, 429), result);
     return send(res, 200, result);
   }
 
@@ -868,6 +974,7 @@ async function handleDynamic(req, res, method, pathname) {
     const result = await updateDb(async (writeableDb) => {
       ensureCollections(writeableDb);
       const writeUser = await currentUser(req, writeableDb);
+      if (!writeUser) return { error: 'auth_required' };
       const match = writeableDb.matches.find((item) => item.id === matchId && item.participantIds.includes(writeUser.id));
       if (!match) return { error: 'match_not_found' };
       const profile = publicProfile(writeableDb, writeUser.id);
@@ -879,7 +986,7 @@ async function handleDynamic(req, res, method, pathname) {
       addReputationEvent(writeableDb, writeUser.id, 'match_message_sent', 3, message.id);
       return compactState(writeableDb, writeUser.id);
     });
-    if (result.error) return send(res, 400, result);
+    if (result.error) return send(res, errorStatus(result, 400), result);
     return send(res, 201, result);
   }
 
@@ -890,6 +997,7 @@ async function handleDynamic(req, res, method, pathname) {
     const result = await updateDb(async (writeableDb) => {
       ensureCollections(writeableDb);
       const writeUser = await currentUser(req, writeableDb);
+      if (!writeUser) return { error: 'auth_required' };
       const match = writeableDb.matches.find((item) => item.id === matchId && item.participantIds.includes(writeUser.id));
       if (!match) return { error: 'match_not_found' };
       const viewing = {
@@ -913,7 +1021,7 @@ async function handleDynamic(req, res, method, pathname) {
       addReputationEvent(writeableDb, writeUser.id, 'viewing_requested', 8, viewing.id);
       return compactState(writeableDb, writeUser.id);
     });
-    if (result.error) return send(res, 400, result);
+    if (result.error) return send(res, errorStatus(result, 400), result);
     return send(res, 201, result);
   }
 
@@ -924,6 +1032,7 @@ async function handleDynamic(req, res, method, pathname) {
     const result = await updateDb(async (writeableDb) => {
       ensureCollections(writeableDb);
       const writeUser = await currentUser(req, writeableDb);
+      if (!writeUser) return { error: 'auth_required' };
       const match = writeableDb.matches.find((item) => item.id === matchId && item.participantIds.includes(writeUser.id));
       if (!match) return { error: 'match_not_found' };
       const revieweeId = body.revieweeId || match.participantIds.find((id) => id !== writeUser.id) || match.participantIds[0];
@@ -944,7 +1053,7 @@ async function handleDynamic(req, res, method, pathname) {
       addReputationEvent(writeableDb, revieweeId, 'review_received', review.rating >= 4 ? 12 : 4, review.id);
       return compactState(writeableDb, writeUser.id);
     });
-    if (result.error) return send(res, 400, result);
+    if (result.error) return send(res, errorStatus(result, 400), result);
     return send(res, 201, result);
   }
 
@@ -953,6 +1062,7 @@ async function handleDynamic(req, res, method, pathname) {
     const result = await updateDb(async (writeableDb) => {
       ensureCollections(writeableDb);
       const writeUser = await currentUser(req, writeableDb);
+      if (!writeUser) return { error: 'auth_required' };
       const product = microProducts.find((item) => item.id === body.productId || item.sku === body.sku);
       if (!product) return { error: 'product_not_found' };
       const purchase = { id: createId('purchase'), userId: writeUser.id, sku: product.sku, amount: product.amount, currency: product.currency, status: 'recorded', provider: 'renteazy-local', createdAt: new Date().toISOString() };
@@ -970,7 +1080,7 @@ async function handleDynamic(req, res, method, pathname) {
       writeableDb.behavioralEvents.unshift({ id: createId('event'), userId: writeUser.id, eventType: 'purchase_recorded', targetType: 'micro_product', targetId: product.id, metadata: { sku: product.sku, amount: product.amount }, createdAt: new Date().toISOString() });
       return compactState(writeableDb, writeUser.id);
     });
-    if (result.error) return send(res, 400, result);
+    if (result.error) return send(res, errorStatus(result, 400), result);
     return send(res, 201, result);
   }
 
@@ -979,6 +1089,7 @@ async function handleDynamic(req, res, method, pathname) {
     const result = await updateDb(async (writeableDb) => {
       ensureCollections(writeableDb);
       const writeUser = await currentUser(req, writeableDb);
+      if (!writeUser) return { error: 'auth_required' };
       const profile = publicProfile(writeableDb, writeUser.id);
       const group = {
         id: createId('group'),
@@ -999,7 +1110,7 @@ async function handleDynamic(req, res, method, pathname) {
       writeableDb.behavioralEvents.unshift({ id: createId('event'), userId: writeUser.id, eventType: 'group_created', targetType: 'group', targetId: group.id, metadata: { groupType: group.groupType, area: group.area }, createdAt: new Date().toISOString() });
       return compactState(writeableDb, writeUser.id);
     });
-    if (result.error) return send(res, 400, result);
+    if (result.error) return send(res, errorStatus(result, 400), result);
     return send(res, 201, result);
   }
 
@@ -1009,6 +1120,7 @@ async function handleDynamic(req, res, method, pathname) {
     const result = await updateDb(async (writeableDb) => {
       ensureCollections(writeableDb);
       const writeUser = await currentUser(req, writeableDb);
+      if (!writeUser) return { error: 'auth_required' };
       const group = writeableDb.groups.find((item) => item.id === groupId);
       if (!group) return { error: 'group_not_found' };
       const existing = writeableDb.groupMemberships.find((item) => item.groupId === groupId && item.userId === writeUser.id);
@@ -1022,7 +1134,7 @@ async function handleDynamic(req, res, method, pathname) {
       writeableDb.behavioralEvents.unshift({ id: createId('event'), userId: writeUser.id, eventType: existing ? 'group_left' : 'group_joined', targetType: 'group', targetId: groupId, metadata: { groupType: group.groupType, area: group.area }, createdAt: new Date().toISOString() });
       return compactState(writeableDb, writeUser.id);
     });
-    if (result.error) return send(res, 404, result);
+    if (result.error) return send(res, errorStatus(result, 404), result);
     return send(res, 200, result);
   }
 
@@ -1032,6 +1144,7 @@ async function handleDynamic(req, res, method, pathname) {
     const result = await updateDb(async (writeableDb) => {
       ensureCollections(writeableDb);
       const writeUser = await currentUser(req, writeableDb);
+      if (!writeUser) return { error: 'auth_required' };
       ensureLifecycleForUser(writeableDb, writeUser.id);
       const task = writeableDb.lifecycleTasks.find((item) => item.id === taskId && (item.userId === writeUser.id || item.userId === demoUserId));
       if (!task) return { error: 'task_not_found' };
@@ -1047,7 +1160,7 @@ async function handleDynamic(req, res, method, pathname) {
       addReputationEvent(writeableDb, writeUser.id, 'lifecycle_task_completed', 3, taskId);
       return compactState(writeableDb, writeUser.id);
     });
-    if (result.error) return send(res, 404, result);
+    if (result.error) return send(res, errorStatus(result, 404), result);
     return send(res, 200, result);
   }
 
@@ -1056,6 +1169,7 @@ async function handleDynamic(req, res, method, pathname) {
     const result = await updateDb(async (writeableDb) => {
       ensureCollections(writeableDb);
       const writeUser = await currentUser(req, writeableDb);
+      if (!writeUser) return { error: 'auth_required' };
       const inviteType = String(body.inviteType || 'Rental connection').trim();
       const target = String(body.target || '').trim();
       const referral = {
@@ -1073,6 +1187,7 @@ async function handleDynamic(req, res, method, pathname) {
       writeableDb.behavioralEvents.unshift({ id: createId('event'), userId: writeUser.id, eventType: 'referral_created', targetType: 'referral', targetId: referral.id, metadata: { inviteType }, createdAt: referral.createdAt });
       return compactState(writeableDb, writeUser.id);
     });
+    if (result.error) return send(res, errorStatus(result, 400), result);
     return send(res, 201, result);
   }
 
@@ -1081,6 +1196,7 @@ async function handleDynamic(req, res, method, pathname) {
     const result = await updateDb(async (writeableDb) => {
       ensureCollections(writeableDb);
       const writeUser = await currentUser(req, writeableDb);
+      if (!writeUser) return { error: 'auth_required' };
       const residentProfile = writeableDb.residentProfiles.find((item) => item.userId === writeUser.id) || writeableDb.residentProfiles.find((item) => item.userId === demoUserId);
       const request = {
         id: createId('maintenance'),
@@ -1101,7 +1217,7 @@ async function handleDynamic(req, res, method, pathname) {
       addNotification(writeableDb, writeUser.id, 'resident_record', 'Maintenance request saved.', 'Your timestamped record is now part of Resident Mode.');
       return compactState(writeableDb, writeUser.id);
     });
-    if (result.error) return send(res, 400, result);
+    if (result.error) return send(res, errorStatus(result, 400), result);
     return send(res, 201, result);
   }
 
@@ -1110,6 +1226,7 @@ async function handleDynamic(req, res, method, pathname) {
     const result = await updateDb(async (writeableDb) => {
       ensureCollections(writeableDb);
       const writeUser = await currentUser(req, writeableDb);
+      if (!writeUser) return { error: 'auth_required' };
       const residentProfile = writeableDb.residentProfiles.find((item) => item.userId === writeUser.id) || writeableDb.residentProfiles.find((item) => item.userId === demoUserId);
       const record = {
         id: createId('rent-record'),
@@ -1130,7 +1247,7 @@ async function handleDynamic(req, res, method, pathname) {
       addNotification(writeableDb, writeUser.id, 'reputation_progress', 'Rent record saved.', 'Verified records can strengthen future RentEazy references.');
       return compactState(writeableDb, writeUser.id);
     });
-    if (result.error) return send(res, 400, result);
+    if (result.error) return send(res, errorStatus(result, 400), result);
     return send(res, 201, result);
   }
 
@@ -1139,6 +1256,7 @@ async function handleDynamic(req, res, method, pathname) {
     const result = await updateDb(async (writeableDb) => {
       ensureCollections(writeableDb);
       const writeUser = await currentUser(req, writeableDb);
+      if (!writeUser) return { error: 'auth_required' };
       const property = {
         id: createId('property'),
         ownerId: writeUser.id,
@@ -1162,7 +1280,7 @@ async function handleDynamic(req, res, method, pathname) {
       addNotification(writeableDb, writeUser.id, 'landlord_pipeline', 'Property pipeline created.', 'RentEazy can now show tenant, agent, operator, and investor demand around it.');
       return compactState(writeableDb, writeUser.id);
     });
-    if (result.error) return send(res, 400, result);
+    if (result.error) return send(res, errorStatus(result, 400), result);
     return send(res, 201, result);
   }
 
@@ -1173,6 +1291,7 @@ async function handleDynamic(req, res, method, pathname) {
     const result = await updateDb(async (writeableDb) => {
       ensureCollections(writeableDb);
       const writeUser = await currentUser(req, writeableDb);
+      if (!writeUser) return { error: 'auth_required' };
       const signal = writeableDb.tenantDemandSignals.find((item) => item.id === demandId);
       if (!signal) return { error: 'tenant_demand_not_found' };
       const now = new Date().toISOString();
@@ -1202,7 +1321,7 @@ async function handleDynamic(req, res, method, pathname) {
       addNotification(writeableDb, writeUser.id, 'landlord_pipeline', 'Demand shortlisted.', 'This signal is now part of your RentEazy property pipeline.');
       return compactState(writeableDb, writeUser.id);
     });
-    if (result.error) return send(res, 404, result);
+    if (result.error) return send(res, errorStatus(result, 404), result);
     return send(res, 200, result);
   }
 
@@ -1211,6 +1330,7 @@ async function handleDynamic(req, res, method, pathname) {
     const result = await updateDb(async (writeableDb) => {
       ensureCollections(writeableDb);
       const writeUser = await currentUser(req, writeableDb);
+      if (!writeUser) return { error: 'auth_required' };
       const dealPostId = String(body.dealPostId || '').trim();
       const dealPost = writeableDb.posts.find((item) => item.id === dealPostId);
       if (!dealPost) return { error: 'deal_post_not_found' };
@@ -1239,7 +1359,7 @@ async function handleDynamic(req, res, method, pathname) {
       addNotification(writeableDb, writeUser.id, 'deal_watchlist', 'Deal added to watchlist.', 'RentEazy will keep this deal signal in your professional pipeline.');
       return compactState(writeableDb, writeUser.id);
     });
-    if (result.error) return send(res, 404, result);
+    if (result.error) return send(res, errorStatus(result, 404), result);
     return send(res, 201, result);
   }
 
@@ -1250,6 +1370,7 @@ async function handleDynamic(req, res, method, pathname) {
     const result = await updateDb(async (writeableDb) => {
       ensureCollections(writeableDb);
       const writeUser = await currentUser(req, writeableDb);
+      if (!writeUser) return { error: 'auth_required' };
       const watchItem = writeableDb.dealWatchlist.find((item) => item.id === watchId && (item.userId === writeUser.id || item.userId === demoUserId));
       if (!watchItem) return { error: 'watch_item_not_found' };
       const now = new Date().toISOString();
@@ -1258,7 +1379,7 @@ async function handleDynamic(req, res, method, pathname) {
       writeableDb.behavioralEvents.unshift({ id: createId('event'), userId: writeUser.id, eventType: 'deal_watch_status_updated', targetType: 'deal_watch', targetId: watchItem.id, metadata: { status: watchItem.status, dealPostId: watchItem.dealPostId }, createdAt: now });
       return compactState(writeableDb, writeUser.id);
     });
-    if (result.error) return send(res, 404, result);
+    if (result.error) return send(res, errorStatus(result, 404), result);
     return send(res, 200, result);
   }
 
@@ -1267,6 +1388,7 @@ async function handleDynamic(req, res, method, pathname) {
     const result = await updateDb(async (writeableDb) => {
       ensureCollections(writeableDb);
       const writeUser = await currentUser(req, writeableDb);
+      if (!writeUser) return { error: 'auth_required' };
       const area = String(body.area || '').trim();
       if (!area) return { error: 'operator_area_required' };
       const now = new Date().toISOString();
@@ -1291,7 +1413,7 @@ async function handleDynamic(req, res, method, pathname) {
       addNotification(writeableDb, writeUser.id, 'operator_signal', 'Operator signal saved.', 'Your areas and model can now improve matching across the Feed.');
       return compactState(writeableDb, writeUser.id);
     });
-    if (result.error) return send(res, 400, result);
+    if (result.error) return send(res, errorStatus(result, 400), result);
     return send(res, 201, result);
   }
 
@@ -1301,13 +1423,14 @@ async function handleDynamic(req, res, method, pathname) {
     const result = await updateDb(async (writeableDb) => {
       ensureCollections(writeableDb);
       const writeUser = await currentUser(req, writeableDb);
+      if (!writeUser) return { error: 'auth_required' };
       const notification = writeableDb.notifications.find((item) => item.id === notificationId && item.userId === writeUser.id);
       if (!notification) return { error: 'notification_not_found' };
       notification.read = true;
       notification.readAt = new Date().toISOString();
       return compactState(writeableDb, writeUser.id);
     });
-    if (result.error) return send(res, 404, result);
+    if (result.error) return send(res, errorStatus(result, 404), result);
     return send(res, 200, result);
   }
 
@@ -1316,6 +1439,7 @@ async function handleDynamic(req, res, method, pathname) {
     const result = await updateDb(async (writeableDb) => {
       ensureCollections(writeableDb);
       const writeUser = await currentUser(req, writeableDb);
+      if (!writeUser) return { error: 'auth_required' };
       writeableDb.behavioralEvents.unshift({
         id: createId('event'),
         userId: writeUser.id,
@@ -1327,6 +1451,7 @@ async function handleDynamic(req, res, method, pathname) {
       });
       return compactState(writeableDb, writeUser.id);
     });
+    if (result.error) return send(res, errorStatus(result, 400), result);
     return send(res, 201, result);
   }
 

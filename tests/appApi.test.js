@@ -72,6 +72,7 @@ describe('RentEazy app API', () => {
     const { response, json } = await request('/api/bootstrap');
     expect(response.status).toBe(200);
     expect(json).toMatchObject({
+      user: null,
       profile: expect.any(Object),
       posts: expect.any(Array),
       groups: expect.any(Array),
@@ -83,7 +84,39 @@ describe('RentEazy app API', () => {
       reportReasons: expect.arrayContaining(['Scam/fraud', 'Fake listing', 'Misleading investment claim']),
       usageLimit: { limitType: 'daily_swipes', period: 'day' },
     });
+    expect(json.profile).toMatchObject({ id: 'preview-visitor', name: 'Guest preview' });
+    expect(json.profile.name).not.toBe('RentEazy member');
+    expect(json.likedIds).toEqual([]);
+    expect(json.savedIds).toEqual([]);
+    expect(json.matches).toEqual([]);
+    expect(json.matchMessages).toEqual([]);
+    expect(json.notifications).toEqual([]);
+    expect(json.reputationProfile).toMatchObject({ userId: 'preview-visitor', score: 0 });
     expect(json.microProducts.some((product) => product.amount < 1)).toBe(true);
+  });
+
+  it('does not let anonymous preview traffic mutate demo account data', async () => {
+    const created = await request('/api/posts', {
+      method: 'POST',
+      body: {
+        postType: 'Question',
+        title: 'Anonymous post should not persist',
+        body: 'Preview visitors can browse but cannot create account history.',
+      },
+    });
+    expect(created.response.status).toBe(401);
+    expect(created.json).toMatchObject({ error: 'auth_required' });
+
+    const swipe = await request('/api/swipes', {
+      method: 'POST',
+      body: { targetId: 'anonymous-card', targetType: 'listing', action: 'like', score: 90 },
+    });
+    expect(swipe.response.status).toBe(401);
+    expect(swipe.json).toMatchObject({ error: 'auth_required' });
+
+    const state = await request('/api/bootstrap');
+    expect(state.json.matches).toEqual([]);
+    expect(state.json.profile.name).toBe('Guest preview');
   });
 
   it('registers users, stores role profile, answers match questions, and returns profile strength inputs', async () => {

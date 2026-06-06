@@ -810,6 +810,60 @@ const defaultAppProfile = {
   avatarBg: 'mist',
 };
 
+const previewUser = {
+  id: 'preview-visitor',
+  name: 'Guest preview',
+  role: '',
+};
+
+const previewAppProfile = {
+  id: previewUser.id,
+  name: previewUser.name,
+  role: previewUser.role,
+  area: '',
+  budget: '',
+  moveDate: '',
+  lookingFor: '',
+  avatarVariant: 'standing',
+  avatarIndex: 1,
+  avatarBg: 'mist',
+};
+
+const previewUsageLimit = {
+  id: 'daily-swipes-preview',
+  userId: previewUser.id,
+  limitType: 'daily_swipes',
+  period: 'day',
+  used: 0,
+  allowance: 0,
+  resetsAt: new Date(Date.now() + 20 * 60 * 60 * 1000).toISOString(),
+};
+
+const previewWallet = {
+  id: 'wallet-preview',
+  userId: previewUser.id,
+  balance: 0,
+  updatedAt: new Date().toISOString(),
+};
+
+const previewAppStreak = {
+  id: 'streak-preview',
+  userId: previewUser.id,
+  streakType: 'daily_app_open',
+  count: 0,
+  lastActivityAt: null,
+};
+
+const previewReputationProfile = {
+  userId: previewUser.id,
+  score: 0,
+  tier: 'Not started',
+  completedEvents: [],
+  missingFields: ['Create an account', 'Choose a role', 'Answer match questions'],
+  suggestions: ['Create a free account to start building real RentEazy reputation.'],
+  updatedAt: new Date().toISOString(),
+};
+
 const matchingQuestions = {
   Tenant: [
     { id: 'tenant-budget', category: 'Budget', prompt: 'What budget should RentEazy match you around?', answerType: 'text', weight: 18, isRequired: true, isAdvanced: false, options: [] },
@@ -4648,9 +4702,11 @@ function LikesSocialInbox({ posts, likedIds, savedIds, matches, matchMessages, p
 function SocialKitProfilePage({ profile, posts, likedIds, savedIds, matches, reputationProfile, answers, onOpenPost }) {
   const strength = calculateProfileStrength(profile, answers);
   const ownOrRelevantPosts = posts
-    .filter((post) => post.authorId === currentUser.id || post.authorName === profile.name || likedIds.includes(post.id) || savedIds.includes(post.id))
+    .filter((post) => post.authorId === profile.id || post.authorName === profile.name || likedIds.includes(post.id) || savedIds.includes(post.id))
     .slice(0, 8);
   const gallery = (ownOrRelevantPosts.length ? ownOrRelevantPosts : posts).filter((post) => post.media?.[0]).slice(0, 6);
+  const ownPostCount = posts.filter((post) => post.authorId === profile.id || post.authorName === profile.name).length;
+  const trustScore = Number.isFinite(Number(reputationProfile?.score)) ? Number(reputationProfile.score) : 0;
 
   return (
     <section className="overflow-hidden rounded-[2rem] bg-white shadow-[0_24px_70px_-52px_rgba(15,23,42,0.62)] ring-1 ring-white">
@@ -4683,8 +4739,8 @@ function SocialKitProfilePage({ profile, posts, likedIds, savedIds, matches, rep
 
       <div className="grid grid-cols-3 gap-2 px-6 py-5 text-center">
         {[
-          [posts.length, 'Posts'],
-          [reputationProfile.score || 100, 'Trust'],
+          [ownPostCount, 'Posts'],
+          [trustScore, 'Trust'],
           [matches.length, 'Matches'],
         ].map(([value, label]) => (
           <div key={label}>
@@ -7150,27 +7206,59 @@ function RentEazyAppContainer({ isPreviewVisitor = false }) {
   const answersSyncRef = useRef('');
   const lastFeedActionRef = useRef(null);
   const scrollSignalRef = useRef(0);
-  const remainingSwipes = Math.max(0, usageLimit.allowance - usageLimit.used);
+
+  const visibleProfile = isPreviewVisitor ? previewAppProfile : profile;
+  const visibleAnswers = isPreviewVisitor ? {} : answers;
+  const visibleLikedIds = isPreviewVisitor ? [] : likedIds;
+  const visibleSavedIds = isPreviewVisitor ? [] : savedIds;
+  const visibleFollowedIds = isPreviewVisitor ? [] : followedIds;
+  const visibleHiddenPostIds = isPreviewVisitor ? [] : hiddenPostIds;
+  const visibleShares = isPreviewVisitor ? [] : shares;
+  const visibleReports = isPreviewVisitor ? [] : reports;
+  const visibleComments = isPreviewVisitor ? [] : comments;
+  const visibleUsageLimit = isPreviewVisitor ? previewUsageLimit : usageLimit;
+  const visibleEntitlements = isPreviewVisitor ? [] : entitlements;
+  const visiblePurchases = isPreviewVisitor ? [] : purchases;
+  const visibleBoosts = isPreviewVisitor ? [] : boosts;
+  const visibleAppStreak = isPreviewVisitor ? previewAppStreak : appStreak;
+  const visibleWallet = isPreviewVisitor ? previewWallet : wallet;
+  const visibleGroupMemberships = isPreviewVisitor ? [] : groupMemberships;
+  const visibleBehavioralEvents = isPreviewVisitor ? [] : behavioralEvents;
+  const visibleFeedSignals = isPreviewVisitor ? [] : feedSignals;
+  const visibleMatches = isPreviewVisitor ? [] : matches;
+  const visibleMatchMessages = isPreviewVisitor ? [] : matchMessages;
+  const visibleViewings = isPreviewVisitor ? [] : viewings;
+  const visibleReviews = isPreviewVisitor ? [] : reviews;
+  const visibleReputationProfile = isPreviewVisitor ? previewReputationProfile : reputationProfile;
+  const visibleLifecycleTasks = isPreviewVisitor ? [] : lifecycleTasks;
+  const visibleReferrals = isPreviewVisitor ? [] : referrals;
+  const visibleResidentProfiles = isPreviewVisitor ? [] : residentProfiles;
+  const visibleMaintenanceRequests = isPreviewVisitor ? [] : maintenanceRequests;
+  const visibleRentRecords = isPreviewVisitor ? [] : rentRecords;
+  const visibleDealWatchlist = isPreviewVisitor ? [] : dealWatchlist;
+  const visibleNotifications = isPreviewVisitor ? [] : notifications;
+
+  const remainingSwipes = Math.max(0, visibleUsageLimit.allowance - visibleUsageLimit.used);
   const activeUpsellProduct = microProducts.find((product) => product.id === upsellProductId);
   const rankedSwipeCards = useMemo(() => heroSwipeCards
-    .map((card) => scoreSwipeCard(card, { profile, answers, recommendationInsights, behavioralEvents }))
-    .sort((a, b) => (b.recommendationScore || 0) - (a.recommendationScore || 0)), [answers, behavioralEvents, profile, recommendationInsights]);
-  const localRecommendationInsights = useMemo(() => buildLocalRecommendationInsights({ profile, answers, feedRankings, behavioralEvents, partnerOffers }), [answers, behavioralEvents, feedRankings, partnerOffers, profile]);
+    .map((card) => scoreSwipeCard(card, { profile: visibleProfile, answers: visibleAnswers, recommendationInsights, behavioralEvents: visibleBehavioralEvents }))
+    .sort((a, b) => (b.recommendationScore || 0) - (a.recommendationScore || 0)), [visibleAnswers, visibleBehavioralEvents, visibleProfile, recommendationInsights]);
+  const localRecommendationInsights = useMemo(() => buildLocalRecommendationInsights({ profile: visibleProfile, answers: visibleAnswers, feedRankings, behavioralEvents: visibleBehavioralEvents, partnerOffers }), [visibleAnswers, visibleBehavioralEvents, feedRankings, partnerOffers, visibleProfile]);
   const activeRecommendationInsights = recommendationInsights || localRecommendationInsights;
   const contextualUpsells = useMemo(() => buildContextualUpsells({
     routeTab,
     activeFeedTab,
     remainingSwipes,
     newPost,
-    profile,
-    answers,
+    profile: visibleProfile,
+    answers: visibleAnswers,
     posts,
-    likedIds,
-    savedIds,
-    shares,
-    boosts,
-    matches,
-  }).filter((card) => !dismissedUpsells.includes(card.id)).slice(0, 2), [activeFeedTab, answers, boosts, dismissedUpsells, likedIds, matches, newPost, posts, profile, remainingSwipes, routeTab, savedIds, shares]);
+    likedIds: visibleLikedIds,
+    savedIds: visibleSavedIds,
+    shares: visibleShares,
+    boosts: visibleBoosts,
+    matches: visibleMatches,
+  }).filter((card) => !dismissedUpsells.includes(card.id)).slice(0, 2), [activeFeedTab, dismissedUpsells, newPost, posts, remainingSwipes, routeTab, visibleAnswers, visibleBoosts, visibleLikedIds, visibleMatches, visibleProfile, visibleSavedIds, visibleShares]);
   const primaryContextualUpsell = contextualUpsells[0];
   const recommendedOfferIds = new Set((activeRecommendationInsights?.perkRecommendations || []).map((offer) => offer.offerId));
   const sortedPartnerOffers = useMemo(() => [...partnerOffers].sort((a, b) => Number(recommendedOfferIds.has(b.id)) - Number(recommendedOfferIds.has(a.id))), [partnerOffers, activeRecommendationInsights]);
@@ -7234,7 +7322,14 @@ function RentEazyAppContainer({ isPreviewVisitor = false }) {
 
   const applyApiState = (state) => {
     if (!state) return;
+    const isPublicPreviewState = state.user === null;
     if (state.posts) setPosts(state.posts);
+    if (state.groups) setGroups(state.groups);
+    if (state.partnerOffers) setPartnerOffers(state.partnerOffers);
+    if (state.feedAds) setFeedAds(state.feedAds);
+    if (state.feedRankings) setFeedRankings(state.feedRankings);
+    if (state.recommendationInsights) setRecommendationInsights(state.recommendationInsights);
+    if (isPublicPreviewState) return;
     if (state.likedIds) setLikedIds(state.likedIds);
     if (state.savedIds) setSavedIds(state.savedIds);
     if (state.followedIds) setFollowedIds(state.followedIds);
@@ -7250,12 +7345,7 @@ function RentEazyAppContainer({ isPreviewVisitor = false }) {
     if (state.boosts) setBoosts(state.boosts);
     if (state.wallet) setWallet(state.wallet);
     if (state.appStreak) setAppStreak(state.appStreak);
-    if (state.groups) setGroups(state.groups);
     if (state.groupMemberships) setGroupMemberships(state.groupMemberships);
-    if (state.partnerOffers) setPartnerOffers(state.partnerOffers);
-    if (state.feedAds) setFeedAds(state.feedAds);
-    if (state.feedRankings) setFeedRankings(state.feedRankings);
-    if (state.recommendationInsights) setRecommendationInsights(state.recommendationInsights);
     if (state.behavioralEvents) setBehavioralEvents(state.behavioralEvents);
     if (state.matches) setMatches(state.matches);
     if (state.matchMessages) setMatchMessages(state.matchMessages);
@@ -7860,18 +7950,18 @@ function RentEazyAppContainer({ isPreviewVisitor = false }) {
 
   const feedStream = useMemo(() => buildRentEazyFeed({
     posts,
-    profile,
-    answers,
-    followedIds,
-    likedIds,
-    savedIds,
-    hiddenPostIds,
-    comments,
-    behavioralEvents,
-    feedSignals,
+    profile: visibleProfile,
+    answers: visibleAnswers,
+    followedIds: visibleFollowedIds,
+    likedIds: visibleLikedIds,
+    savedIds: visibleSavedIds,
+    hiddenPostIds: visibleHiddenPostIds,
+    comments: visibleComments,
+    behavioralEvents: visibleBehavioralEvents,
+    feedSignals: visibleFeedSignals,
     activeFeedTab,
     minItems: 60,
-  }), [activeFeedTab, answers, behavioralEvents, comments, feedSignals, followedIds, hiddenPostIds, likedIds, posts, profile, savedIds]);
+  }), [activeFeedTab, posts, visibleAnswers, visibleBehavioralEvents, visibleComments, visibleFeedSignals, visibleFollowedIds, visibleHiddenPostIds, visibleLikedIds, visibleProfile, visibleSavedIds]);
   const rankingById = feedStream.rankingById;
   const feedItems = feedStream.items;
   const visibleFeedItems = isPreviewVisitor ? feedItems.slice(0, 6) : feedItems;
@@ -7943,16 +8033,16 @@ function RentEazyAppContainer({ isPreviewVisitor = false }) {
         <ShareEverywhereModal post={sharePost || newPost} onClose={() => setSharePost(null)} onShared={trackShare} />
       )}
       {reportPost && <ReportModal post={reportPost} onClose={() => setReportPost(null)} onReport={submitReport} />}
-      {commentPost && <CommentModal post={commentPost} comments={comments.filter((comment) => comment.postId === commentPost.id)} onClose={() => setCommentPost(null)} onComment={addComment} />}
+      {commentPost && <CommentModal post={commentPost} comments={visibleComments.filter((comment) => comment.postId === commentPost.id)} onClose={() => setCommentPost(null)} onComment={addComment} />}
       <MicroUpsellModal product={activeUpsellProduct} onClose={closeUpsell} onConfirm={confirmMicroProduct} billingEnabled={clerkEnabled} />
       {previewPrompt && <PreviewSignupPrompt action={previewPrompt} onClose={() => setPreviewPrompt(null)} />}
       <FeedImmersiveViewer
         items={visibleFeedItems}
         initialIndex={selectedFeedViewerIndex}
-        likedIds={likedIds}
-        savedIds={savedIds}
-        followedIds={followedIds}
-        comments={comments}
+        likedIds={visibleLikedIds}
+        savedIds={visibleSavedIds}
+        followedIds={visibleFollowedIds}
+        comments={visibleComments}
         onClose={() => setSelectedFeedViewerIndex(null)}
         onLike={guardedToggleLike}
         onSave={guardedToggleSave}
@@ -7993,13 +8083,13 @@ function RentEazyAppContainer({ isPreviewVisitor = false }) {
         {routeTab === 'Feed' && (
           <FeedScreen
             activeFeedTab={activeFeedTab}
-            comments={comments}
+            comments={visibleComments}
             components={appScreenComponents}
             createGroup={createGroup}
             dismissUpsell={dismissUpsell}
             feedTabs={feedTabs}
-            followedIds={followedIds}
-            groupMemberships={groupMemberships}
+            followedIds={visibleFollowedIds}
+            groupMemberships={visibleGroupMemberships}
             groups={groups}
             guardedComment={guardedComment}
             guardedOpenFeedItem={guardedOpenFeedItem}
@@ -8010,20 +8100,20 @@ function RentEazyAppContainer({ isPreviewVisitor = false }) {
             guardedToggleSave={guardedToggleSave}
             isPreviewVisitor={isPreviewVisitor}
             joinGroup={joinGroup}
-            likedIds={likedIds}
+            likedIds={visibleLikedIds}
             newPost={newPost}
             openedOfferId={openedOfferId}
             openPartnerOffer={openPartnerOffer}
             openUpsell={openUpsell}
             posts={posts}
             primaryContextualUpsell={primaryContextualUpsell}
-            profile={profile}
+            profile={visibleProfile}
             requireAccount={requireAccount}
-            savedIds={savedIds}
+            savedIds={visibleSavedIds}
             setActiveFeedTab={setActiveFeedTab}
             setSharePost={setSharePost}
             sortedPartnerOffers={sortedPartnerOffers}
-            usageLimit={usageLimit}
+            usageLimit={visibleUsageLimit}
             visibleFeedItems={visibleFeedItems}
           />
         )}
@@ -8039,15 +8129,15 @@ function RentEazyAppContainer({ isPreviewVisitor = false }) {
           {routeTab === 'Post' && (
             <PostScreen
               addPost={addPost}
-              boosts={boosts}
+              boosts={visibleBoosts}
               components={appScreenComponents}
               isPreviewVisitor={isPreviewVisitor}
               openUpsell={openUpsell}
               posts={posts}
-              profile={profile}
-              reports={reports}
-              shares={shares}
-              usageLimit={usageLimit}
+              profile={visibleProfile}
+              reports={visibleReports}
+              shares={visibleShares}
+              usageLimit={visibleUsageLimit}
             />
           )}
 
@@ -8058,7 +8148,7 @@ function RentEazyAppContainer({ isPreviewVisitor = false }) {
                   Perk opened. RentEazy records the signal so future offers can be more relevant.
                 </div>
               )}
-              <PerksRail partnerOffers={sortedPartnerOffers} profile={profile} onOpenOffer={openPartnerOffer} />
+              <PerksRail partnerOffers={sortedPartnerOffers} profile={visibleProfile} onOpenOffer={openPartnerOffer} />
             </div>
           )}
 
@@ -8079,15 +8169,15 @@ function RentEazyAppContainer({ isPreviewVisitor = false }) {
               components={appScreenComponents}
               dismissUpsell={dismissUpsell}
               feedItems={feedItems}
-              likedIds={likedIds}
-              matches={matches}
-              matchMessages={matchMessages}
+              likedIds={visibleLikedIds}
+              matches={visibleMatches}
+              matchMessages={visibleMatchMessages}
               newPost={newPost}
               openUpsell={openUpsell}
               posts={posts}
               primaryContextualUpsell={primaryContextualUpsell}
-              profile={profile}
-              savedIds={savedIds}
+              profile={visibleProfile}
+              savedIds={visibleSavedIds}
               setSelectedFeedViewerIndex={setSelectedFeedViewerIndex}
               setSharePost={setSharePost}
             />
@@ -8095,51 +8185,51 @@ function RentEazyAppContainer({ isPreviewVisitor = false }) {
 
           {!previewGateActive && routeTab === 'Profile' && (
             <ProfileScreen
-              answers={answers}
-              comments={comments}
+              answers={visibleAnswers}
+              comments={visibleComments}
               components={appScreenComponents}
               completeLifecycleTask={completeLifecycleTask}
               dismissUpsell={dismissUpsell}
               feedItems={feedItems}
-              lifecycleTasks={lifecycleTasks}
-              likedIds={likedIds}
+              lifecycleTasks={visibleLifecycleTasks}
+              likedIds={visibleLikedIds}
               markNotificationRead={markNotificationRead}
-              matches={matches}
+              matches={visibleMatches}
               newPost={newPost}
-              notifications={notifications}
+              notifications={visibleNotifications}
               openUpsell={openUpsell}
               posts={posts}
               primaryContextualUpsell={primaryContextualUpsell}
-              profile={profile}
-              reports={reports}
-              reputationProfile={reputationProfile}
-              savedIds={savedIds}
-              setAnswers={setAnswers}
-              setProfile={setProfile}
+              profile={visibleProfile}
+              reports={visibleReports}
+              reputationProfile={visibleReputationProfile}
+              savedIds={visibleSavedIds}
+              setAnswers={isPreviewVisitor ? () => requireAccount('profile') : setAnswers}
+              setProfile={isPreviewVisitor ? () => requireAccount('profile') : setProfile}
               setSelectedFeedViewerIndex={setSelectedFeedViewerIndex}
               setSharePost={setSharePost}
             />
           )}
 
           {!previewGateActive && routeTab === 'Billing' && (
-            <BillingScreen boosts={boosts} components={appScreenComponents} openUpsell={openUpsell} purchases={purchases} wallet={wallet} />
+            <BillingScreen boosts={visibleBoosts} components={appScreenComponents} openUpsell={openUpsell} purchases={visiblePurchases} wallet={visibleWallet} />
           )}
         </section>}
 
         {routeTab === 'Feed' && (
           <aside className="sticky top-5 hidden space-y-4 lg:block">
-            <DailySwipePanel usageLimit={usageLimit} onBuyMore={openUpsell} />
-            <ProfileStrengthCard profile={profile} answers={answers} />
-            <UsefulNotificationsPanel notifications={notifications} onMarkRead={markNotificationRead} />
+            <DailySwipePanel usageLimit={visibleUsageLimit} onBuyMore={openUpsell} />
+            <ProfileStrengthCard profile={visibleProfile} answers={visibleAnswers} />
+            <UsefulNotificationsPanel notifications={visibleNotifications} onMarkRead={markNotificationRead} />
             <RecommendationLoopPanel insights={activeRecommendationInsights} onOpenOffer={openRecommendedOffer} />
             <MiniShopPanel onSelectProduct={openUpsell} compact />
           </aside>
         )}
 
         {routeTab === 'Profile' && <aside className="hidden space-y-4 lg:block">
-          <DailySwipePanel usageLimit={usageLimit} onBuyMore={openUpsell} />
-          <ProfileStrengthCard profile={profile} answers={answers} />
-          <UsefulNotificationsPanel notifications={notifications} onMarkRead={markNotificationRead} />
+          <DailySwipePanel usageLimit={visibleUsageLimit} onBuyMore={openUpsell} />
+          <ProfileStrengthCard profile={visibleProfile} answers={visibleAnswers} />
+          <UsefulNotificationsPanel notifications={visibleNotifications} onMarkRead={markNotificationRead} />
           <RecommendationLoopPanel insights={activeRecommendationInsights} onOpenOffer={openRecommendedOffer} />
           <MiniShopPanel onSelectProduct={openUpsell} compact />
         </aside>}
@@ -8147,28 +8237,28 @@ function RentEazyAppContainer({ isPreviewVisitor = false }) {
         {routeTab !== 'Feed' && routeTab !== 'Swipe' && routeTab !== 'Profile' && routeTab !== 'Perks' && (
           <AppSupportSidebar
             routeTab={routeTab}
-            wallet={wallet}
-            purchases={purchases}
-            boosts={boosts}
-            reports={reports}
-            shares={shares}
+            wallet={visibleWallet}
+            purchases={visiblePurchases}
+            boosts={visibleBoosts}
+            reports={visibleReports}
+            shares={visibleShares}
             posts={posts}
-            savedIds={savedIds}
-            comments={comments}
-            entitlements={entitlements}
-            appStreak={appStreak}
-            usageLimit={usageLimit}
-            profile={profile}
-            answers={answers}
-            notifications={notifications}
+            savedIds={visibleSavedIds}
+            comments={visibleComments}
+            entitlements={visibleEntitlements}
+            appStreak={visibleAppStreak}
+            usageLimit={visibleUsageLimit}
+            profile={visibleProfile}
+            answers={visibleAnswers}
+            notifications={visibleNotifications}
             markNotificationRead={markNotificationRead}
             activeRecommendationInsights={activeRecommendationInsights}
             openRecommendedOffer={openRecommendedOffer}
-            referrals={referrals}
+            referrals={visibleReferrals}
             createReferral={createReferral}
-            residentProfiles={residentProfiles}
-            maintenanceRequests={maintenanceRequests}
-            rentRecords={rentRecords}
+            residentProfiles={visibleResidentProfiles}
+            maintenanceRequests={visibleMaintenanceRequests}
+            rentRecords={visibleRentRecords}
             logMaintenanceRequest={logMaintenanceRequest}
             logRentRecord={logRentRecord}
             landlordProperties={landlordProperties}
@@ -8178,14 +8268,14 @@ function RentEazyAppContainer({ isPreviewVisitor = false }) {
             shortlistTenantDemand={shortlistTenantDemand}
             professionalProfiles={professionalProfiles}
             groups={groups}
-            dealWatchlist={dealWatchlist}
+            dealWatchlist={visibleDealWatchlist}
             watchDeal={watchDeal}
             updateDealStatus={updateDealStatus}
             operatorPortfolioSignals={operatorPortfolioSignals}
             addOperatorSignal={addOperatorSignal}
             activeFeedTab={activeFeedTab}
             setActiveFeedTab={setActiveFeedTab}
-            likedIds={likedIds}
+            likedIds={visibleLikedIds}
             feedAds={feedAds}
             openUpsell={openUpsell}
           />
