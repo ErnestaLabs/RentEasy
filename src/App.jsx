@@ -6362,6 +6362,11 @@ function PreviewSignupPrompt({ action = 'continue', onClose }) {
     share: ['Create a free account to share from RentEazy.', 'Share links, track interest, and bring replies back into RentEazy.'],
     follow: ['Create a free account to follow people and groups.', 'Following makes the Feed more relevant.'],
     report: ['Create a free account to report this.', 'Reports are tied to accountable RentEazy profiles.'],
+    group: ['Create a free account to join groups.', 'Groups keep area, role, and deal conversations attached to real profiles.'],
+    billing: ['Create a free account to manage plans and perks.', 'Paid extras, credits, boosts, and Protect records belong inside your RentEazy account.'],
+    invite: ['Create a free account to invite people.', 'Invite links and rewards need an account so they can be tracked properly.'],
+    resident: ['Create a free account to use Resident Mode.', 'Maintenance, rent records, and viewing notes are saved to your own profile.'],
+    profile: ['Create a free account to edit your profile.', 'Your role, avatar, answers, and reputation progress belong to your account.'],
     continue: ['Create a free account to continue.', 'The preview is open. Interaction starts after signup.'],
   };
   const [title, body] = copyByAction[action] || copyByAction.continue;
@@ -7497,6 +7502,10 @@ function RentEazyAppContainer({ isPreviewVisitor = false }) {
   };
 
   const openUpsell = (productId) => {
+    if (isPreviewVisitor) {
+      requireAccount('billing');
+      return;
+    }
     if (dismissedUpsells.includes(productId)) return;
     setUpsellProductId(productId);
   };
@@ -7864,6 +7873,11 @@ function RentEazyAppContainer({ isPreviewVisitor = false }) {
   };
 
   const confirmMicroProduct = (product) => {
+    if (isPreviewVisitor) {
+      setUpsellProductId(null);
+      requireAccount('billing');
+      return;
+    }
     const purchase = {
       id: createPostId(),
       userId: profile.id || currentUser.id,
@@ -7989,6 +8003,19 @@ function RentEazyAppContainer({ isPreviewVisitor = false }) {
   const guardedShare = previewGuard('share', setSharePost);
   const guardedComment = previewGuard('comment', setCommentPost);
   const guardedReport = previewGuard('report', setReportPost);
+  const guardedOpenUpsell = previewGuard('billing', openUpsell);
+  const guardedJoinGroup = previewGuard('group', joinGroup);
+  const guardedCreateGroup = previewGuard('group', createGroup);
+  const guardedMarkNotificationRead = previewGuard('profile', markNotificationRead);
+  const guardedCompleteLifecycleTask = previewGuard('profile', completeLifecycleTask);
+  const guardedCreateReferral = previewGuard('invite', createReferral);
+  const guardedLogMaintenanceRequest = previewGuard('resident', logMaintenanceRequest);
+  const guardedLogRentRecord = previewGuard('resident', logRentRecord);
+  const guardedAddLandlordProperty = previewGuard('profile', addLandlordProperty);
+  const guardedShortlistTenantDemand = previewGuard('match', shortlistTenantDemand);
+  const guardedWatchDeal = previewGuard('match', watchDeal);
+  const guardedUpdateDealStatus = previewGuard('match', updateDealStatus);
+  const guardedAddOperatorSignal = previewGuard('profile', addOperatorSignal);
   const guardedOpenFeedItem = (index) => {
     if (isPreviewVisitor) {
       requireAccount('continue');
@@ -8092,7 +8119,7 @@ function RentEazyAppContainer({ isPreviewVisitor = false }) {
             activeFeedTab={activeFeedTab}
             comments={visibleComments}
             components={appScreenComponents}
-            createGroup={createGroup}
+            createGroup={guardedCreateGroup}
             dismissUpsell={dismissUpsell}
             feedTabs={feedTabs}
             followedIds={visibleFollowedIds}
@@ -8106,12 +8133,12 @@ function RentEazyAppContainer({ isPreviewVisitor = false }) {
             guardedToggleLike={guardedToggleLike}
             guardedToggleSave={guardedToggleSave}
             isPreviewVisitor={isPreviewVisitor}
-            joinGroup={joinGroup}
+            joinGroup={guardedJoinGroup}
             likedIds={visibleLikedIds}
             newPost={newPost}
             openedOfferId={openedOfferId}
             openPartnerOffer={openPartnerOffer}
-            openUpsell={openUpsell}
+            openUpsell={guardedOpenUpsell}
             posts={posts}
             primaryContextualUpsell={primaryContextualUpsell}
             profile={visibleProfile}
@@ -8139,7 +8166,7 @@ function RentEazyAppContainer({ isPreviewVisitor = false }) {
               boosts={visibleBoosts}
               components={appScreenComponents}
               isPreviewVisitor={isPreviewVisitor}
-              openUpsell={openUpsell}
+              openUpsell={guardedOpenUpsell}
               posts={posts}
               profile={visibleProfile}
               reports={visibleReports}
@@ -8164,7 +8191,7 @@ function RentEazyAppContainer({ isPreviewVisitor = false }) {
               components={appScreenComponents}
               handleSwipeAction={handleSwipeAction}
               isPreviewVisitor={isPreviewVisitor}
-              openUpsell={openUpsell}
+              openUpsell={guardedOpenUpsell}
               rankedSwipeCards={rankedSwipeCards}
               remainingSwipes={remainingSwipes}
               requireAccount={requireAccount}
@@ -8180,7 +8207,7 @@ function RentEazyAppContainer({ isPreviewVisitor = false }) {
               matches={visibleMatches}
               matchMessages={visibleMatchMessages}
               newPost={newPost}
-              openUpsell={openUpsell}
+              openUpsell={guardedOpenUpsell}
               posts={posts}
               primaryContextualUpsell={primaryContextualUpsell}
               profile={visibleProfile}
@@ -8195,16 +8222,16 @@ function RentEazyAppContainer({ isPreviewVisitor = false }) {
               answers={visibleAnswers}
               comments={visibleComments}
               components={appScreenComponents}
-              completeLifecycleTask={completeLifecycleTask}
+              completeLifecycleTask={guardedCompleteLifecycleTask}
               dismissUpsell={dismissUpsell}
               feedItems={feedItems}
               lifecycleTasks={visibleLifecycleTasks}
               likedIds={visibleLikedIds}
-              markNotificationRead={markNotificationRead}
+              markNotificationRead={guardedMarkNotificationRead}
               matches={visibleMatches}
               newPost={newPost}
               notifications={visibleNotifications}
-              openUpsell={openUpsell}
+              openUpsell={guardedOpenUpsell}
               posts={posts}
               primaryContextualUpsell={primaryContextualUpsell}
               profile={visibleProfile}
@@ -8219,26 +8246,26 @@ function RentEazyAppContainer({ isPreviewVisitor = false }) {
           )}
 
           {!previewGateActive && routeTab === 'Billing' && (
-            <BillingScreen boosts={visibleBoosts} components={appScreenComponents} openUpsell={openUpsell} purchases={visiblePurchases} wallet={visibleWallet} />
+            <BillingScreen boosts={visibleBoosts} components={appScreenComponents} openUpsell={guardedOpenUpsell} purchases={visiblePurchases} wallet={visibleWallet} />
           )}
         </section>}
 
         {routeTab === 'Feed' && (
           <aside className="sticky top-5 hidden space-y-4 lg:block">
-            <DailySwipePanel usageLimit={visibleUsageLimit} onBuyMore={openUpsell} />
+            <DailySwipePanel usageLimit={visibleUsageLimit} onBuyMore={guardedOpenUpsell} />
             <ProfileStrengthCard profile={visibleProfile} answers={visibleAnswers} />
             <UsefulNotificationsPanel notifications={visibleNotifications} onMarkRead={markNotificationRead} />
             <RecommendationLoopPanel insights={activeRecommendationInsights} onOpenOffer={openRecommendedOffer} />
-            <MiniShopPanel onSelectProduct={openUpsell} compact />
+            <MiniShopPanel onSelectProduct={guardedOpenUpsell} compact />
           </aside>
         )}
 
         {routeTab === 'Profile' && <aside className="hidden space-y-4 lg:block">
-          <DailySwipePanel usageLimit={visibleUsageLimit} onBuyMore={openUpsell} />
+          <DailySwipePanel usageLimit={visibleUsageLimit} onBuyMore={guardedOpenUpsell} />
           <ProfileStrengthCard profile={visibleProfile} answers={visibleAnswers} />
           <UsefulNotificationsPanel notifications={visibleNotifications} onMarkRead={markNotificationRead} />
           <RecommendationLoopPanel insights={activeRecommendationInsights} onOpenOffer={openRecommendedOffer} />
-          <MiniShopPanel onSelectProduct={openUpsell} compact />
+          <MiniShopPanel onSelectProduct={guardedOpenUpsell} compact />
         </aside>}
 
         {routeTab !== 'Feed' && routeTab !== 'Swipe' && routeTab !== 'Profile' && routeTab !== 'Perks' && (
@@ -8258,33 +8285,33 @@ function RentEazyAppContainer({ isPreviewVisitor = false }) {
             profile={visibleProfile}
             answers={visibleAnswers}
             notifications={visibleNotifications}
-            markNotificationRead={markNotificationRead}
+            markNotificationRead={guardedMarkNotificationRead}
             activeRecommendationInsights={activeRecommendationInsights}
             openRecommendedOffer={openRecommendedOffer}
             referrals={visibleReferrals}
-            createReferral={createReferral}
+            createReferral={guardedCreateReferral}
             residentProfiles={visibleResidentProfiles}
             maintenanceRequests={visibleMaintenanceRequests}
             rentRecords={visibleRentRecords}
-            logMaintenanceRequest={logMaintenanceRequest}
-            logRentRecord={logRentRecord}
+            logMaintenanceRequest={guardedLogMaintenanceRequest}
+            logRentRecord={guardedLogRentRecord}
             landlordProperties={landlordProperties}
-            addLandlordProperty={addLandlordProperty}
+            addLandlordProperty={guardedAddLandlordProperty}
             tenantDemandSignals={tenantDemandSignals}
             marketIntroductions={marketIntroductions}
-            shortlistTenantDemand={shortlistTenantDemand}
+            shortlistTenantDemand={guardedShortlistTenantDemand}
             professionalProfiles={professionalProfiles}
             groups={groups}
             dealWatchlist={visibleDealWatchlist}
-            watchDeal={watchDeal}
-            updateDealStatus={updateDealStatus}
+            watchDeal={guardedWatchDeal}
+            updateDealStatus={guardedUpdateDealStatus}
             operatorPortfolioSignals={operatorPortfolioSignals}
-            addOperatorSignal={addOperatorSignal}
+            addOperatorSignal={guardedAddOperatorSignal}
             activeFeedTab={activeFeedTab}
             setActiveFeedTab={setActiveFeedTab}
             likedIds={visibleLikedIds}
             feedAds={feedAds}
-            openUpsell={openUpsell}
+            openUpsell={guardedOpenUpsell}
           />
         )}
       </main>
