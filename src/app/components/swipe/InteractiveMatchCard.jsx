@@ -2,7 +2,14 @@ import { useRef, useState } from 'react';
 import { ArrowDownLeft, Check, Heart, RotateCcw, Send, Sparkles, X } from 'lucide-react';
 import DemoCardVisual from './DemoCardVisual';
 
-export default function InteractiveMatchCard({ cards = [], canSwipe = true, onSwipeAction = () => {}, onBlocked = () => {}, immersive = false }) {
+export default function InteractiveMatchCard({
+  cards = [],
+  canSwipe = true,
+  onSwipeAction = () => {},
+  onBlocked = () => {},
+  blockedFeedback = 'Daily swipes used',
+  immersive = false,
+}) {
   const [activeIndex, setActiveIndex] = useState(0);
   const [dragX, setDragX] = useState(0);
   const [dragY, setDragY] = useState(0);
@@ -76,7 +83,7 @@ export default function InteractiveMatchCard({ cards = [], canSwipe = true, onSw
 
   const swipe = (action) => {
     if (!canSwipe) {
-      setFeedback('Daily swipes used');
+      setFeedback(blockedFeedback);
       onBlocked();
       return;
     }

@@ -38,6 +38,7 @@ export default function SwipeScreen({
         canSwipe={!isPreviewVisitor && remainingSwipes > 0}
         onSwipeAction={handleSwipeAction}
         onBlocked={() => isPreviewVisitor ? requireAccount('match') : openUpsell('extra-swipes-10')}
+        blockedFeedback={isPreviewVisitor ? 'Create a free account to swipe' : 'Daily swipes used'}
         immersive
       />
     </div>

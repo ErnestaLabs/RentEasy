@@ -300,7 +300,7 @@ const heroSwipeCards = demoCardData.map(([id, type, title, location, price, matc
     badges,
     gallery,
     imageSrc: gallery[0],
-    imageAlt: `${title} demo card`,
+    imageAlt: `${title} swipe card`,
     imagePosition: 'center',
     visual: { from, to, icon, index },
   };
@@ -775,7 +775,7 @@ const microProducts = [
 
 const currentUser = {
   id: 'demo-user',
-  name: 'RentEazy member',
+  name: 'New RentEazy profile',
   role: '',
 };
 
@@ -3145,7 +3145,14 @@ function DemoCardVisual({ card, dimmed = false, quiet = false, photoIndex = 0, o
   );
 }
 
-function InteractiveMatchCard({ cards = heroSwipeCards, canSwipe = true, onSwipeAction = () => {}, onBlocked = () => {}, immersive = false }) {
+function InteractiveMatchCard({
+  cards = heroSwipeCards,
+  canSwipe = true,
+  onSwipeAction = () => {},
+  onBlocked = () => {},
+  blockedFeedback = 'Daily swipes used',
+  immersive = false,
+}) {
   const [activeIndex, setActiveIndex] = useState(0);
   const [dragX, setDragX] = useState(0);
   const [dragY, setDragY] = useState(0);
@@ -3208,7 +3215,7 @@ function InteractiveMatchCard({ cards = heroSwipeCards, canSwipe = true, onSwipe
 
   const swipe = (action) => {
     if (!canSwipe) {
-      setFeedback('Daily swipes used');
+      setFeedback(blockedFeedback);
       onBlocked();
       return;
     }
@@ -3790,7 +3797,7 @@ function ClerkSessionBridge({ setProfile }) {
   useEffect(() => {
     if (!isSignedIn || !user) return;
     const savedRole = getStoredJson('renteazy-signup-role', '');
-    const displayName = user.fullName || user.primaryEmailAddress?.emailAddress || 'RentEazy member';
+    const displayName = user.fullName || user.primaryEmailAddress?.emailAddress || 'New RentEazy profile';
     setProfile((current) => ({
       ...current,
       id: current.id?.startsWith('clerk-') ? current.id : `clerk-${user.id}`,
@@ -4378,7 +4385,7 @@ function ProfileSocialOverview({ profile, answers, reputationProfile, usageLimit
             <span className="rounded-full bg-[#edf7ff] px-3 py-1 text-xs font-semibold text-[#154f79] ring-1 ring-[#cfe9fb]">{displayRole(profile.role)}</span>
             <span className="rounded-full bg-[#edf8ee] px-3 py-1 text-xs font-semibold text-[#215d27] ring-1 ring-[#d5ecd7]">{reputationProfile.tier} reputation</span>
           </div>
-          <h1 className="mt-4 text-3xl font-semibold leading-tight tracking-tight text-slate-950 sm:text-4xl">{profile.name || 'RentEazy member'}</h1>
+          <h1 className="mt-4 text-3xl font-semibold leading-tight tracking-tight text-slate-950 sm:text-4xl">{profile.name || 'New RentEazy profile'}</h1>
           <p className="mx-auto mt-2 max-w-2xl text-sm leading-6 text-slate-500">{[profile.area || 'Set area', profile.budget || 'Add budget/range', profile.moveDate || 'Add timing'].join(' · ')}</p>
           <div className="mt-5 grid grid-cols-2 gap-2 sm:mx-auto sm:max-w-sm">
             <a href="/app/post" className="rounded-full bg-[#092243] px-4 py-3 text-sm font-semibold text-white shadow-[0_14px_28px_-22px_rgba(9,34,67,0.82)]">Post</a>
@@ -4732,7 +4739,7 @@ function SocialKitProfilePage({ profile, posts, likedIds, savedIds, matches, rep
             ring="ring-8 ring-white/15"
             imageClassName={(profile.avatarVariant || 'standing') === 'bust' ? '' : 'object-contain p-1'}
           />
-          <h1 className="mt-4 font-['Bricolage_Grotesque_Variable',Inter,sans-serif] text-2xl font-semibold tracking-tight text-white">{profile.name || 'RentEazy member'}</h1>
+          <h1 className="mt-4 font-['Bricolage_Grotesque_Variable',Inter,sans-serif] text-2xl font-semibold tracking-tight text-white">{profile.name || 'New RentEazy profile'}</h1>
           <p className="mt-1 text-sm font-medium text-white/65">@{(profile.name || 'renteazy').toLowerCase().replace(/[^a-z0-9]+/g, '') || 'renteazy'} · {displayRole(profile.role)}</p>
         </div>
       </div>
@@ -7798,7 +7805,7 @@ function RentEazyAppContainer({ isPreviewVisitor = false }) {
         reasonBadges: [...new Set([...(card.badges || []), ...(card.recommendationReasons || [])])].slice(0, 6),
         missingInfo: ['Confirm viewing availability'],
         counterpartId: `source-${card.id || 'card'}`,
-        counterpartName: card.type === 'room' || card.type === 'flat' || card.type === 'studio' ? 'Listing source' : 'RentEazy member',
+        counterpartName: card.type === 'room' || card.type === 'flat' || card.type === 'studio' ? 'Listing source' : 'RentEazy profile',
         counterpartType: card.type || 'Member',
       },
     }));
