@@ -13,7 +13,7 @@ export default defineConfig({
   server: {
     port: 3000,
     watch: {
-      ignored: ['**/server/data/**', '**/server/*.log']
+      ignored: ['**/server/data/**', '**/server/*.log', '**/tmp/**']
     },
     proxy: {
       '/api': {
