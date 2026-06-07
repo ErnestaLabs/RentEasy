@@ -193,7 +193,17 @@ describe('RentEazy app API', () => {
     });
     expect(reportState.json.reports[0]).toMatchObject({ targetId: created.json.id, reason: 'Fake listing', status: 'open' });
 
-    const moderation = await request('/api/admin/moderation');
+    const anonymousModeration = await request('/api/admin/moderation');
+    expect(anonymousModeration.response.status).toBe(401);
+    expect(anonymousModeration.json).toMatchObject({ error: 'auth_required' });
+
+    const nonAdminModeration = await request('/api/admin/moderation', { token: auth.token });
+    expect(nonAdminModeration.response.status).toBe(403);
+    expect(nonAdminModeration.json).toMatchObject({ error: 'admin_required' });
+
+    process.env.RENTEAZY_ADMIN_EMAILS = auth.user.email;
+    const moderation = await request('/api/admin/moderation', { token: auth.token });
+    delete process.env.RENTEAZY_ADMIN_EMAILS;
     expect(moderation.response.status).toBe(200);
     expect(moderation.json.reports.some((report) => report.targetId === created.json.id)).toBe(true);
   });

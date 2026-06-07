@@ -113,7 +113,7 @@ async function clerkUserFromToken(db, token) {
       profile = {
         id: user.id,
         userId: user.id,
-        name: payload.name || payload.email || 'RentEazy member',
+        name: payload.name || payload.email || 'New RentEazy profile',
         role: '',
         area: '',
         budget: '',
@@ -140,6 +140,19 @@ async function clerkUserFromToken(db, token) {
 async function currentUser(req, db) {
   const token = authToken(req);
   return getUserFromToken(db, token) || await clerkUserFromToken(db, token) || null;
+}
+
+async function currentAdminUser(req, db) {
+  const user = await currentUser(req, db);
+  if (!user) return { error: 'auth_required' };
+  const allowedEmails = String(process.env.RENTEAZY_ADMIN_EMAILS || '')
+    .split(',')
+    .map((email) => email.trim().toLowerCase())
+    .filter(Boolean);
+  if (!allowedEmails.length || !allowedEmails.includes(String(user.email || '').toLowerCase())) {
+    return { error: 'admin_required' };
+  }
+  return { user };
 }
 
 function compactState(db, userId = demoUserId) {
@@ -654,7 +667,7 @@ function createOrUpdateMatch(db, userId, body, action) {
   const match = {
     id: createId('match'),
     participantIds: [userId, counterpartId],
-    participantNames: [publicProfile(db, userId).name, body.counterpartName || body.authorName || 'RentEazy member'],
+    participantNames: [publicProfile(db, userId).name, body.counterpartName || body.authorName || 'RentEazy profile'],
     participantTypes: [publicProfile(db, userId).role || 'Member', body.counterpartType || body.authorType || body.type || 'Member'],
     subjectType: body.targetType || 'swipe_card',
     subjectId: targetId,
@@ -749,7 +762,7 @@ const routes = {
     const body = await readBody(req);
     const email = String(body.email || '').trim().toLowerCase();
     const password = String(body.password || '');
-    const name = String(body.name || 'RentEazy member').trim();
+    const name = String(body.name || 'New RentEazy profile').trim();
     const role = roleOptions.includes(body.role) ? body.role : '';
     if (!email || password.length < 8) return send(res, 400, { error: 'email_and_password_required' });
 
@@ -1456,6 +1469,9 @@ async function handleDynamic(req, res, method, pathname) {
   }
 
   if (method === 'GET' && pathname === '/api/admin/moderation') {
+    const admin = await currentAdminUser(req, db);
+    if (admin.error === 'auth_required') return send(res, 401, admin);
+    if (admin.error) return send(res, 403, admin);
     return send(res, 200, { reports: db.reports, hiddenPosts: db.hiddenPosts, sponsoredPosts: db.posts.filter((post) => post.sponsoredStatus) });
   }
 
