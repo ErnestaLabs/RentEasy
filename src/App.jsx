@@ -7395,7 +7395,7 @@ function RentEazyAppContainer({ isPreviewVisitor = false }) {
   }, []);
 
   useEffect(() => {
-    if (backendStatus !== 'connected') return;
+    if (isPreviewVisitor || backendStatus !== 'connected') return;
     const editableProfile = {
       name: profile.name,
       role: profile.role,
@@ -7414,10 +7414,10 @@ function RentEazyAppContainer({ isPreviewVisitor = false }) {
       syncApiState(apiRequest('/api/profile', { method: 'PATCH', body: editableProfile }));
     }, 500);
     return () => window.clearTimeout(timer);
-  }, [backendStatus, profile]);
+  }, [backendStatus, isPreviewVisitor, profile]);
 
   useEffect(() => {
-    if (backendStatus !== 'connected') return;
+    if (isPreviewVisitor || backendStatus !== 'connected') return;
     const payload = JSON.stringify(answers);
     if (answersSyncRef.current === payload) return;
     answersSyncRef.current = payload;
@@ -7425,9 +7425,10 @@ function RentEazyAppContainer({ isPreviewVisitor = false }) {
       syncApiState(apiRequest('/api/answers', { method: 'PATCH', body: { answers } }));
     }, 500);
     return () => window.clearTimeout(timer);
-  }, [answers, backendStatus]);
+  }, [answers, backendStatus, isPreviewVisitor]);
 
   useEffect(() => {
+    if (isPreviewVisitor) return;
     const now = Date.now();
     if (new Date(usageLimit.resetsAt).getTime() <= now) {
       setUsageLimit((current) => ({
@@ -7436,9 +7437,10 @@ function RentEazyAppContainer({ isPreviewVisitor = false }) {
         resetsAt: new Date(now + 24 * 60 * 60 * 1000).toISOString(),
       }));
     }
-  }, [setUsageLimit, usageLimit.resetsAt]);
+  }, [isPreviewVisitor, setUsageLimit, usageLimit.resetsAt]);
 
   useEffect(() => {
+    if (isPreviewVisitor) return;
     const today = new Date().toISOString().slice(0, 10);
     const last = String(appStreak.lastActivityAt || '').slice(0, 10);
     if (today !== last) {
@@ -7448,9 +7450,10 @@ function RentEazyAppContainer({ isPreviewVisitor = false }) {
         lastActivityAt: new Date().toISOString(),
       }));
     }
-  }, [appStreak.lastActivityAt, setAppStreak]);
+  }, [appStreak.lastActivityAt, isPreviewVisitor, setAppStreak]);
 
   useEffect(() => {
+    if (isPreviewVisitor) return undefined;
     if (routeTab !== 'Feed') return undefined;
     const onScroll = () => {
       const now = Date.now();
@@ -7472,7 +7475,7 @@ function RentEazyAppContainer({ isPreviewVisitor = false }) {
     };
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
-  }, [activeFeedTab, routeTab, setFeedSignals]);
+  }, [activeFeedTab, isPreviewVisitor, routeTab, setFeedSignals]);
 
   useEffect(() => {
     if (routeTab !== 'Feed') return undefined;
