@@ -31,6 +31,14 @@ Ship the app experience, not another landing-page pass. Claude owns presentation
 - Preserve app route/data wiring while Claude changes visual UI.
 - Keep tests/build green after each backend or contract change.
 
+## Deployment Contract
+
+- The app can be hosted as a static Vite build, but the Node API must be deployed separately with `npm start`.
+- Production frontend deployments must set `VITE_RENTEAZY_API_URL` to the deployed API origin. Without it, a static host rewrites `/api/*` to `index.html` and the app falls back to offline/demo state.
+- API deployments must set `CLERK_SECRET_KEY` for Clerk token verification.
+- API deployments must set `RENTEAZY_ADMIN_EMAILS` to a comma-separated list of admin emails before exposing moderation tools.
+- `PORT` is respected by the API host; `RENTEAZY_API_PORT` is only the local fallback.
+
 ## Claude Lane
 
 - UI-only polish on `src/app/screens/*` and presentational `src/app/components/*`.
