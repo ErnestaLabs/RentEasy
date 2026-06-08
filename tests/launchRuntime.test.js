@@ -6,6 +6,7 @@ describe('launch runtime contract', () => {
     const pkg = JSON.parse(await readFile('package.json', 'utf8'));
 
     expect(pkg.scripts.start).toBe('node server/index.js');
+    expect(pkg.scripts['launch:smoke']).toBe('node scripts/launch-smoke.mjs');
   });
 
   it('documents the frontend API origin and admin allowlist env vars', async () => {
@@ -29,5 +30,16 @@ describe('launch runtime contract', () => {
     expect(app).toContain('Live data');
     expect(app).toContain('Preview data');
     expect(app).not.toMatch(/API connected|API checking/i);
+  });
+
+  it('ships a production smoke script for deployed app/API verification', async () => {
+    const smoke = await readFile('scripts/launch-smoke.mjs', 'utf8');
+
+    expect(smoke).toContain('RENTEAZY_APP_URL');
+    expect(smoke).toContain('RENTEAZY_API_URL');
+    expect(smoke).toContain('/api/health');
+    expect(smoke).toContain('/api/bootstrap');
+    expect(smoke).toContain('/app/feed');
+    expect(smoke).toContain('static host api guard');
   });
 });
