@@ -36,6 +36,7 @@ Ship the app experience, not another landing-page pass. Claude owns presentation
 ## Deployment Contract
 
 - The app can be hosted as a static Vite build, but the Node API must be deployed separately with `npm start`.
+- `railway.json` is the API deployment manifest: Nixpacks build, `npm start`, `/api/health` healthcheck, restart on failure.
 - Production frontend deployments must set `VITE_RENTEAZY_API_URL` to the deployed API origin. Without it, a static host rewrites `/api/*` to `index.html` and the app falls back to offline/demo state.
 - API deployments must set `CLERK_SECRET_KEY` for Clerk token verification.
 - API deployments must set `RENTEAZY_ADMIN_EMAILS` to a comma-separated list of admin emails before exposing moderation tools.

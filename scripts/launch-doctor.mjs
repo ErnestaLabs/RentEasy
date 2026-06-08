@@ -61,6 +61,7 @@ await check('required launch files', async () => {
     'scripts/launch-doctor.mjs',
     'docs/LAUNCH_PRD.md',
     'netlify.toml',
+    'railway.json',
     '.env.example',
   ];
   for (const path of required) {
@@ -72,9 +73,18 @@ await check('required launch files', async () => {
 await check('environment example documents production runtime', async () => {
   const envExample = await read('.env.example');
   for (const name of ['VITE_RENTEAZY_API_URL', 'CLERK_SECRET_KEY', 'RENTEAZY_ADMIN_EMAILS', 'PORT']) {
-    assert(envExample.includes(`${name}=`) || envExample.includes(`${name}`), `.env.example missing ${name}`);
+    assert(envExample.split(/\r?\n/).some((line) => line.startsWith(`${name}=`) || line.startsWith(`# ${name}=`)), `.env.example missing ${name}`);
   }
   return 'frontend API, Clerk, admin, and port envs documented';
+});
+
+await check('Railway API service deploys the Node server', async () => {
+  const railway = JSON.parse(await read('railway.json'));
+  assert(railway.build?.builder === 'NIXPACKS', 'Railway should use Nixpacks for the Node app');
+  assert(railway.deploy?.startCommand === 'npm start', 'Railway startCommand must run npm start');
+  assert(railway.deploy?.healthcheckPath === '/api/health', 'Railway healthcheck must hit /api/health');
+  assert(railway.deploy?.restartPolicyType === 'ON_FAILURE', 'Railway restart policy should recover failed API processes');
+  return 'Nixpacks, npm start, /api/health healthcheck present';
 });
 
 await check('Netlify static host cannot swallow API calls', async () => {

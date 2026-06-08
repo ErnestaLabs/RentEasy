@@ -15,6 +15,16 @@ describe('launch runtime contract', () => {
 
     expect(envExample).toContain('VITE_RENTEAZY_API_URL=');
     expect(envExample).toContain('RENTEAZY_ADMIN_EMAILS=');
+    expect(envExample).toContain('PORT=');
+  });
+
+  it('ships Railway API deployment config for the Node backend', async () => {
+    const railway = JSON.parse(await readFile('railway.json', 'utf8'));
+
+    expect(railway.build.builder).toBe('NIXPACKS');
+    expect(railway.deploy.startCommand).toBe('npm start');
+    expect(railway.deploy.healthcheckPath).toBe('/api/health');
+    expect(railway.deploy.restartPolicyType).toBe('ON_FAILURE');
   });
 
   it('keeps Netlify as a static frontend host rather than pretending to host the API', async () => {
@@ -50,6 +60,7 @@ describe('launch runtime contract', () => {
     expect(doctor).toContain('require-build');
     expect(doctor).toContain('require-production-env');
     expect(doctor).toContain('Netlify static host cannot swallow API calls');
+    expect(doctor).toContain('Railway API service deploys the Node server');
     expect(doctor).toContain('production build artifacts exist');
     expect(doctor).toContain('source launch language stays clean');
   });
