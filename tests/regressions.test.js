@@ -12,6 +12,7 @@ const app = read('src/App.jsx');
 const css = read('src/index.css');
 const main = read('src/main.jsx');
 const vsl = read('src/components/vsl/VSLPlayer.jsx');
+const serverDb = read('server/db.js');
 
 describe('icon styling regression (React 18 + custom elements)', () => {
   it('never uses className on the <iconify-icon> custom element', () => {
@@ -59,5 +60,15 @@ describe('brand-safe registry usage', () => {
     // green/blue explicitly.
     expect(vsl).toMatch(/colorFrom=/);
     expect(vsl).not.toMatch(/#9c40ff/); // the component's default purple
+  });
+});
+
+describe('launch copy contract', () => {
+  it('does not expose fake generic member or demo-card language in app/API seeds', () => {
+    const publicSources = `${app}\n${serverDb}`;
+    expect(publicSources).not.toMatch(/RentEazy member/i);
+    expect(publicSources).not.toMatch(/demo member/i);
+    expect(publicSources).not.toMatch(/demo card/i);
+    expect(publicSources).not.toMatch(/upsell/i);
   });
 });

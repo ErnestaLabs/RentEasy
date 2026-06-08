@@ -4,7 +4,7 @@ export default function SwipeScreen({
   components,
   handleSwipeAction,
   isPreviewVisitor,
-  openUpsell,
+  openOffer,
   rankedSwipeCards,
   remainingSwipes,
   requireAccount,
@@ -21,7 +21,7 @@ export default function SwipeScreen({
       {!isPreviewVisitor && (
         <button
           type="button"
-          onClick={() => openUpsell('extra-swipes-10')}
+          onClick={() => openOffer('extra-swipes-10')}
           className="fixed right-[4.25rem] top-4 z-[45] rounded-full border border-white/10 bg-white/10 px-3 py-2 text-xs font-bold text-white backdrop-blur-xl md:absolute md:right-[4.25rem] md:top-5"
         >
           {remainingSwipes} swipes
@@ -37,7 +37,7 @@ export default function SwipeScreen({
         cards={rankedSwipeCards}
         canSwipe={!isPreviewVisitor && remainingSwipes > 0}
         onSwipeAction={handleSwipeAction}
-        onBlocked={() => isPreviewVisitor ? requireAccount('match') : openUpsell('extra-swipes-10')}
+        onBlocked={() => isPreviewVisitor ? requireAccount('match') : openOffer('extra-swipes-10')}
         blockedFeedback={isPreviewVisitor ? 'Create a free account to swipe' : 'Daily swipes used'}
         immersive
       />

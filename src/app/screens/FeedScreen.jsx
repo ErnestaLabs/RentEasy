@@ -5,7 +5,7 @@ export default function FeedScreen({
   activeFeedTab,
   comments,
   components,
-  dismissUpsell,
+  dismissOffer,
   feedTabs,
   followedIds,
   groupMemberships,
@@ -23,9 +23,9 @@ export default function FeedScreen({
   newPost,
   openPartnerOffer,
   openedOfferId,
-  openUpsell,
+  openOffer,
   posts,
-  primaryContextualUpsell,
+  primaryContextualOffer,
   profile,
   requireAccount,
   savedIds,
@@ -40,7 +40,7 @@ export default function FeedScreen({
     BrandLogo,
     FeedPreviewBanner,
     FeedTimelineCard,
-    GenUpsellCard,
+    GenOfferCard,
     GroupsPanel,
     PeepAvatar,
     PerksRail,
@@ -156,7 +156,7 @@ export default function FeedScreen({
             <p className="text-sm font-medium text-[#215d27]">Want more people to see this?</p>
             <div className="mt-3 flex flex-wrap gap-2">
               <button onClick={() => setSharePost(newPost)} className="rounded-full bg-[#2f7d32] px-4 py-2 text-sm text-white">Share Everywhere</button>
-              <button onClick={() => openUpsell('post-bump-small')} className="rounded-full bg-[#092243] px-4 py-2 text-sm text-white">Boost post from 29p</button>
+              <button onClick={() => openOffer('post-bump-small')} className="rounded-full bg-[#092243] px-4 py-2 text-sm text-white">Boost post from 29p</button>
             </div>
           </div>
         )}
@@ -215,11 +215,11 @@ export default function FeedScreen({
                       </button>
                     )}
                   </div>
-                  {primaryContextualUpsell && !isPreviewVisitor && index === 3 && (
-                    <GenUpsellCard
-                      card={primaryContextualUpsell}
-                      onSelectProduct={openUpsell}
-                      onDismiss={dismissUpsell}
+                  {primaryContextualOffer && !isPreviewVisitor && index === 3 && (
+                    <GenOfferCard
+                      card={primaryContextualOffer}
+                      onSelectProduct={openOffer}
+                      onDismiss={dismissOffer}
                       onSharePost={setSharePost}
                       newPost={newPost}
                     />

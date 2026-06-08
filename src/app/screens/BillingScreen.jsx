@@ -1,4 +1,4 @@
-export default function BillingScreen({ boosts, components, openUpsell, purchases, wallet }) {
+export default function BillingScreen({ boosts, components, openOffer, purchases, wallet }) {
   const { BillingPanel } = components;
-  return <BillingPanel onSelectProduct={openUpsell} purchases={purchases} boosts={boosts} wallet={wallet} />;
+  return <BillingPanel onSelectProduct={openOffer} purchases={purchases} boosts={boosts} wallet={wallet} />;
 }

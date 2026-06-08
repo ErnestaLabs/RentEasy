@@ -297,7 +297,7 @@ export const matches = [
   {
     id: 'match-demo-stratford',
     participantIds: [demoUserId, 'agent-eastline'],
-    participantNames: ['RentEazy member', 'Eastline Rooms'],
+    participantNames: ['Alex Morgan', 'Eastline Rooms'],
     participantTypes: ['Member', 'Agent'],
     subjectType: 'post',
     subjectId: 'post-stratford-room',
@@ -734,7 +734,7 @@ export function createInitialDb() {
     profiles: [{
       id: demoUserId,
       userId: demoUserId,
-      name: 'RentEazy member',
+      name: 'Alex Morgan',
       role: '',
       area: '',
       budget: '',

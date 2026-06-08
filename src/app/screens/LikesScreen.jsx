@@ -1,20 +1,20 @@
 export default function LikesScreen({
   components,
-  dismissUpsell,
+  dismissOffer,
   feedItems,
   likedIds,
   matches,
   matchMessages,
   newPost,
-  openUpsell,
+  openOffer,
   posts,
-  primaryContextualUpsell,
+  primaryContextualOffer,
   profile,
   savedIds,
   setSelectedFeedViewerIndex,
   setSharePost,
 }) {
-  const { GenUpsellCard, LikesSocialInbox } = components;
+  const { GenOfferCard, LikesSocialInbox } = components;
 
   return (
     <div className="space-y-4">
@@ -25,17 +25,17 @@ export default function LikesScreen({
         matches={matches}
         matchMessages={matchMessages}
         profile={profile}
-        onSelectProduct={openUpsell}
+        onSelectProduct={openOffer}
         onOpenPost={(post) => {
           const index = feedItems.findIndex((item) => item.post.id === post.id);
           if (index >= 0) setSelectedFeedViewerIndex(index);
         }}
       />
-      {primaryContextualUpsell && (
-        <GenUpsellCard
-          card={primaryContextualUpsell}
-          onSelectProduct={openUpsell}
-          onDismiss={dismissUpsell}
+      {primaryContextualOffer && (
+        <GenOfferCard
+          card={primaryContextualOffer}
+          onSelectProduct={openOffer}
+          onDismiss={dismissOffer}
           onSharePost={setSharePost}
           newPost={newPost}
         />

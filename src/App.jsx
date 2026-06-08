@@ -6473,7 +6473,7 @@ function PreviewRouteGate({ action = 'continue', title, body }) {
   );
 }
 
-function buildContextualUpsells({ routeTab, activeFeedTab, remainingSwipes, newPost, profile, answers, posts, likedIds, savedIds, shares, boosts, matches }) {
+function buildContextualOffers({ routeTab, activeFeedTab, remainingSwipes, newPost, profile, answers, posts, likedIds, savedIds, shares, boosts, matches }) {
   const strength = calculateProfileStrength(profile, answers);
   const ownPosts = posts.filter((post) => post.authorId === currentUser.id || post.authorName === profile.name || post.authorName === currentUser.name);
   const warmPost = ownPosts.find((post) => Number(post.likeCount || 0) + Number(post.saveCount || 0) + Number(post.shareCount || 0) + Number(post.commentCount || 0) > 0);
@@ -6562,7 +6562,7 @@ function buildContextualUpsells({ routeTab, activeFeedTab, remainingSwipes, newP
   }
 
   // Match-milestone moment: once a mutual match exists, the logical next offer
-  // is keeping the match + viewing trail — not a generic upsell. Fills the
+  // is keeping the match + viewing trail. Fills the
   // Profile/Likes slot that otherwise sits empty for an active member.
   if (['Profile', 'Likes'].includes(routeTab) && matches.length > 0) {
     cards.push({
@@ -6610,7 +6610,7 @@ function buildContextualUpsells({ routeTab, activeFeedTab, remainingSwipes, newP
   return cards.sort((a, b) => b.priority - a.priority);
 }
 
-function GenUpsellCard({ card, onSelectProduct, onDismiss, onSharePost, newPost, compact = false }) {
+function GenOfferCard({ card, onSelectProduct, onDismiss, onSharePost, newPost, compact = false }) {
   if (!card) return null;
   const product = microProducts.find((item) => item.id === card.id);
   const Icon = card.icon || Sparkles;
@@ -6703,7 +6703,7 @@ function BillingPanel({ onSelectProduct, purchases, boosts, wallet }) {
   );
 }
 
-function MicroUpsellModal({ product, onClose, onConfirm, billingEnabled = false }) {
+function MicroOfferModal({ product, onClose, onConfirm, billingEnabled = false }) {
   if (!product) return null;
 
   return (
@@ -7097,7 +7097,7 @@ function AppSupportSidebar({
   setActiveFeedTab,
   likedIds,
   feedAds,
-  openUpsell,
+  openOffer,
 }) {
   const ownPostCount = posts.filter((post) => post.authorId === profile.id || post.authorName === profile.name).length;
   return (
@@ -7125,7 +7125,7 @@ function AppSupportSidebar({
         </div>
       </div>
 
-      <DailySwipePanel usageLimit={usageLimit} onBuyMore={openUpsell} />
+      <DailySwipePanel usageLimit={usageLimit} onBuyMore={openOffer} />
       <ProfileStrengthCard profile={profile} answers={answers} />
 
       <SupportDisclosure title="Notifications" subtitle={`${notifications.filter((item) => !item.read).length} unread`} defaultOpen>
@@ -7164,15 +7164,15 @@ function AppSupportSidebar({
       </SupportDisclosure>
 
       <SupportDisclosure title="Boosts and Perks" subtitle="Paid reach, clear labels">
-        <TractionPanel posts={posts} likedIds={likedIds} savedIds={savedIds} shares={shares} comments={comments} onBoost={openUpsell} />
+        <TractionPanel posts={posts} likedIds={likedIds} savedIds={savedIds} shares={shares} comments={comments} onBoost={openOffer} />
         <div className="mt-3">
-          <BoostPerformanceCard boosts={boosts} onBoost={openUpsell} />
+          <BoostPerformanceCard boosts={boosts} onBoost={openOffer} />
         </div>
         <div className="mt-3">
-          <AdsInventoryPanel onBoost={openUpsell} />
+          <AdsInventoryPanel onBoost={openOffer} />
         </div>
         <div className="mt-3">
-          <MiniShopPanel onSelectProduct={openUpsell} compact />
+          <MiniShopPanel onSelectProduct={openOffer} compact />
         </div>
       </SupportDisclosure>
 
@@ -7246,8 +7246,8 @@ function RentEazyAppContainer({ isPreviewVisitor = false }) {
   const [reportPost, setReportPost] = useState(null);
   const [commentPost, setCommentPost] = useState(null);
   const [previewPrompt, setPreviewPrompt] = useState(null);
-  const [upsellProductId, setUpsellProductId] = useState(null);
-  const [dismissedUpsells, setDismissedUpsells] = useState([]);
+  const [offerProductId, setOfferProductId] = useState(null);
+  const [dismissedOffers, setDismissedOffers] = useState([]);
   const [newPost, setNewPost] = useState(null);
   const [backendStatus, setBackendStatus] = useState('checking');
   const profileSyncRef = useRef('');
@@ -7287,13 +7287,13 @@ function RentEazyAppContainer({ isPreviewVisitor = false }) {
   const visibleNotifications = isPreviewVisitor ? [] : notifications;
 
   const remainingSwipes = Math.max(0, visibleUsageLimit.allowance - visibleUsageLimit.used);
-  const activeUpsellProduct = microProducts.find((product) => product.id === upsellProductId);
+  const activeOfferProduct = microProducts.find((product) => product.id === offerProductId);
   const rankedSwipeCards = useMemo(() => heroSwipeCards
     .map((card) => scoreSwipeCard(card, { profile: visibleProfile, answers: visibleAnswers, recommendationInsights, behavioralEvents: visibleBehavioralEvents }))
     .sort((a, b) => (b.recommendationScore || 0) - (a.recommendationScore || 0)), [visibleAnswers, visibleBehavioralEvents, visibleProfile, recommendationInsights]);
   const localRecommendationInsights = useMemo(() => buildLocalRecommendationInsights({ profile: visibleProfile, answers: visibleAnswers, feedRankings, behavioralEvents: visibleBehavioralEvents, partnerOffers }), [visibleAnswers, visibleBehavioralEvents, feedRankings, partnerOffers, visibleProfile]);
   const activeRecommendationInsights = recommendationInsights || localRecommendationInsights;
-  const contextualUpsells = useMemo(() => buildContextualUpsells({
+  const contextualOffers = useMemo(() => buildContextualOffers({
     routeTab,
     activeFeedTab,
     remainingSwipes,
@@ -7306,8 +7306,8 @@ function RentEazyAppContainer({ isPreviewVisitor = false }) {
     shares: visibleShares,
     boosts: visibleBoosts,
     matches: visibleMatches,
-  }).filter((card) => !dismissedUpsells.includes(card.id)).slice(0, 2), [activeFeedTab, dismissedUpsells, newPost, posts, remainingSwipes, routeTab, visibleAnswers, visibleBoosts, visibleLikedIds, visibleMatches, visibleProfile, visibleSavedIds, visibleShares]);
-  const primaryContextualUpsell = contextualUpsells[0];
+  }).filter((card) => !dismissedOffers.includes(card.id)).slice(0, 2), [activeFeedTab, dismissedOffers, newPost, posts, remainingSwipes, routeTab, visibleAnswers, visibleBoosts, visibleLikedIds, visibleMatches, visibleProfile, visibleSavedIds, visibleShares]);
+  const primaryContextualOffer = contextualOffers[0];
   const recommendedOfferIds = new Set((activeRecommendationInsights?.perkRecommendations || []).map((offer) => offer.offerId));
   const sortedPartnerOffers = useMemo(() => [...partnerOffers].sort((a, b) => Number(recommendedOfferIds.has(b.id)) - Number(recommendedOfferIds.has(a.id))), [partnerOffers, activeRecommendationInsights]);
   const dailyPicks = rankedSwipeCards.slice(0, 3);
@@ -7540,22 +7540,22 @@ function RentEazyAppContainer({ isPreviewVisitor = false }) {
     }
   };
 
-  const openUpsell = (productId) => {
+  const openOffer = (productId) => {
     if (isPreviewVisitor) {
       requireAccount('billing');
       return;
     }
-    if (dismissedUpsells.includes(productId)) return;
-    setUpsellProductId(productId);
+    if (dismissedOffers.includes(productId)) return;
+    setOfferProductId(productId);
   };
 
-  const closeUpsell = () => {
-    if (upsellProductId) setDismissedUpsells((current) => [...new Set([...current, upsellProductId])]);
-    setUpsellProductId(null);
+  const closeOffer = () => {
+    if (offerProductId) setDismissedOffers((current) => [...new Set([...current, offerProductId])]);
+    setOfferProductId(null);
   };
 
-  const dismissUpsell = (productId) => {
-    setDismissedUpsells((current) => [...new Set([...current, productId])]);
+  const dismissOffer = (productId) => {
+    setDismissedOffers((current) => [...new Set([...current, productId])]);
   };
 
   const toggleId = (setter, id) => {
@@ -7841,7 +7841,7 @@ function RentEazyAppContainer({ isPreviewVisitor = false }) {
 
   const handleSwipeAction = (action, card = {}) => {
     setUsageLimit((current) => ({ ...current, used: Math.min(current.allowance, current.used + 1) }));
-    if (action === 'superlike') openUpsell('superlike-1');
+    if (action === 'superlike') openOffer('superlike-1');
     syncApiState(apiRequest('/api/swipes', {
       method: 'POST',
       body: {
@@ -7913,7 +7913,7 @@ function RentEazyAppContainer({ isPreviewVisitor = false }) {
 
   const confirmMicroProduct = (product) => {
     if (isPreviewVisitor) {
-      setUpsellProductId(null);
+      setOfferProductId(null);
       requireAccount('billing');
       return;
     }
@@ -7961,7 +7961,7 @@ function RentEazyAppContainer({ isPreviewVisitor = false }) {
       }, ...current]);
     }
 
-    setUpsellProductId(null);
+    setOfferProductId(null);
     syncApiState(apiRequest('/api/purchases', { method: 'POST', body: { productId: product.id, sku: product.sku } }));
   };
 
@@ -7999,7 +7999,7 @@ function RentEazyAppContainer({ isPreviewVisitor = false }) {
   };
 
   const boostPost = (postId, productId = 'post-bump-small') => {
-    openUpsell(productId);
+    openOffer(productId);
     syncApiState(apiRequest(`/api/posts/${postId}/boost`, { method: 'POST', body: { productId } }));
   };
 
@@ -8042,7 +8042,7 @@ function RentEazyAppContainer({ isPreviewVisitor = false }) {
   const guardedShare = previewGuard('share', setSharePost);
   const guardedComment = previewGuard('comment', setCommentPost);
   const guardedReport = previewGuard('report', setReportPost);
-  const guardedOpenUpsell = previewGuard('billing', openUpsell);
+  const guardedOpenOffer = previewGuard('billing', openOffer);
   const guardedJoinGroup = previewGuard('group', joinGroup);
   const guardedCreateGroup = previewGuard('group', createGroup);
   const guardedMarkNotificationRead = previewGuard('profile', markNotificationRead);
@@ -8080,7 +8080,7 @@ function RentEazyAppContainer({ isPreviewVisitor = false }) {
     DailyReturnPanel,
     FeedPreviewBanner,
     FeedTimelineCard,
-    GenUpsellCard,
+    GenOfferCard,
     GroupsPanel,
     InteractiveMatchCard: SwipeInteractiveMatchCard,
     LikesSocialInbox,
@@ -8107,7 +8107,7 @@ function RentEazyAppContainer({ isPreviewVisitor = false }) {
       )}
       {reportPost && <ReportModal post={reportPost} onClose={() => setReportPost(null)} onReport={submitReport} />}
       {commentPost && <CommentModal post={commentPost} comments={visibleComments.filter((comment) => comment.postId === commentPost.id)} onClose={() => setCommentPost(null)} onComment={addComment} />}
-      <MicroUpsellModal product={activeUpsellProduct} onClose={closeUpsell} onConfirm={confirmMicroProduct} billingEnabled={clerkEnabled} />
+      <MicroOfferModal product={activeOfferProduct} onClose={closeOffer} onConfirm={confirmMicroProduct} billingEnabled={clerkEnabled} />
       {previewPrompt && <PreviewSignupPrompt action={previewPrompt} onClose={() => setPreviewPrompt(null)} />}
       <FeedImmersiveViewer
         items={visibleFeedItems}
@@ -8159,7 +8159,7 @@ function RentEazyAppContainer({ isPreviewVisitor = false }) {
             comments={visibleComments}
             components={appScreenComponents}
             createGroup={guardedCreateGroup}
-            dismissUpsell={dismissUpsell}
+            dismissOffer={dismissOffer}
             feedTabs={feedTabs}
             followedIds={visibleFollowedIds}
             groupMemberships={visibleGroupMemberships}
@@ -8177,9 +8177,9 @@ function RentEazyAppContainer({ isPreviewVisitor = false }) {
             newPost={newPost}
             openedOfferId={openedOfferId}
             openPartnerOffer={openPartnerOffer}
-            openUpsell={guardedOpenUpsell}
+            openOffer={guardedOpenOffer}
             posts={posts}
-            primaryContextualUpsell={primaryContextualUpsell}
+            primaryContextualOffer={primaryContextualOffer}
             profile={visibleProfile}
             requireAccount={requireAccount}
             savedIds={visibleSavedIds}
@@ -8205,7 +8205,7 @@ function RentEazyAppContainer({ isPreviewVisitor = false }) {
               boosts={visibleBoosts}
               components={appScreenComponents}
               isPreviewVisitor={isPreviewVisitor}
-              openUpsell={guardedOpenUpsell}
+              openOffer={guardedOpenOffer}
               posts={posts}
               profile={visibleProfile}
               reports={visibleReports}
@@ -8230,7 +8230,7 @@ function RentEazyAppContainer({ isPreviewVisitor = false }) {
               components={appScreenComponents}
               handleSwipeAction={handleSwipeAction}
               isPreviewVisitor={isPreviewVisitor}
-              openUpsell={guardedOpenUpsell}
+              openOffer={guardedOpenOffer}
               rankedSwipeCards={rankedSwipeCards}
               remainingSwipes={remainingSwipes}
               requireAccount={requireAccount}
@@ -8240,15 +8240,15 @@ function RentEazyAppContainer({ isPreviewVisitor = false }) {
           {!previewGateActive && routeTab === 'Likes' && (
             <LikesScreen
               components={appScreenComponents}
-              dismissUpsell={dismissUpsell}
+              dismissOffer={dismissOffer}
               feedItems={feedItems}
               likedIds={visibleLikedIds}
               matches={visibleMatches}
               matchMessages={visibleMatchMessages}
               newPost={newPost}
-              openUpsell={guardedOpenUpsell}
+              openOffer={guardedOpenOffer}
               posts={posts}
-              primaryContextualUpsell={primaryContextualUpsell}
+              primaryContextualOffer={primaryContextualOffer}
               profile={visibleProfile}
               savedIds={visibleSavedIds}
               setSelectedFeedViewerIndex={setSelectedFeedViewerIndex}
@@ -8262,7 +8262,7 @@ function RentEazyAppContainer({ isPreviewVisitor = false }) {
               comments={visibleComments}
               components={appScreenComponents}
               completeLifecycleTask={guardedCompleteLifecycleTask}
-              dismissUpsell={dismissUpsell}
+              dismissOffer={dismissOffer}
               feedItems={feedItems}
               lifecycleTasks={visibleLifecycleTasks}
               likedIds={visibleLikedIds}
@@ -8270,9 +8270,9 @@ function RentEazyAppContainer({ isPreviewVisitor = false }) {
               matches={visibleMatches}
               newPost={newPost}
               notifications={visibleNotifications}
-              openUpsell={guardedOpenUpsell}
+              openOffer={guardedOpenOffer}
               posts={posts}
-              primaryContextualUpsell={primaryContextualUpsell}
+              primaryContextualOffer={primaryContextualOffer}
               profile={visibleProfile}
               reports={visibleReports}
               reputationProfile={visibleReputationProfile}
@@ -8285,26 +8285,26 @@ function RentEazyAppContainer({ isPreviewVisitor = false }) {
           )}
 
           {!previewGateActive && routeTab === 'Billing' && (
-            <BillingScreen boosts={visibleBoosts} components={appScreenComponents} openUpsell={guardedOpenUpsell} purchases={visiblePurchases} wallet={visibleWallet} />
+            <BillingScreen boosts={visibleBoosts} components={appScreenComponents} openOffer={guardedOpenOffer} purchases={visiblePurchases} wallet={visibleWallet} />
           )}
         </section>}
 
         {routeTab === 'Feed' && (
           <aside className="sticky top-5 hidden space-y-4 lg:block">
-            <DailySwipePanel usageLimit={visibleUsageLimit} onBuyMore={guardedOpenUpsell} />
+            <DailySwipePanel usageLimit={visibleUsageLimit} onBuyMore={guardedOpenOffer} />
             <ProfileStrengthCard profile={visibleProfile} answers={visibleAnswers} />
             <UsefulNotificationsPanel notifications={visibleNotifications} onMarkRead={markNotificationRead} />
             <RecommendationLoopPanel insights={activeRecommendationInsights} onOpenOffer={openRecommendedOffer} />
-            <MiniShopPanel onSelectProduct={guardedOpenUpsell} compact />
+            <MiniShopPanel onSelectProduct={guardedOpenOffer} compact />
           </aside>
         )}
 
         {routeTab === 'Profile' && <aside className="hidden space-y-4 lg:block">
-          <DailySwipePanel usageLimit={visibleUsageLimit} onBuyMore={guardedOpenUpsell} />
+          <DailySwipePanel usageLimit={visibleUsageLimit} onBuyMore={guardedOpenOffer} />
           <ProfileStrengthCard profile={visibleProfile} answers={visibleAnswers} />
           <UsefulNotificationsPanel notifications={visibleNotifications} onMarkRead={markNotificationRead} />
           <RecommendationLoopPanel insights={activeRecommendationInsights} onOpenOffer={openRecommendedOffer} />
-          <MiniShopPanel onSelectProduct={guardedOpenUpsell} compact />
+          <MiniShopPanel onSelectProduct={guardedOpenOffer} compact />
         </aside>}
 
         {routeTab !== 'Feed' && routeTab !== 'Swipe' && routeTab !== 'Profile' && routeTab !== 'Perks' && (
@@ -8350,7 +8350,7 @@ function RentEazyAppContainer({ isPreviewVisitor = false }) {
             setActiveFeedTab={setActiveFeedTab}
             likedIds={visibleLikedIds}
             feedAds={feedAds}
-            openUpsell={guardedOpenUpsell}
+            openOffer={guardedOpenOffer}
           />
         )}
       </main>

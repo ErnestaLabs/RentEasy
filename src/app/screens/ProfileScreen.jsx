@@ -2,16 +2,16 @@ export default function ProfileScreen({
   answers,
   comments,
   components,
-  dismissUpsell,
+  dismissOffer,
   feedItems,
   lifecycleTasks,
   likedIds,
   matches,
   newPost,
   notifications,
-  openUpsell,
+  openOffer,
   posts,
-  primaryContextualUpsell,
+  primaryContextualOffer,
   profile,
   reports,
   reputationProfile,
@@ -25,7 +25,7 @@ export default function ProfileScreen({
 }) {
   const {
     DailyReturnPanel,
-    GenUpsellCard,
+    GenOfferCard,
     ProfileEditor,
     ReputationScoreCard,
     SocialKitProfilePage,
@@ -48,11 +48,11 @@ export default function ProfileScreen({
           if (index >= 0) setSelectedFeedViewerIndex(index);
         }}
       />
-      {primaryContextualUpsell && (
-        <GenUpsellCard
-          card={primaryContextualUpsell}
-          onSelectProduct={openUpsell}
-          onDismiss={dismissUpsell}
+      {primaryContextualOffer && (
+        <GenOfferCard
+          card={primaryContextualOffer}
+          onSelectProduct={openOffer}
+          onDismiss={dismissOffer}
           onSharePost={setSharePost}
           newPost={newPost}
         />
