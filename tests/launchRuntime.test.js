@@ -7,6 +7,7 @@ describe('launch runtime contract', () => {
 
     expect(pkg.scripts.start).toBe('node server/index.js');
     expect(pkg.scripts['launch:doctor']).toBe('node scripts/launch-doctor.mjs');
+    expect(pkg.scripts['launch:pr']).toBe('node scripts/launch-pr.mjs');
     expect(pkg.scripts['launch:smoke']).toBe('node scripts/launch-smoke.mjs');
   });
 
@@ -65,12 +66,24 @@ describe('launch runtime contract', () => {
     expect(doctor).toContain('source launch language stays clean');
   });
 
+  it('ships an authenticated GitHub PR helper for the launch branch', async () => {
+    const helper = await readFile('scripts/launch-pr.mjs', 'utf8');
+    const body = await readFile('docs/LAUNCH_PR_BODY.md', 'utf8');
+
+    expect(helper).toContain('gh auth login');
+    expect(helper).toContain('app-ui-uplift');
+    expect(helper).toContain('docs/LAUNCH_PR_BODY.md');
+    expect(body).toContain('RentEazy App Launch');
+    expect(body).toContain('npm run launch:smoke');
+  });
+
   it('ships a Claude/Codex launch handoff for landing and deploy', async () => {
     const handoff = await readFile('docs/LAUNCH_HANDOFF.md', 'utf8');
 
     expect(handoff).toContain('Claude UI Lane');
     expect(handoff).toContain('Codex Backend Contract');
     expect(handoff).toContain('npm run launch:doctor -- --require-build');
+    expect(handoff).toContain('npm run launch:pr');
     expect(handoff).toContain('npm run launch:smoke');
     expect(handoff).toContain('GitHub CLI is not authenticated');
   });

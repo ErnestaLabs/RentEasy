@@ -51,7 +51,8 @@ await check('package launch scripts', async () => {
   assert(pkg.scripts?.build === 'vite build', 'build must run Vite');
   assert(pkg.scripts?.['launch:smoke'] === 'node scripts/launch-smoke.mjs', 'launch:smoke script missing');
   assert(pkg.scripts?.['launch:doctor'] === 'node scripts/launch-doctor.mjs', 'launch:doctor script missing');
-  return 'start, build, launch:doctor, launch:smoke present';
+  assert(pkg.scripts?.['launch:pr'] === 'node scripts/launch-pr.mjs', 'launch:pr script missing');
+  return 'start, build, launch:doctor, launch:pr, launch:smoke present';
 });
 
 await check('required launch files', async () => {
@@ -59,8 +60,10 @@ await check('required launch files', async () => {
     'server/index.js',
     'scripts/launch-smoke.mjs',
     'scripts/launch-doctor.mjs',
+    'scripts/launch-pr.mjs',
     'docs/LAUNCH_PRD.md',
     'docs/LAUNCH_HANDOFF.md',
+    'docs/LAUNCH_PR_BODY.md',
     'netlify.toml',
     'railway.json',
     '.env.example',
@@ -75,9 +78,22 @@ await check('launch handoff names Claude and production smoke next steps', async
   const handoff = await read('docs/LAUNCH_HANDOFF.md');
   assert(handoff.includes('Claude UI Lane'), 'handoff must preserve Claude UI lane');
   assert(handoff.includes('Codex Backend Contract'), 'handoff must preserve Codex backend lane');
+  assert(handoff.includes('npm run launch:pr'), 'handoff must include launch PR command');
   assert(handoff.includes('npm run launch:smoke'), 'handoff must include production smoke command');
   assert(handoff.includes('GitHub CLI is not authenticated'), 'handoff must state current PR/deploy blocker');
   return 'Claude lane, Codex lane, smoke, and blocker documented';
+});
+
+await check('launch PR helper is ready for authenticated GitHub CLI', async () => {
+  const helper = await read('scripts/launch-pr.mjs');
+  const body = await read('docs/LAUNCH_PR_BODY.md');
+  assert(helper.includes('gh'), 'launch PR helper must use GitHub CLI');
+  assert(helper.includes('gh auth login'), 'launch PR helper must explain missing GitHub auth');
+  assert(helper.includes('app-ui-uplift'), 'launch PR helper must target app-ui-uplift');
+  assert(helper.includes('docs/LAUNCH_PR_BODY.md'), 'launch PR helper must use the committed PR body');
+  assert(body.includes('RentEazy App Launch'), 'PR body must describe the launch');
+  assert(body.includes('npm run launch:smoke'), 'PR body must include production smoke command');
+  return 'gh helper and PR body present';
 });
 
 await check('environment example documents production runtime', async () => {

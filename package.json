@@ -12,6 +12,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "launch:doctor": "node scripts/launch-doctor.mjs",
+    "launch:pr": "node scripts/launch-pr.mjs",
     "launch:smoke": "node scripts/launch-smoke.mjs",
     "test": "vitest run",
     "typecheck:server": "tsc -p tsconfig.server.json",

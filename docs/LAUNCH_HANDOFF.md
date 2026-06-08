@@ -71,6 +71,23 @@ Known build warnings:
 - Clerk package references unresolved internal image aliases during Vite build.
 - These warnings are non-fatal as long as `npm run build` exits `0`.
 
+## Pull Request
+
+After the pre-deploy gate passes, create or reuse the launch PR:
+
+```powershell
+npm run launch:pr
+```
+
+If this fails because GitHub CLI is not authenticated, run:
+
+```powershell
+gh auth login --hostname github.com
+npm run launch:pr
+```
+
+The PR body is committed at `docs/LAUNCH_PR_BODY.md`.
+
 ## Deploy Contract
 
 Frontend host:
