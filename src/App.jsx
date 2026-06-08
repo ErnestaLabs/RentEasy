@@ -8146,7 +8146,7 @@ function RentEazyAppContainer({ isPreviewVisitor = false }) {
             {isPreviewVisitor
               ? <a href="/signup" className="hidden rounded-full bg-[#edf8ee] px-3 py-1.5 text-xs font-semibold text-[#215d27] sm:inline-flex">Sign up</a>
               : <a href="/app/profile" className="hidden rounded-full bg-[#edf7ff] px-3 py-1.5 text-xs text-[#154f79] sm:inline-flex">{displayRole(profile.role)}</a>}
-            <span className={`hidden rounded-full px-3 py-1.5 text-xs lg:inline-flex ${backendStatus === 'connected' ? 'bg-[#edf8ee] text-[#215d27]' : backendStatus === 'checking' ? 'bg-[#edf7ff] text-[#154f79]' : 'bg-[#fff7ed] text-[#9a3412]'}`}>{backendStatus === 'connected' ? 'API connected' : backendStatus === 'checking' ? 'API checking' : 'Offline mode'}</span>
+            <span className={`hidden rounded-full px-3 py-1.5 text-xs lg:inline-flex ${backendStatus === 'connected' ? 'bg-[#edf8ee] text-[#215d27]' : backendStatus === 'checking' ? 'bg-[#edf7ff] text-[#154f79]' : 'bg-[#fff7ed] text-[#9a3412]'}`}>{backendStatus === 'connected' ? 'Live data' : backendStatus === 'checking' ? 'Connecting' : 'Preview data'}</span>
             {clerkEnabled ? <ClerkAccountControls /> : <button className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-slate-600 ring-1 ring-black/5"><Bell className="h-4 w-4" /></button>}
           </div>
         </div>

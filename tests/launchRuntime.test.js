@@ -19,6 +19,15 @@ describe('launch runtime contract', () => {
     const netlify = await readFile('netlify.toml', 'utf8');
 
     expect(netlify).toContain('publish = "dist"');
-    expect(netlify).not.toContain('from = "/api/');
+    expect(netlify).toMatch(/from = "\/api\/\*"\s+to = "\/404\.html"\s+status = 404/s);
+    expect(netlify).not.toMatch(/from = "\/api\/\*"\s+to = "\/index\.html"/s);
+  });
+
+  it('uses product language for backend connection state in the app shell', async () => {
+    const app = await readFile('src/App.jsx', 'utf8');
+
+    expect(app).toContain('Live data');
+    expect(app).toContain('Preview data');
+    expect(app).not.toMatch(/API connected|API checking/i);
   });
 });
