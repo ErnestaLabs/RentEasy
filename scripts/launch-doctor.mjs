@@ -60,6 +60,7 @@ await check('required launch files', async () => {
     'scripts/launch-smoke.mjs',
     'scripts/launch-doctor.mjs',
     'docs/LAUNCH_PRD.md',
+    'docs/LAUNCH_HANDOFF.md',
     'netlify.toml',
     'railway.json',
     '.env.example',
@@ -68,6 +69,15 @@ await check('required launch files', async () => {
     assert(await exists(path), `${path} is missing`);
   }
   return `${required.length} files present`;
+});
+
+await check('launch handoff names Claude and production smoke next steps', async () => {
+  const handoff = await read('docs/LAUNCH_HANDOFF.md');
+  assert(handoff.includes('Claude UI Lane'), 'handoff must preserve Claude UI lane');
+  assert(handoff.includes('Codex Backend Contract'), 'handoff must preserve Codex backend lane');
+  assert(handoff.includes('npm run launch:smoke'), 'handoff must include production smoke command');
+  assert(handoff.includes('GitHub CLI is not authenticated'), 'handoff must state current PR/deploy blocker');
+  return 'Claude lane, Codex lane, smoke, and blocker documented';
 });
 
 await check('environment example documents production runtime', async () => {

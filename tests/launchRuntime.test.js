@@ -64,4 +64,14 @@ describe('launch runtime contract', () => {
     expect(doctor).toContain('production build artifacts exist');
     expect(doctor).toContain('source launch language stays clean');
   });
+
+  it('ships a Claude/Codex launch handoff for landing and deploy', async () => {
+    const handoff = await readFile('docs/LAUNCH_HANDOFF.md', 'utf8');
+
+    expect(handoff).toContain('Claude UI Lane');
+    expect(handoff).toContain('Codex Backend Contract');
+    expect(handoff).toContain('npm run launch:doctor -- --require-build');
+    expect(handoff).toContain('npm run launch:smoke');
+    expect(handoff).toContain('GitHub CLI is not authenticated');
+  });
 });
