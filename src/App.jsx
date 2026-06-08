@@ -8043,10 +8043,13 @@ function RentEazyAppContainer({ isPreviewVisitor = false }) {
   const guardedComment = previewGuard('comment', setCommentPost);
   const guardedReport = previewGuard('report', setReportPost);
   const guardedOpenOffer = previewGuard('billing', openOffer);
+  const guardedBoostPost = previewGuard('billing', (post) => boostPost(post.id));
   const guardedJoinGroup = previewGuard('group', joinGroup);
   const guardedCreateGroup = previewGuard('group', createGroup);
   const guardedMarkNotificationRead = previewGuard('profile', markNotificationRead);
   const guardedCompleteLifecycleTask = previewGuard('profile', completeLifecycleTask);
+  const guardedOpenPartnerOffer = previewGuard('perks', openPartnerOffer);
+  const guardedOpenRecommendedOffer = previewGuard('perks', openRecommendedOffer);
   const guardedCreateReferral = previewGuard('invite', createReferral);
   const guardedLogMaintenanceRequest = previewGuard('resident', logMaintenanceRequest);
   const guardedLogRentRecord = previewGuard('resident', logRentRecord);
@@ -8055,6 +8058,11 @@ function RentEazyAppContainer({ isPreviewVisitor = false }) {
   const guardedWatchDeal = previewGuard('match', watchDeal);
   const guardedUpdateDealStatus = previewGuard('match', updateDealStatus);
   const guardedAddOperatorSignal = previewGuard('profile', addOperatorSignal);
+  const guardedHidePost = previewGuard('hide', hidePost);
+  const guardedPassFeedCard = previewGuard('hide', passFeedCard);
+  const guardedMatchFeedCard = previewGuard('match', matchFeedCard);
+  const guardedExplainFeedItem = previewGuard('continue', explainFeedItem);
+  const guardedRecordFeedSignal = previewGuard('continue', recordFeedSignal);
   const guardedOpenFeedItem = (index) => {
     if (isPreviewVisitor) {
       requireAccount('continue');
@@ -8122,13 +8130,13 @@ function RentEazyAppContainer({ isPreviewVisitor = false }) {
         onFollow={guardedToggleFollow}
         onShare={guardedShare}
         onComment={guardedComment}
-        onBoost={(post) => boostPost(post.id)}
-        onHide={hidePost}
+        onBoost={guardedBoostPost}
+        onHide={guardedHidePost}
         onReport={guardedReport}
-        onExplain={explainFeedItem}
-        onPass={passFeedCard}
-        onMatch={matchFeedCard}
-        onSignal={recordFeedSignal}
+        onExplain={guardedExplainFeedItem}
+        onPass={guardedPassFeedCard}
+        onMatch={guardedMatchFeedCard}
+        onSignal={guardedRecordFeedSignal}
       />
       {!isPreviewVisitor && <GlobalChatWidget matches={matches} messages={matchMessages} profile={profile} onSendMessage={sendMatchMessage} routeTab={routeTab} />}
       {routeTab !== 'Feed' && routeTab !== 'Swipe' && <header className="sticky top-0 z-40 px-3 pt-3">
@@ -8176,7 +8184,7 @@ function RentEazyAppContainer({ isPreviewVisitor = false }) {
             likedIds={visibleLikedIds}
             newPost={newPost}
             openedOfferId={openedOfferId}
-            openPartnerOffer={openPartnerOffer}
+            openPartnerOffer={guardedOpenPartnerOffer}
             openOffer={guardedOpenOffer}
             posts={posts}
             primaryContextualOffer={primaryContextualOffer}
@@ -8184,7 +8192,7 @@ function RentEazyAppContainer({ isPreviewVisitor = false }) {
             requireAccount={requireAccount}
             savedIds={visibleSavedIds}
             setActiveFeedTab={setActiveFeedTab}
-            setSharePost={setSharePost}
+            setSharePost={guardedShare}
             sortedPartnerOffers={sortedPartnerOffers}
             usageLimit={visibleUsageLimit}
             visibleFeedItems={visibleFeedItems}
@@ -8252,7 +8260,7 @@ function RentEazyAppContainer({ isPreviewVisitor = false }) {
               profile={visibleProfile}
               savedIds={visibleSavedIds}
               setSelectedFeedViewerIndex={setSelectedFeedViewerIndex}
-              setSharePost={setSharePost}
+              setSharePost={guardedShare}
             />
           )}
 
@@ -8280,7 +8288,7 @@ function RentEazyAppContainer({ isPreviewVisitor = false }) {
               setAnswers={isPreviewVisitor ? () => requireAccount('profile') : setAnswers}
               setProfile={isPreviewVisitor ? () => requireAccount('profile') : setProfile}
               setSelectedFeedViewerIndex={setSelectedFeedViewerIndex}
-              setSharePost={setSharePost}
+              setSharePost={guardedShare}
             />
           )}
 
@@ -8293,8 +8301,8 @@ function RentEazyAppContainer({ isPreviewVisitor = false }) {
           <aside className="sticky top-5 hidden space-y-4 lg:block">
             <DailySwipePanel usageLimit={visibleUsageLimit} onBuyMore={guardedOpenOffer} />
             <ProfileStrengthCard profile={visibleProfile} answers={visibleAnswers} />
-            <UsefulNotificationsPanel notifications={visibleNotifications} onMarkRead={markNotificationRead} />
-            <RecommendationLoopPanel insights={activeRecommendationInsights} onOpenOffer={openRecommendedOffer} />
+            <UsefulNotificationsPanel notifications={visibleNotifications} onMarkRead={guardedMarkNotificationRead} />
+            <RecommendationLoopPanel insights={activeRecommendationInsights} onOpenOffer={guardedOpenRecommendedOffer} />
             <MiniShopPanel onSelectProduct={guardedOpenOffer} compact />
           </aside>
         )}
@@ -8302,8 +8310,8 @@ function RentEazyAppContainer({ isPreviewVisitor = false }) {
         {routeTab === 'Profile' && <aside className="hidden space-y-4 lg:block">
           <DailySwipePanel usageLimit={visibleUsageLimit} onBuyMore={guardedOpenOffer} />
           <ProfileStrengthCard profile={visibleProfile} answers={visibleAnswers} />
-          <UsefulNotificationsPanel notifications={visibleNotifications} onMarkRead={markNotificationRead} />
-          <RecommendationLoopPanel insights={activeRecommendationInsights} onOpenOffer={openRecommendedOffer} />
+          <UsefulNotificationsPanel notifications={visibleNotifications} onMarkRead={guardedMarkNotificationRead} />
+          <RecommendationLoopPanel insights={activeRecommendationInsights} onOpenOffer={guardedOpenRecommendedOffer} />
           <MiniShopPanel onSelectProduct={guardedOpenOffer} compact />
         </aside>}
 
@@ -8326,7 +8334,7 @@ function RentEazyAppContainer({ isPreviewVisitor = false }) {
             notifications={visibleNotifications}
             markNotificationRead={guardedMarkNotificationRead}
             activeRecommendationInsights={activeRecommendationInsights}
-            openRecommendedOffer={openRecommendedOffer}
+            openRecommendedOffer={guardedOpenRecommendedOffer}
             referrals={visibleReferrals}
             createReferral={guardedCreateReferral}
             residentProfiles={visibleResidentProfiles}
