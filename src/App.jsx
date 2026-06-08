@@ -5723,6 +5723,7 @@ function AppHeroPanel({ profile, usageLimit, posts, shares, onPost }) {
 function MarketCommandPanel({ profile, usageLimit, posts, shares, answers, onSelectTab }) {
   const remaining = Math.max(0, usageLimit.allowance - usageLimit.used);
   const match = getMatchSummary(profile, answers);
+  const ownPostCount = posts.filter((post) => post.authorId === profile.id || post.authorName === profile.name).length;
   const quickLanes = [
     ['Properties', 'Homes, rooms, stays'],
     ['Looking', 'Demand and briefs'],
@@ -5744,7 +5745,7 @@ function MarketCommandPanel({ profile, usageLimit, posts, shares, answers, onSel
         <div className="grid grid-cols-3 gap-2 text-center">
           {[
             [remaining, 'Swipes'],
-            [posts.length, 'Posts'],
+            [ownPostCount, 'Posts'],
             [shares.length, 'Shares'],
           ].map(([value, label]) => (
             <div key={label} className="rounded-2xl bg-slate-50 px-3 py-3">
@@ -7064,6 +7065,7 @@ function AppSupportSidebar({
   feedAds,
   openUpsell,
 }) {
+  const ownPostCount = posts.filter((post) => post.authorId === profile.id || post.authorName === profile.name).length;
   return (
     <aside className="sticky top-5 hidden max-h-[calc(100vh-2.5rem)] space-y-3 overflow-y-auto pr-1 lg:block [scrollbar-width:none]">
       <div className="rounded-[1.75rem] bg-[#092243] p-5 text-white shadow-[0_26px_70px_-48px_rgba(9,34,67,0.82)]">
@@ -7076,7 +7078,7 @@ function AppSupportSidebar({
         </div>
         <div className="mt-4 grid grid-cols-2 gap-2 text-sm">
           {[
-            [posts.length, 'Posts'],
+            [ownPostCount, 'Posts'],
             [shares.length, 'Shares'],
             [savedIds.length, 'Saves'],
             [reports.length, 'Reports'],
