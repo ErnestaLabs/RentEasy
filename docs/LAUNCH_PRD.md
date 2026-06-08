@@ -12,6 +12,7 @@ Ship the app experience, not another landing-page pass. Claude owns presentation
 - Feed and Swipe must feel like the product core: social discovery plus focused matching, not admin dashboards.
 - No public UI exposes internal terms such as upsell, placeholder, Mastodon, Duolicious, Postiz, Fediverse, ActivityPub, or fake member states.
 - Billing and paid visibility stay separate from trust. Paid reach never implies better reputation.
+- Pre-deploy readiness can be run with `npm run launch:doctor -- --require-build`.
 - Production smoke can be run with `RENTEAZY_APP_URL=<frontend> RENTEAZY_API_URL=<api> npm run launch:smoke`.
 - Build, tests, and server typecheck must pass before launch handoff.
 
@@ -56,5 +57,6 @@ Ship the app experience, not another landing-page pass. Claude owns presentation
 - `/app/profile` does not show a hardcoded member identity to anonymous visitors.
 - `/app/likes` has no horizontal clipping at 440px.
 - `/app/billing` uses product language, not internal monetization language.
+- `npm run launch:doctor -- --require-build` passes before deployment.
 - `RENTEAZY_APP_URL=<frontend> RENTEAZY_API_URL=<api> npm run launch:smoke` passes against the deployed app/API.
 - Tests, server typecheck, and build pass.

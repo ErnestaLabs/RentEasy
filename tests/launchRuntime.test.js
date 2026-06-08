@@ -6,6 +6,7 @@ describe('launch runtime contract', () => {
     const pkg = JSON.parse(await readFile('package.json', 'utf8'));
 
     expect(pkg.scripts.start).toBe('node server/index.js');
+    expect(pkg.scripts['launch:doctor']).toBe('node scripts/launch-doctor.mjs');
     expect(pkg.scripts['launch:smoke']).toBe('node scripts/launch-smoke.mjs');
   });
 
@@ -41,5 +42,15 @@ describe('launch runtime contract', () => {
     expect(smoke).toContain('/api/bootstrap');
     expect(smoke).toContain('/app/feed');
     expect(smoke).toContain('static host api guard');
+  });
+
+  it('ships a pre-deploy doctor for local launch readiness checks', async () => {
+    const doctor = await readFile('scripts/launch-doctor.mjs', 'utf8');
+
+    expect(doctor).toContain('require-build');
+    expect(doctor).toContain('require-production-env');
+    expect(doctor).toContain('Netlify static host cannot swallow API calls');
+    expect(doctor).toContain('production build artifacts exist');
+    expect(doctor).toContain('source launch language stays clean');
   });
 });
