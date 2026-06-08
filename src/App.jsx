@@ -288,6 +288,7 @@ const demoCardData = [
 const heroSwipeCards = demoCardData.map(([id, type, title, location, price, matchScore, availability, detailLine, badges], index) => {
   const [from, to, icon] = demoVisuals[index % demoVisuals.length];
   const gallery = buildConsistentGallery(type, index);
+  const peopleCard = ['tenant', 'buddy', 'operator', 'investor', 'landlord'].includes(type);
   return {
     id,
     type,
@@ -301,7 +302,7 @@ const heroSwipeCards = demoCardData.map(([id, type, title, location, price, matc
     gallery,
     imageSrc: gallery[0],
     imageAlt: `${title} swipe card`,
-    imagePosition: 'center',
+    imagePosition: peopleCard ? 'center center' : 'center 68%',
     visual: { from, to, icon, index },
   };
 });
@@ -4622,7 +4623,7 @@ function LikesSocialInbox({ posts, likedIds, savedIds, matches, matchMessages, p
 
   return (
     <section className="max-w-full overflow-hidden rounded-[2rem] border border-white bg-white shadow-[0_24px_70px_-50px_rgba(15,23,42,0.62)]">
-      <div className="flex items-center gap-3 border-b border-slate-100 p-4 sm:p-5">
+      <div className="grid grid-cols-[auto_minmax(0,1fr)] gap-3 border-b border-slate-100 p-4 sm:flex sm:items-center sm:p-5">
         <PeepAvatar
           seed={`${profile.id}-${profile.name}-${profile.role}`}
           variant={profile.avatarVariant || 'standing'}
@@ -4632,11 +4633,11 @@ function LikesSocialInbox({ posts, likedIds, savedIds, matches, matchMessages, p
           ring="ring-1 ring-slate-200"
           imageClassName={(profile.avatarVariant || 'standing') === 'bust' ? '' : 'object-contain p-1'}
         />
-        <div className="min-w-0 flex-1">
+        <div className="min-w-0">
           <h1 className="font-['Bricolage_Grotesque_Variable',Inter,sans-serif] text-2xl font-normal tracking-tight text-slate-950">Likes</h1>
           <p className="truncate text-sm text-slate-500">Matches, saved posts, and useful threads in one place.</p>
         </div>
-        <button type="button" onClick={() => onSelectProduct('reveal-like-1')} className="shrink-0 rounded-full bg-[#092243] px-3 py-2 text-xs font-semibold text-white sm:px-4 sm:text-sm">Unlock</button>
+        <button type="button" onClick={() => onSelectProduct('reveal-like-1')} className="col-span-2 w-full rounded-full bg-[#092243] px-3 py-2 text-xs font-semibold text-white sm:col-span-1 sm:w-auto sm:shrink-0 sm:px-4 sm:text-sm">Unlock</button>
       </div>
 
       <div className="p-4 sm:p-5">
@@ -4644,7 +4645,7 @@ function LikesSocialInbox({ posts, likedIds, savedIds, matches, matchMessages, p
           <Search className="h-4 w-4" />
           <span className="min-w-0 truncate">Search matches, saved posts, people</span>
         </div>
-        <div className="mt-3 flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none]">
+        <div className="mt-3 flex flex-wrap gap-2 pb-1">
           {['All', 'Matches', 'Liked', 'Saved', 'Viewing'].map((chip, index) => (
             <button key={chip} type="button" className={`shrink-0 rounded-full px-4 py-2 text-sm font-semibold ${index === 0 ? 'bg-[#092243] text-white' : 'bg-[#f3f6f8] text-slate-600'}`}>{chip}</button>
           ))}
@@ -6418,14 +6419,39 @@ function FeedPreviewBanner({ onSignup }) {
 }
 
 function PreviewRouteGate({ action = 'continue', title, body }) {
+  const highlightsByAction = {
+    post: [
+      ['Media-ready', 'Add photos or videos to listings, rooms, stays, deals, and updates.'],
+      ['Share Everywhere', 'Generate a caption, tracking link, copy action, and share reward.'],
+      ['Real traction', 'See views, likes, saves, comments, shares, and labelled boosts.'],
+    ],
+    continue: [
+      ['Free preview', 'Browse the Feed and Swipe before creating an account.'],
+      ['Account actions', 'Like, save, post, match, message, and report after signup.'],
+      ['No fake stats', 'Your own profile and activity starts when you create an account.'],
+    ],
+  };
+  const highlights = highlightsByAction[action] || highlightsByAction.continue;
+
   return (
-    <div className="mx-auto grid min-h-[calc(100vh-10rem)] max-w-xl place-items-center px-4">
+    <div className="mx-auto grid min-h-[calc(100vh-9rem)] max-w-xl content-center gap-4 px-4 py-8">
       <section className="overflow-hidden rounded-[2rem] bg-white shadow-[0_24px_70px_-50px_rgba(15,23,42,0.62)] ring-1 ring-white">
-        <div className="bg-[#092243] p-6 text-white">
+        <div className="bg-linear-to-br from-[#092243] via-[#0d2e57] to-[#06182f] p-6 text-white">
           <p className="text-xs font-bold uppercase tracking-[0.14em] text-white/46">RentEazy preview</p>
           <h1 className="mt-2 text-3xl font-bold tracking-tight">{title}</h1>
+          <div className="mt-5 rounded-[1.35rem] bg-white/10 p-3 ring-1 ring-white/12">
+            <div className="rounded-[1rem] bg-white p-3 text-[#092243]">
+              <p className="text-xs font-bold uppercase tracking-[0.12em] text-[#2f7d32]">Post to Feed</p>
+              <p className="mt-1 text-sm font-semibold">Listings, questions, rooms, deals, stays, and updates</p>
+            </div>
+            <div className="mt-2 grid grid-cols-3 gap-2 text-center text-[0.68rem] font-bold text-white/76">
+              <span className="rounded-full bg-white/10 py-2">Photos</span>
+              <span className="rounded-full bg-white/10 py-2">Videos</span>
+              <span className="rounded-full bg-white/10 py-2">Share</span>
+            </div>
+          </div>
         </div>
-        <div className="p-6">
+        <div className="p-6 pt-5">
           <p className="text-sm leading-7 text-slate-600">{body}</p>
           <SignupAction className="mt-5 inline-flex w-full items-center justify-center rounded-full bg-[#2f7d32] px-5 py-3 text-sm font-bold text-white">
             Create free account
@@ -6433,6 +6459,14 @@ function PreviewRouteGate({ action = 'continue', title, body }) {
           <a href="/app/feed" className="mt-2 inline-flex w-full items-center justify-center rounded-full bg-slate-100 px-5 py-3 text-sm font-bold text-slate-700">
             Back to preview Feed
           </a>
+          <div className="mt-5 space-y-2">
+            {highlights.map(([label, text]) => (
+              <div key={label} className="rounded-[1.15rem] bg-[#f3f7f4] p-3 ring-1 ring-[#d5ecd7]">
+                <p className="text-sm font-bold text-[#092243]">{label}</p>
+                <p className="mt-1 text-xs leading-5 text-slate-600">{text}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
     </div>
@@ -6640,7 +6674,7 @@ function BillingPanel({ onSelectProduct, purchases, boosts, wallet }) {
     <div className="space-y-5">
       <section className="overflow-hidden rounded-[2rem] bg-[#092243] p-6 text-white shadow-[0_28px_70px_-46px_rgba(9,34,67,0.95)]">
         <p className="font-['JetBrains_Mono',monospace] text-xs text-[#8fd0ff]">BILLING</p>
-        <h1 className="mt-3 font-['Bricolage_Grotesque_Variable',Inter,sans-serif] text-4xl font-normal leading-[0.98] tracking-tight">Plans, boosts, credits, and Protect.</h1>
+        <h1 className="mt-3 max-w-full break-words font-['Bricolage_Grotesque_Variable',Inter,sans-serif] text-[2rem] font-normal leading-[1.04] tracking-tight sm:text-4xl">Plans, boosts, credits, and Protect.</h1>
         <p className="mt-4 max-w-2xl text-sm leading-7 text-white/68">Start free, keep useful activity flowing, and upgrade only when you want less friction or labelled business reach. Paid visibility never replaces suitability or trust.</p>
         <div className="mt-5 grid gap-2 sm:grid-cols-3">
           {[
